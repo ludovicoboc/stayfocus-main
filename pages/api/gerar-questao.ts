@@ -21,7 +21,10 @@ interface GerarQuestaoRequest {
 import fetch from 'node-fetch';
 
 // Chave e modelo Perplexity
-const PPLX_API_KEY = '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';
+const PPLX_API_KEY = process.env.PPLX_API_KEY;
+if (!PPLX_API_KEY) {
+  throw new Error('A variável de ambiente PPLX_API_KEY não está definida.');
+}
 const PPLX_MODEL = 'sonar-pro';
 
 // Chamada real à Perplexity API
