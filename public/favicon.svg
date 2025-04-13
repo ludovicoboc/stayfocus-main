@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="infinityGradient" x1="10%" y1="10%" x2="90%" y2="90%">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#000000" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(0, 50)">
+    <path d="M400,300 
+           C340,230 220,280 220,350 
+           C220,420 340,470 400,400 
+           C460,470 580,420 580,350 
+           C580,280 460,230 400,300 Z" 
+          fill="url(#infinityGradient)" 
+          stroke-width="20"
+          style="stroke-linecap: round; stroke-linejoin: round;" />
+  </g>
+</svg>
