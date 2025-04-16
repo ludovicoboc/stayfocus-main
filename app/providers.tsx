@@ -2,11 +2,16 @@
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { type ThemeProviderProps } from 'next-themes/dist/types'
+import { DbProvider } from './lib/db-context'
 
-export function Providers({ children, ...props }: ThemeProviderProps) {
+type ProvidersProps = ThemeProviderProps
+
+export function Providers({ children, ...props }: ProvidersProps) {
   return (
     <NextThemesProvider attribute="class" defaultTheme="system" enableSystem {...props}>
-      {children}
+      <DbProvider>
+        {children}
+      </DbProvider>
     </NextThemesProvider>
   )
 }

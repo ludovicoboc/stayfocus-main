@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Modelo de Usuário/Perfil
+model Usuario {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  nome               String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Preferências visuais
+  altoContraste      Boolean  @default(false)
+  reducaoEstimulos   Boolean  @default(false)
+  textoGrande        Boolean  @default(false)
+  
+  // Metas diárias
+  metaHorasSono      Int      @default(8)
+  metaTarefasPrioritarias Int @default(3)
+  metaCoposAgua      Int      @default(8)
+  metaPausasProgramadas Int   @default(4)
+  
+  // Configurações
+  notificacoesAtivas Boolean  @default(true)
+  pausasAtivas       Boolean  @default(true)
+
+  // Relações
+  refeicoes          Refeicao[]
+  registrosRefeicao  RegistroRefeicao[]
+  registrosSono      RegistroSono[]
+  lembretesSono      LembreteSono[]
+  receitas           Receita[]
+  receitasFavoritas  ReceitaFavorita[]
+}
+
+// Modelos de Alimentação
+model Refeicao {
+  id        String   @id @default(uuid())
+  horario   String
+  descricao String
+  
+  // Relações
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  @@index([usuarioId])
+}
+
+model RegistroRefeicao {
+  id        String   @id @default(uuid())
+  data      DateTime
+  horario   String
+  descricao String
+  tipoIcone String?
+  foto      String?
+  
+  // Relações
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  @@index([usuarioId])
+  @@index([data])
+}
+
+model RegistroHidratacao {
+  id        String   @id @default(uuid())
+  data      DateTime @default(now())
+  horario   String
+  quantidade Int
+  
+  // Relações
+  usuarioId String
+  
+  @@index([usuarioId])
+  @@index([data])
+}
+
+// Modelos de Sono
+model RegistroSono {
+  id        String   @id @default(uuid())
+  inicio    DateTime
+  fim       DateTime?
+  qualidade Int?
+  notas     String?
+  
+  // Relações
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  @@index([usuarioId])
+  @@index([inicio])
+}
+
+model LembreteSono {
+  id         String   @id @default(uuid())
+  tipo       String   // 'dormir' ou 'acordar'
+  horario    String
+  diasSemana Int[]
+  ativo      Boolean  @default(true)
+  
+  // Relações
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  @@index([usuarioId])
+}
+
+// Modelos de Receitas
+model Receita {
+  id           String   @id @default(uuid())
+  nome         String
+  descricao    String
+  categorias   String[]
+  tags         String[]
+  tempoPreparo Int
+  porcoes      Int
+  calorias     String
+  imagem       String?
+  
+  // Relações
+  usuarioId    String
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  ingredientes Ingrediente[]
+  passos       PassoReceita[]
+  favoritos    ReceitaFavorita[]
+  
+  @@index([usuarioId])
+}
+
+model Ingrediente {
+  id        String   @id @default(uuid())
+  nome      String
+  quantidade Float
+  unidade    String
+  
+  // Relações
+  receitaId String
+  receita   Receita  @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  
+  @@index([receitaId])
+}
+
+model PassoReceita {
+  id        String   @id @default(uuid())
+  ordem     Int
+  descricao String
+  
+  // Relações
+  receitaId String
+  receita   Receita  @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  
+  @@index([receitaId])
+}
+
+model ReceitaFavorita {
+  id        String   @id @default(uuid())
+  
+  // Relações
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  receitaId String
+  receita   Receita  @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  
+  @@unique([usuarioId, receitaId])
+  @@index([usuarioId])
+  @@index([receitaId])
+}
