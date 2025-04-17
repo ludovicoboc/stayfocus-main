@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@prisma/client": "^6.6.0",
+    "@supabase/supabase-js": "^2.49.4",
     "@types/node-fetch": "^2.6.12",
     "@types/stream-buffers": "^3.0.7",
     "@vercel/speed-insights": "^1.2.0",

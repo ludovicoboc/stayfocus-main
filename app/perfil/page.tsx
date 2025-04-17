@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePerfilStore } from '../stores/perfilStore'
+import { useRouter } from 'next/navigation' // Importar useRouter
+import { useAuth } from '../lib/authContext' // Importar useAuth
+import { usePerfilStore } from '../stores/perfilStore' // Manter por enquanto, será removido na Fase 2
 import { InformacoesPessoais } from '../components/perfil/InformacoesPessoais'
 import { MetasDiarias } from '../components/perfil/MetasDiarias'
 import { PreferenciasVisuais } from '../components/perfil/PreferenciasVisuais'
@@ -9,9 +11,18 @@ import { ExportarImportarDados } from '../components/ExportarImportarDados'
 import { RefreshCw, User } from 'lucide-react'
 
 export default function PerfilPage() {
-  const { resetarPerfil, preferenciasVisuais } = usePerfilStore()
+  const router = useRouter()
+  const { user, loading: authLoading, session } = useAuth() // Usar useAuth
+  const { resetarPerfil, preferenciasVisuais } = usePerfilStore() // Manter por enquanto
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
-  
+
+  useEffect(() => {
+    // Redireciona se não estiver logado após a verificação inicial
+    if (!authLoading && !user) {
+      router.replace('/auth/login') // Use replace para não adicionar ao histórico
+    }
+  }, [user, authLoading, router])
+
   // Aplicar classes de acessibilidade ao carregar a página
   useEffect(() => {
     if (preferenciasVisuais.altoContraste) {
@@ -37,8 +48,21 @@ export default function PerfilPage() {
     setResetConfirmOpen(false)
   }
 
+  // Exibe estado de carregamento ou nada enquanto verifica a autenticação
+  if (authLoading || !user) {
+    // TODO: Adicionar um componente de Skeleton ou Spinner mais elegante
+    return (
+        <div className="flex min-h-screen items-center justify-center">
+            Carregando perfil...
+        </div>
+    );
+  }
+
+  // Renderiza a página apenas se o usuário estiver autenticado
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8">
+      {/* Adiciona saudação com email do usuário */}
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Logado como: {user.email}</p>
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center">
           <div className="h-12 w-12 rounded-full bg-perfil-primary flex items-center justify-center text-white text-xl font-bold mr-4">

@@ -1,12 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/lib/prisma"
+  output   = "../app/lib/prisma" // Adicionar o caminho de saída novamente
 }
 
 datasource db {
@@ -15,45 +9,33 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Modelo de Usuário/Perfil
 model Usuario {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  nome      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Preferências visuais
-  altoContraste    Boolean @default(false)
-  reducaoEstimulos Boolean @default(false)
-  textoGrande      Boolean @default(false)
-
-  // Metas diárias
-  metaHorasSono           Int @default(8)
-  metaTarefasPrioritarias Int @default(3)
-  metaCoposAgua           Int @default(8)
-  metaPausasProgramadas   Int @default(4)
-
-  // Configurações
-  notificacoesAtivas Boolean @default(true)
-  pausasAtivas       Boolean @default(true)
-
-  // Relações
-  refeicoes         Refeicao[]
-  registrosRefeicao RegistroRefeicao[]
-  registrosSono     RegistroSono[]
-  lembretesSono     LembreteSono[]
-  receitas          Receita[]
-  receitasFavoritas ReceitaFavorita[]
+  id                      String             @id @default(uuid())
+  email                   String             @unique
+  nome                    String
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  altoContraste           Boolean            @default(false)
+  reducaoEstimulos        Boolean            @default(false)
+  textoGrande             Boolean            @default(false)
+  metaHorasSono           Int                @default(8)
+  metaTarefasPrioritarias Int                @default(3)
+  metaCoposAgua           Int                @default(8)
+  metaPausasProgramadas   Int                @default(4)
+  notificacoesAtivas      Boolean            @default(true)
+  pausasAtivas            Boolean            @default(true)
+  lembretesSono           LembreteSono[]
+  receitas                Receita[]
+  receitasFavoritas       ReceitaFavorita[]
+  refeicoes               Refeicao[]
+  registrosRefeicao       RegistroRefeicao[]
+  registrosSono           RegistroSono[]
 }
 
-// Modelos de Alimentação
 model Refeicao {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   horario   String
   descricao String
-
-  // Relações
   usuarioId String
   usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
@@ -67,10 +49,8 @@ model RegistroRefeicao {
   descricao String
   tipoIcone String?
   foto      String?
-
-  // Relações
   usuarioId String
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
   @@index([data])
@@ -81,25 +61,20 @@ model RegistroHidratacao {
   data       DateTime @default(now())
   horario    String
   quantidade Int
-
-  // Relações
-  usuarioId String
+  usuarioId  String
 
   @@index([usuarioId])
   @@index([data])
 }
 
-// Modelos de Sono
 model RegistroSono {
   id        String    @id @default(uuid())
   inicio    DateTime
   fim       DateTime?
   qualidade Int?
   notas     String?
-
-  // Relações
   usuarioId String
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
   @@index([inicio])
@@ -107,21 +82,18 @@ model RegistroSono {
 
 model LembreteSono {
   id         String  @id @default(uuid())
-  tipo       String // 'dormir' ou 'acordar'
+  tipo       String
   horario    String
   diasSemana Int[]
   ativo      Boolean @default(true)
-
-  // Relações
-  usuarioId String
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId  String
+  usuario    Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
 }
 
-// Modelos de Receitas
 model Receita {
-  id           String   @id @default(uuid())
+  id           String            @id @default(uuid())
   nome         String
   descricao    String
   categorias   String[]
@@ -130,36 +102,30 @@ model Receita {
   porcoes      Int
   calorias     String
   imagem       String?
-
-  // Relações
   usuarioId    String
-  usuario      Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   ingredientes Ingrediente[]
   passos       PassoReceita[]
+  usuario      Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   favoritos    ReceitaFavorita[]
 
   @@index([usuarioId])
 }
 
 model Ingrediente {
-  id         String @id @default(uuid())
+  id         String  @id @default(uuid())
   nome       String
   quantidade Float
   unidade    String
-
-  // Relações
-  receitaId String
-  receita   Receita @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  receitaId  String
+  receita    Receita @relation(fields: [receitaId], references: [id], onDelete: Cascade)
 
   @@index([receitaId])
 }
 
 model PassoReceita {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   ordem     Int
   descricao String
-
-  // Relações
   receitaId String
   receita   Receita @relation(fields: [receitaId], references: [id], onDelete: Cascade)
 
@@ -167,13 +133,11 @@ model PassoReceita {
 }
 
 model ReceitaFavorita {
-  id String @id @default(uuid())
-
-  // Relações
+  id        String  @id @default(uuid())
   usuarioId String
-  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   receitaId String
   receita   Receita @relation(fields: [receitaId], references: [id], onDelete: Cascade)
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([usuarioId, receitaId])
   @@index([usuarioId])

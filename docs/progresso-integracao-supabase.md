@@ -80,3 +80,49 @@ Este documento registra o progresso cronológico da integração do StayFocus co
 - Desenvolver um plano estratégico de migração dividido em sprints
 - Melhorar a documentação técnica com diagramas de arquitetura
 - Aprimorar o código de migração com tratamento de erros robusto e logs detalhados
+
+
+## Sessão de Trabalho - 16/04/2025 (Continuação)
+
+### 8. Implementação da Autenticação (Fase 1)
+
+- **Instalação do Cliente Supabase:**
+  - Adicionada a dependência `@supabase/supabase-js` via npm.
+
+- **Criação do Cliente Supabase:**
+  - Criado `app/lib/supabaseClient.ts` para inicializar e exportar a instância do cliente Supabase, lendo as variáveis de ambiente necessárias.
+
+- **Componentes de Autenticação:**
+  - Criado `app/components/auth/LoginForm.tsx`: Formulário para login com email/senha, chamando `supabase.auth.signInWithPassword()`.
+  - Criado `app/components/auth/RegisterForm.tsx`: Formulário para registro com email/senha, chamando `supabase.auth.signUp()`.
+  - Criado `app/components/auth/LogoutButton.tsx`: Botão para desconectar o usuário, chamando `supabase.auth.signOut()`.
+
+- **Páginas de Autenticação:**
+  - Criada `app/auth/login/page.tsx` utilizando `LoginForm`.
+  - Criada `app/auth/register/page.tsx` utilizando `RegisterForm`.
+
+- **Contexto de Autenticação:**
+  - Criado `app/lib/authContext.tsx` com `AuthProvider` e hook `useAuth` para monitorar e fornecer o estado da sessão (usuário, sessão, loading) globalmente.
+  - Integrado `AuthProvider` em `app/providers.tsx` para envolver toda a aplicação.
+
+- **Criação de Perfil no Registro:**
+  - Modificado `RegisterForm.tsx` para, após o `signUp` bem-sucedido, chamar `usuarioService.criar` para criar uma entrada correspondente na tabela `Usuario` do banco de dados.
+
+- **Proteção de Rota Básica:**
+  - Modificada a página `app/perfil/page.tsx` para usar `useAuth` e redirecionar para `/auth/login` se o usuário não estiver autenticado.
+
+### 9. Conexão do Módulo de Perfil (Fase 2)
+
+- **Objetivo:** Adaptar os componentes do perfil para usar o banco de dados via `usuarioService` e `AuthContext`, removendo a dependência da `usePerfilStore`.
+
+- **Componentes Adaptados:**
+  - `app/components/perfil/InformacoesPessoais.tsx`: Modificado para buscar/salvar o nome do usuário no banco de dados.
+  - `app/components/perfil/PreferenciasVisuais.tsx`: Modificado para buscar/salvar as preferências visuais e gerais no banco de dados. Código duplicado removido.
+  - `app/components/perfil/MetasDiarias.tsx`: Modificado para buscar/salvar as metas diárias no banco de dados.
+
+### 10. Próximos Passos Imediatos (Revisão)
+
+- Conectar outros módulos (Sono, Alimentação, etc.) ao banco de dados, seguindo a abordagem de substituir as stores Zustand ou implementar sincronização.
+- Refinar a implementação da autenticação (ex: recuperação de senha, confirmação de email se habilitada no Supabase).
+- Implementar tratamento de erros mais robusto e feedback visual para o usuário.
+- Adicionar testes automatizados para os serviços e componentes.

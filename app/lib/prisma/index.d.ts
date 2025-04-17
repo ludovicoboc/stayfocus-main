@@ -1688,21 +1688,21 @@ export namespace Prisma {
    */
 
   export type UsuarioCountOutputType = {
-    refeicoes: number
-    registrosRefeicao: number
-    registrosSono: number
     lembretesSono: number
     receitas: number
     receitasFavoritas: number
+    refeicoes: number
+    registrosRefeicao: number
+    registrosSono: number
   }
 
   export type UsuarioCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    refeicoes?: boolean | UsuarioCountOutputTypeCountRefeicoesArgs
-    registrosRefeicao?: boolean | UsuarioCountOutputTypeCountRegistrosRefeicaoArgs
-    registrosSono?: boolean | UsuarioCountOutputTypeCountRegistrosSonoArgs
     lembretesSono?: boolean | UsuarioCountOutputTypeCountLembretesSonoArgs
     receitas?: boolean | UsuarioCountOutputTypeCountReceitasArgs
     receitasFavoritas?: boolean | UsuarioCountOutputTypeCountReceitasFavoritasArgs
+    refeicoes?: boolean | UsuarioCountOutputTypeCountRefeicoesArgs
+    registrosRefeicao?: boolean | UsuarioCountOutputTypeCountRegistrosRefeicaoArgs
+    registrosSono?: boolean | UsuarioCountOutputTypeCountRegistrosSonoArgs
   }
 
   // Custom InputTypes
@@ -1714,27 +1714,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the UsuarioCountOutputType
      */
     select?: UsuarioCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UsuarioCountOutputType without action
-   */
-  export type UsuarioCountOutputTypeCountRefeicoesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RefeicaoWhereInput
-  }
-
-  /**
-   * UsuarioCountOutputType without action
-   */
-  export type UsuarioCountOutputTypeCountRegistrosRefeicaoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RegistroRefeicaoWhereInput
-  }
-
-  /**
-   * UsuarioCountOutputType without action
-   */
-  export type UsuarioCountOutputTypeCountRegistrosSonoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: RegistroSonoWhereInput
   }
 
   /**
@@ -1756,6 +1735,27 @@ export namespace Prisma {
    */
   export type UsuarioCountOutputTypeCountReceitasFavoritasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReceitaFavoritaWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountRefeicoesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RefeicaoWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountRegistrosRefeicaoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RegistroRefeicaoWhereInput
+  }
+
+  /**
+   * UsuarioCountOutputType without action
+   */
+  export type UsuarioCountOutputTypeCountRegistrosSonoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RegistroSonoWhereInput
   }
 
 
@@ -2094,12 +2094,12 @@ export namespace Prisma {
     metaPausasProgramadas?: boolean
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: boolean | Usuario$refeicoesArgs<ExtArgs>
-    registrosRefeicao?: boolean | Usuario$registrosRefeicaoArgs<ExtArgs>
-    registrosSono?: boolean | Usuario$registrosSonoArgs<ExtArgs>
     lembretesSono?: boolean | Usuario$lembretesSonoArgs<ExtArgs>
     receitas?: boolean | Usuario$receitasArgs<ExtArgs>
     receitasFavoritas?: boolean | Usuario$receitasFavoritasArgs<ExtArgs>
+    refeicoes?: boolean | Usuario$refeicoesArgs<ExtArgs>
+    registrosRefeicao?: boolean | Usuario$registrosRefeicaoArgs<ExtArgs>
+    registrosSono?: boolean | Usuario$registrosSonoArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["usuario"]>
 
@@ -2156,12 +2156,12 @@ export namespace Prisma {
 
   export type UsuarioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nome" | "createdAt" | "updatedAt" | "altoContraste" | "reducaoEstimulos" | "textoGrande" | "metaHorasSono" | "metaTarefasPrioritarias" | "metaCoposAgua" | "metaPausasProgramadas" | "notificacoesAtivas" | "pausasAtivas", ExtArgs["result"]["usuario"]>
   export type UsuarioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    refeicoes?: boolean | Usuario$refeicoesArgs<ExtArgs>
-    registrosRefeicao?: boolean | Usuario$registrosRefeicaoArgs<ExtArgs>
-    registrosSono?: boolean | Usuario$registrosSonoArgs<ExtArgs>
     lembretesSono?: boolean | Usuario$lembretesSonoArgs<ExtArgs>
     receitas?: boolean | Usuario$receitasArgs<ExtArgs>
     receitasFavoritas?: boolean | Usuario$receitasFavoritasArgs<ExtArgs>
+    refeicoes?: boolean | Usuario$refeicoesArgs<ExtArgs>
+    registrosRefeicao?: boolean | Usuario$registrosRefeicaoArgs<ExtArgs>
+    registrosSono?: boolean | Usuario$registrosSonoArgs<ExtArgs>
     _count?: boolean | UsuarioCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UsuarioIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2170,12 +2170,12 @@ export namespace Prisma {
   export type $UsuarioPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Usuario"
     objects: {
-      refeicoes: Prisma.$RefeicaoPayload<ExtArgs>[]
-      registrosRefeicao: Prisma.$RegistroRefeicaoPayload<ExtArgs>[]
-      registrosSono: Prisma.$RegistroSonoPayload<ExtArgs>[]
       lembretesSono: Prisma.$LembreteSonoPayload<ExtArgs>[]
       receitas: Prisma.$ReceitaPayload<ExtArgs>[]
       receitasFavoritas: Prisma.$ReceitaFavoritaPayload<ExtArgs>[]
+      refeicoes: Prisma.$RefeicaoPayload<ExtArgs>[]
+      registrosRefeicao: Prisma.$RegistroRefeicaoPayload<ExtArgs>[]
+      registrosSono: Prisma.$RegistroSonoPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2586,12 +2586,12 @@ export namespace Prisma {
    */
   export interface Prisma__UsuarioClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    refeicoes<T extends Usuario$refeicoesArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$refeicoesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefeicaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    registrosRefeicao<T extends Usuario$registrosRefeicaoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$registrosRefeicaoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegistroRefeicaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    registrosSono<T extends Usuario$registrosSonoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$registrosSonoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegistroSonoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     lembretesSono<T extends Usuario$lembretesSonoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$lembretesSonoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LembreteSonoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receitas<T extends Usuario$receitasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$receitasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReceitaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     receitasFavoritas<T extends Usuario$receitasFavoritasArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$receitasFavoritasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReceitaFavoritaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    refeicoes<T extends Usuario$refeicoesArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$refeicoesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefeicaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    registrosRefeicao<T extends Usuario$registrosRefeicaoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$registrosRefeicaoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegistroRefeicaoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    registrosSono<T extends Usuario$registrosSonoArgs<ExtArgs> = {}>(args?: Subset<T, Usuario$registrosSonoArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RegistroSonoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3023,78 +3023,6 @@ export namespace Prisma {
   }
 
   /**
-   * Usuario.refeicoes
-   */
-  export type Usuario$refeicoesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Refeicao
-     */
-    select?: RefeicaoSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Refeicao
-     */
-    omit?: RefeicaoOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RefeicaoInclude<ExtArgs> | null
-    where?: RefeicaoWhereInput
-    orderBy?: RefeicaoOrderByWithRelationInput | RefeicaoOrderByWithRelationInput[]
-    cursor?: RefeicaoWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: RefeicaoScalarFieldEnum | RefeicaoScalarFieldEnum[]
-  }
-
-  /**
-   * Usuario.registrosRefeicao
-   */
-  export type Usuario$registrosRefeicaoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegistroRefeicao
-     */
-    select?: RegistroRefeicaoSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the RegistroRefeicao
-     */
-    omit?: RegistroRefeicaoOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RegistroRefeicaoInclude<ExtArgs> | null
-    where?: RegistroRefeicaoWhereInput
-    orderBy?: RegistroRefeicaoOrderByWithRelationInput | RegistroRefeicaoOrderByWithRelationInput[]
-    cursor?: RegistroRefeicaoWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: RegistroRefeicaoScalarFieldEnum | RegistroRefeicaoScalarFieldEnum[]
-  }
-
-  /**
-   * Usuario.registrosSono
-   */
-  export type Usuario$registrosSonoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegistroSono
-     */
-    select?: RegistroSonoSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the RegistroSono
-     */
-    omit?: RegistroSonoOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: RegistroSonoInclude<ExtArgs> | null
-    where?: RegistroSonoWhereInput
-    orderBy?: RegistroSonoOrderByWithRelationInput | RegistroSonoOrderByWithRelationInput[]
-    cursor?: RegistroSonoWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: RegistroSonoScalarFieldEnum | RegistroSonoScalarFieldEnum[]
-  }
-
-  /**
    * Usuario.lembretesSono
    */
   export type Usuario$lembretesSonoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3164,6 +3092,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ReceitaFavoritaScalarFieldEnum | ReceitaFavoritaScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.refeicoes
+   */
+  export type Usuario$refeicoesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Refeicao
+     */
+    select?: RefeicaoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Refeicao
+     */
+    omit?: RefeicaoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RefeicaoInclude<ExtArgs> | null
+    where?: RefeicaoWhereInput
+    orderBy?: RefeicaoOrderByWithRelationInput | RefeicaoOrderByWithRelationInput[]
+    cursor?: RefeicaoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RefeicaoScalarFieldEnum | RefeicaoScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.registrosRefeicao
+   */
+  export type Usuario$registrosRefeicaoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RegistroRefeicao
+     */
+    select?: RegistroRefeicaoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RegistroRefeicao
+     */
+    omit?: RegistroRefeicaoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegistroRefeicaoInclude<ExtArgs> | null
+    where?: RegistroRefeicaoWhereInput
+    orderBy?: RegistroRefeicaoOrderByWithRelationInput | RegistroRefeicaoOrderByWithRelationInput[]
+    cursor?: RegistroRefeicaoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RegistroRefeicaoScalarFieldEnum | RegistroRefeicaoScalarFieldEnum[]
+  }
+
+  /**
+   * Usuario.registrosSono
+   */
+  export type Usuario$registrosSonoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RegistroSono
+     */
+    select?: RegistroSonoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RegistroSono
+     */
+    omit?: RegistroSonoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RegistroSonoInclude<ExtArgs> | null
+    where?: RegistroSonoWhereInput
+    orderBy?: RegistroSonoOrderByWithRelationInput | RegistroSonoOrderByWithRelationInput[]
+    cursor?: RegistroSonoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RegistroSonoScalarFieldEnum | RegistroSonoScalarFieldEnum[]
   }
 
   /**
@@ -8783,9 +8783,9 @@ export namespace Prisma {
     calorias?: boolean
     imagem?: boolean
     usuarioId?: boolean
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     ingredientes?: boolean | Receita$ingredientesArgs<ExtArgs>
     passos?: boolean | Receita$passosArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     favoritos?: boolean | Receita$favoritosArgs<ExtArgs>
     _count?: boolean | ReceitaCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["receita"]>
@@ -8833,9 +8833,9 @@ export namespace Prisma {
 
   export type ReceitaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nome" | "descricao" | "categorias" | "tags" | "tempoPreparo" | "porcoes" | "calorias" | "imagem" | "usuarioId", ExtArgs["result"]["receita"]>
   export type ReceitaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     ingredientes?: boolean | Receita$ingredientesArgs<ExtArgs>
     passos?: boolean | Receita$passosArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     favoritos?: boolean | Receita$favoritosArgs<ExtArgs>
     _count?: boolean | ReceitaCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -8849,9 +8849,9 @@ export namespace Prisma {
   export type $ReceitaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Receita"
     objects: {
-      usuario: Prisma.$UsuarioPayload<ExtArgs>
       ingredientes: Prisma.$IngredientePayload<ExtArgs>[]
       passos: Prisma.$PassoReceitaPayload<ExtArgs>[]
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
       favoritos: Prisma.$ReceitaFavoritaPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -9259,9 +9259,9 @@ export namespace Prisma {
    */
   export interface Prisma__ReceitaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     ingredientes<T extends Receita$ingredientesArgs<ExtArgs> = {}>(args?: Subset<T, Receita$ingredientesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$IngredientePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     passos<T extends Receita$passosArgs<ExtArgs> = {}>(args?: Subset<T, Receita$passosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PassoReceitaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     favoritos<T extends Receita$favoritosArgs<ExtArgs> = {}>(args?: Subset<T, Receita$favoritosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReceitaFavoritaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -12107,24 +12107,24 @@ export namespace Prisma {
     id?: boolean
     usuarioId?: boolean
     receitaId?: boolean
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["receitaFavorita"]>
 
   export type ReceitaFavoritaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     usuarioId?: boolean
     receitaId?: boolean
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["receitaFavorita"]>
 
   export type ReceitaFavoritaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     usuarioId?: boolean
     receitaId?: boolean
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["receitaFavorita"]>
 
   export type ReceitaFavoritaSelectScalar = {
@@ -12135,23 +12135,23 @@ export namespace Prisma {
 
   export type ReceitaFavoritaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "receitaId", ExtArgs["result"]["receitaFavorita"]>
   export type ReceitaFavoritaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
   export type ReceitaFavoritaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
   export type ReceitaFavoritaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     receita?: boolean | ReceitaDefaultArgs<ExtArgs>
+    usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
   }
 
   export type $ReceitaFavoritaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ReceitaFavorita"
     objects: {
-      usuario: Prisma.$UsuarioPayload<ExtArgs>
       receita: Prisma.$ReceitaPayload<ExtArgs>
+      usuario: Prisma.$UsuarioPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -12551,8 +12551,8 @@ export namespace Prisma {
    */
   export interface Prisma__ReceitaFavoritaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     receita<T extends ReceitaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ReceitaDefaultArgs<ExtArgs>>): Prisma__ReceitaClient<$Result.GetResult<Prisma.$ReceitaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13250,12 +13250,12 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFilter<"Usuario"> | number
     notificacoesAtivas?: BoolFilter<"Usuario"> | boolean
     pausasAtivas?: BoolFilter<"Usuario"> | boolean
-    refeicoes?: RefeicaoListRelationFilter
-    registrosRefeicao?: RegistroRefeicaoListRelationFilter
-    registrosSono?: RegistroSonoListRelationFilter
     lembretesSono?: LembreteSonoListRelationFilter
     receitas?: ReceitaListRelationFilter
     receitasFavoritas?: ReceitaFavoritaListRelationFilter
+    refeicoes?: RefeicaoListRelationFilter
+    registrosRefeicao?: RegistroRefeicaoListRelationFilter
+    registrosSono?: RegistroSonoListRelationFilter
   }
 
   export type UsuarioOrderByWithRelationInput = {
@@ -13273,12 +13273,12 @@ export namespace Prisma {
     metaPausasProgramadas?: SortOrder
     notificacoesAtivas?: SortOrder
     pausasAtivas?: SortOrder
-    refeicoes?: RefeicaoOrderByRelationAggregateInput
-    registrosRefeicao?: RegistroRefeicaoOrderByRelationAggregateInput
-    registrosSono?: RegistroSonoOrderByRelationAggregateInput
     lembretesSono?: LembreteSonoOrderByRelationAggregateInput
     receitas?: ReceitaOrderByRelationAggregateInput
     receitasFavoritas?: ReceitaFavoritaOrderByRelationAggregateInput
+    refeicoes?: RefeicaoOrderByRelationAggregateInput
+    registrosRefeicao?: RegistroRefeicaoOrderByRelationAggregateInput
+    registrosSono?: RegistroSonoOrderByRelationAggregateInput
   }
 
   export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
@@ -13299,12 +13299,12 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFilter<"Usuario"> | number
     notificacoesAtivas?: BoolFilter<"Usuario"> | boolean
     pausasAtivas?: BoolFilter<"Usuario"> | boolean
-    refeicoes?: RefeicaoListRelationFilter
-    registrosRefeicao?: RegistroRefeicaoListRelationFilter
-    registrosSono?: RegistroSonoListRelationFilter
     lembretesSono?: LembreteSonoListRelationFilter
     receitas?: ReceitaListRelationFilter
     receitasFavoritas?: ReceitaFavoritaListRelationFilter
+    refeicoes?: RefeicaoListRelationFilter
+    registrosRefeicao?: RegistroRefeicaoListRelationFilter
+    registrosSono?: RegistroSonoListRelationFilter
   }, "id" | "email">
 
   export type UsuarioOrderByWithAggregationInput = {
@@ -13656,9 +13656,9 @@ export namespace Prisma {
     calorias?: StringFilter<"Receita"> | string
     imagem?: StringNullableFilter<"Receita"> | string | null
     usuarioId?: StringFilter<"Receita"> | string
-    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     ingredientes?: IngredienteListRelationFilter
     passos?: PassoReceitaListRelationFilter
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     favoritos?: ReceitaFavoritaListRelationFilter
   }
 
@@ -13673,9 +13673,9 @@ export namespace Prisma {
     calorias?: SortOrder
     imagem?: SortOrderInput | SortOrder
     usuarioId?: SortOrder
-    usuario?: UsuarioOrderByWithRelationInput
     ingredientes?: IngredienteOrderByRelationAggregateInput
     passos?: PassoReceitaOrderByRelationAggregateInput
+    usuario?: UsuarioOrderByWithRelationInput
     favoritos?: ReceitaFavoritaOrderByRelationAggregateInput
   }
 
@@ -13693,9 +13693,9 @@ export namespace Prisma {
     calorias?: StringFilter<"Receita"> | string
     imagem?: StringNullableFilter<"Receita"> | string | null
     usuarioId?: StringFilter<"Receita"> | string
-    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     ingredientes?: IngredienteListRelationFilter
     passos?: PassoReceitaListRelationFilter
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     favoritos?: ReceitaFavoritaListRelationFilter
   }, "id">
 
@@ -13849,16 +13849,16 @@ export namespace Prisma {
     id?: StringFilter<"ReceitaFavorita"> | string
     usuarioId?: StringFilter<"ReceitaFavorita"> | string
     receitaId?: StringFilter<"ReceitaFavorita"> | string
-    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     receita?: XOR<ReceitaScalarRelationFilter, ReceitaWhereInput>
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }
 
   export type ReceitaFavoritaOrderByWithRelationInput = {
     id?: SortOrder
     usuarioId?: SortOrder
     receitaId?: SortOrder
-    usuario?: UsuarioOrderByWithRelationInput
     receita?: ReceitaOrderByWithRelationInput
+    usuario?: UsuarioOrderByWithRelationInput
   }
 
   export type ReceitaFavoritaWhereUniqueInput = Prisma.AtLeast<{
@@ -13869,8 +13869,8 @@ export namespace Prisma {
     NOT?: ReceitaFavoritaWhereInput | ReceitaFavoritaWhereInput[]
     usuarioId?: StringFilter<"ReceitaFavorita"> | string
     receitaId?: StringFilter<"ReceitaFavorita"> | string
-    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     receita?: XOR<ReceitaScalarRelationFilter, ReceitaWhereInput>
+    usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
   }, "id" | "usuarioId_receitaId">
 
   export type ReceitaFavoritaOrderByWithAggregationInput = {
@@ -13906,12 +13906,12 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateInput = {
@@ -13929,12 +13929,12 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUpdateInput = {
@@ -13952,12 +13952,12 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateInput = {
@@ -13975,12 +13975,12 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateManyInput = {
@@ -14341,9 +14341,9 @@ export namespace Prisma {
     porcoes: number
     calorias: string
     imagem?: string | null
-    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     ingredientes?: IngredienteCreateNestedManyWithoutReceitaInput
     passos?: PassoReceitaCreateNestedManyWithoutReceitaInput
+    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     favoritos?: ReceitaFavoritaCreateNestedManyWithoutReceitaInput
   }
 
@@ -14373,9 +14373,9 @@ export namespace Prisma {
     porcoes?: IntFieldUpdateOperationsInput | number
     calorias?: StringFieldUpdateOperationsInput | string
     imagem?: NullableStringFieldUpdateOperationsInput | string | null
-    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     ingredientes?: IngredienteUpdateManyWithoutReceitaNestedInput
     passos?: PassoReceitaUpdateManyWithoutReceitaNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     favoritos?: ReceitaFavoritaUpdateManyWithoutReceitaNestedInput
   }
 
@@ -14538,8 +14538,8 @@ export namespace Prisma {
 
   export type ReceitaFavoritaCreateInput = {
     id?: string
-    usuario: UsuarioCreateNestedOneWithoutReceitasFavoritasInput
     receita: ReceitaCreateNestedOneWithoutFavoritosInput
+    usuario: UsuarioCreateNestedOneWithoutReceitasFavoritasInput
   }
 
   export type ReceitaFavoritaUncheckedCreateInput = {
@@ -14550,8 +14550,8 @@ export namespace Prisma {
 
   export type ReceitaFavoritaUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    usuario?: UsuarioUpdateOneRequiredWithoutReceitasFavoritasNestedInput
     receita?: ReceitaUpdateOneRequiredWithoutFavoritosNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutReceitasFavoritasNestedInput
   }
 
   export type ReceitaFavoritaUncheckedUpdateInput = {
@@ -14618,24 +14618,6 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type RefeicaoListRelationFilter = {
-    every?: RefeicaoWhereInput
-    some?: RefeicaoWhereInput
-    none?: RefeicaoWhereInput
-  }
-
-  export type RegistroRefeicaoListRelationFilter = {
-    every?: RegistroRefeicaoWhereInput
-    some?: RegistroRefeicaoWhereInput
-    none?: RegistroRefeicaoWhereInput
-  }
-
-  export type RegistroSonoListRelationFilter = {
-    every?: RegistroSonoWhereInput
-    some?: RegistroSonoWhereInput
-    none?: RegistroSonoWhereInput
-  }
-
   export type LembreteSonoListRelationFilter = {
     every?: LembreteSonoWhereInput
     some?: LembreteSonoWhereInput
@@ -14654,16 +14636,22 @@ export namespace Prisma {
     none?: ReceitaFavoritaWhereInput
   }
 
-  export type RefeicaoOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type RefeicaoListRelationFilter = {
+    every?: RefeicaoWhereInput
+    some?: RefeicaoWhereInput
+    none?: RefeicaoWhereInput
   }
 
-  export type RegistroRefeicaoOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type RegistroRefeicaoListRelationFilter = {
+    every?: RegistroRefeicaoWhereInput
+    some?: RegistroRefeicaoWhereInput
+    none?: RegistroRefeicaoWhereInput
   }
 
-  export type RegistroSonoOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type RegistroSonoListRelationFilter = {
+    every?: RegistroSonoWhereInput
+    some?: RegistroSonoWhereInput
+    none?: RegistroSonoWhereInput
   }
 
   export type LembreteSonoOrderByRelationAggregateInput = {
@@ -14675,6 +14663,18 @@ export namespace Prisma {
   }
 
   export type ReceitaFavoritaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RefeicaoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RegistroRefeicaoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type RegistroSonoOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15242,27 +15242,6 @@ export namespace Prisma {
     receitaId?: SortOrder
   }
 
-  export type RefeicaoCreateNestedManyWithoutUsuarioInput = {
-    create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
-    createMany?: RefeicaoCreateManyUsuarioInputEnvelope
-    connect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
-  }
-
-  export type RegistroRefeicaoCreateNestedManyWithoutUsuarioInput = {
-    create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
-    createMany?: RegistroRefeicaoCreateManyUsuarioInputEnvelope
-    connect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
-  }
-
-  export type RegistroSonoCreateNestedManyWithoutUsuarioInput = {
-    create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
-    createMany?: RegistroSonoCreateManyUsuarioInputEnvelope
-    connect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
-  }
-
   export type LembreteSonoCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<LembreteSonoCreateWithoutUsuarioInput, LembreteSonoUncheckedCreateWithoutUsuarioInput> | LembreteSonoCreateWithoutUsuarioInput[] | LembreteSonoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: LembreteSonoCreateOrConnectWithoutUsuarioInput | LembreteSonoCreateOrConnectWithoutUsuarioInput[]
@@ -15284,21 +15263,21 @@ export namespace Prisma {
     connect?: ReceitaFavoritaWhereUniqueInput | ReceitaFavoritaWhereUniqueInput[]
   }
 
-  export type RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput = {
+  export type RefeicaoCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
     createMany?: RefeicaoCreateManyUsuarioInputEnvelope
     connect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
   }
 
-  export type RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput = {
+  export type RegistroRefeicaoCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
     createMany?: RegistroRefeicaoCreateManyUsuarioInputEnvelope
     connect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
   }
 
-  export type RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput = {
+  export type RegistroSonoCreateNestedManyWithoutUsuarioInput = {
     create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
     createMany?: RegistroSonoCreateManyUsuarioInputEnvelope
@@ -15326,6 +15305,27 @@ export namespace Prisma {
     connect?: ReceitaFavoritaWhereUniqueInput | ReceitaFavoritaWhereUniqueInput[]
   }
 
+  export type RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: RefeicaoCreateManyUsuarioInputEnvelope
+    connect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
+  }
+
+  export type RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: RegistroRefeicaoCreateManyUsuarioInputEnvelope
+    connect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
+  }
+
+  export type RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput = {
+    create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
+    createMany?: RegistroSonoCreateManyUsuarioInputEnvelope
+    connect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -15344,48 +15344,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type RefeicaoUpdateManyWithoutUsuarioNestedInput = {
-    create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
-    upsert?: RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
-    createMany?: RefeicaoCreateManyUsuarioInputEnvelope
-    set?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
-    disconnect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
-    delete?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
-    connect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
-    update?: RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput | RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput[]
-    updateMany?: RefeicaoUpdateManyWithWhereWithoutUsuarioInput | RefeicaoUpdateManyWithWhereWithoutUsuarioInput[]
-    deleteMany?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
-  }
-
-  export type RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput = {
-    create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
-    upsert?: RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
-    createMany?: RegistroRefeicaoCreateManyUsuarioInputEnvelope
-    set?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
-    disconnect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
-    delete?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
-    connect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
-    update?: RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput | RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput[]
-    updateMany?: RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput | RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput[]
-    deleteMany?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
-  }
-
-  export type RegistroSonoUpdateManyWithoutUsuarioNestedInput = {
-    create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
-    connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
-    upsert?: RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput[]
-    createMany?: RegistroSonoCreateManyUsuarioInputEnvelope
-    set?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
-    disconnect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
-    delete?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
-    connect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
-    update?: RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput | RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput[]
-    updateMany?: RegistroSonoUpdateManyWithWhereWithoutUsuarioInput | RegistroSonoUpdateManyWithWhereWithoutUsuarioInput[]
-    deleteMany?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
   }
 
   export type LembreteSonoUpdateManyWithoutUsuarioNestedInput = {
@@ -15430,7 +15388,7 @@ export namespace Prisma {
     deleteMany?: ReceitaFavoritaScalarWhereInput | ReceitaFavoritaScalarWhereInput[]
   }
 
-  export type RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  export type RefeicaoUpdateManyWithoutUsuarioNestedInput = {
     create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
     upsert?: RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
@@ -15444,7 +15402,7 @@ export namespace Prisma {
     deleteMany?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
   }
 
-  export type RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  export type RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput = {
     create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
     upsert?: RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
@@ -15458,7 +15416,7 @@ export namespace Prisma {
     deleteMany?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
   }
 
-  export type RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+  export type RegistroSonoUpdateManyWithoutUsuarioNestedInput = {
     create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
     connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
     upsert?: RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput[]
@@ -15512,6 +15470,48 @@ export namespace Prisma {
     update?: ReceitaFavoritaUpdateWithWhereUniqueWithoutUsuarioInput | ReceitaFavoritaUpdateWithWhereUniqueWithoutUsuarioInput[]
     updateMany?: ReceitaFavoritaUpdateManyWithWhereWithoutUsuarioInput | ReceitaFavoritaUpdateManyWithWhereWithoutUsuarioInput[]
     deleteMany?: ReceitaFavoritaScalarWhereInput | ReceitaFavoritaScalarWhereInput[]
+  }
+
+  export type RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput> | RefeicaoCreateWithoutUsuarioInput[] | RefeicaoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RefeicaoCreateOrConnectWithoutUsuarioInput | RefeicaoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: RefeicaoCreateManyUsuarioInputEnvelope
+    set?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
+    disconnect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
+    delete?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
+    connect?: RefeicaoWhereUniqueInput | RefeicaoWhereUniqueInput[]
+    update?: RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput | RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: RefeicaoUpdateManyWithWhereWithoutUsuarioInput | RefeicaoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
+  }
+
+  export type RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput> | RegistroRefeicaoCreateWithoutUsuarioInput[] | RegistroRefeicaoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RegistroRefeicaoCreateOrConnectWithoutUsuarioInput | RegistroRefeicaoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: RegistroRefeicaoCreateManyUsuarioInputEnvelope
+    set?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
+    disconnect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
+    delete?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
+    connect?: RegistroRefeicaoWhereUniqueInput | RegistroRefeicaoWhereUniqueInput[]
+    update?: RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput | RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput | RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
+  }
+
+  export type RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput = {
+    create?: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput> | RegistroSonoCreateWithoutUsuarioInput[] | RegistroSonoUncheckedCreateWithoutUsuarioInput[]
+    connectOrCreate?: RegistroSonoCreateOrConnectWithoutUsuarioInput | RegistroSonoCreateOrConnectWithoutUsuarioInput[]
+    upsert?: RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput | RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput[]
+    createMany?: RegistroSonoCreateManyUsuarioInputEnvelope
+    set?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
+    disconnect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
+    delete?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
+    connect?: RegistroSonoWhereUniqueInput | RegistroSonoWhereUniqueInput[]
+    update?: RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput | RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput[]
+    updateMany?: RegistroSonoUpdateManyWithWhereWithoutUsuarioInput | RegistroSonoUpdateManyWithWhereWithoutUsuarioInput[]
+    deleteMany?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
   }
 
   export type UsuarioCreateNestedOneWithoutRefeicoesInput = {
@@ -15603,12 +15603,6 @@ export namespace Prisma {
     set: string[]
   }
 
-  export type UsuarioCreateNestedOneWithoutReceitasInput = {
-    create?: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
-    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasInput
-    connect?: UsuarioWhereUniqueInput
-  }
-
   export type IngredienteCreateNestedManyWithoutReceitaInput = {
     create?: XOR<IngredienteCreateWithoutReceitaInput, IngredienteUncheckedCreateWithoutReceitaInput> | IngredienteCreateWithoutReceitaInput[] | IngredienteUncheckedCreateWithoutReceitaInput[]
     connectOrCreate?: IngredienteCreateOrConnectWithoutReceitaInput | IngredienteCreateOrConnectWithoutReceitaInput[]
@@ -15621,6 +15615,12 @@ export namespace Prisma {
     connectOrCreate?: PassoReceitaCreateOrConnectWithoutReceitaInput | PassoReceitaCreateOrConnectWithoutReceitaInput[]
     createMany?: PassoReceitaCreateManyReceitaInputEnvelope
     connect?: PassoReceitaWhereUniqueInput | PassoReceitaWhereUniqueInput[]
+  }
+
+  export type UsuarioCreateNestedOneWithoutReceitasInput = {
+    create?: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasInput
+    connect?: UsuarioWhereUniqueInput
   }
 
   export type ReceitaFavoritaCreateNestedManyWithoutReceitaInput = {
@@ -15661,14 +15661,6 @@ export namespace Prisma {
     push?: string | string[]
   }
 
-  export type UsuarioUpdateOneRequiredWithoutReceitasNestedInput = {
-    create?: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
-    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasInput
-    upsert?: UsuarioUpsertWithoutReceitasInput
-    connect?: UsuarioWhereUniqueInput
-    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutReceitasInput, UsuarioUpdateWithoutReceitasInput>, UsuarioUncheckedUpdateWithoutReceitasInput>
-  }
-
   export type IngredienteUpdateManyWithoutReceitaNestedInput = {
     create?: XOR<IngredienteCreateWithoutReceitaInput, IngredienteUncheckedCreateWithoutReceitaInput> | IngredienteCreateWithoutReceitaInput[] | IngredienteUncheckedCreateWithoutReceitaInput[]
     connectOrCreate?: IngredienteCreateOrConnectWithoutReceitaInput | IngredienteCreateOrConnectWithoutReceitaInput[]
@@ -15695,6 +15687,14 @@ export namespace Prisma {
     update?: PassoReceitaUpdateWithWhereUniqueWithoutReceitaInput | PassoReceitaUpdateWithWhereUniqueWithoutReceitaInput[]
     updateMany?: PassoReceitaUpdateManyWithWhereWithoutReceitaInput | PassoReceitaUpdateManyWithWhereWithoutReceitaInput[]
     deleteMany?: PassoReceitaScalarWhereInput | PassoReceitaScalarWhereInput[]
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutReceitasNestedInput = {
+    create?: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasInput
+    upsert?: UsuarioUpsertWithoutReceitasInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutReceitasInput, UsuarioUpdateWithoutReceitasInput>, UsuarioUncheckedUpdateWithoutReceitasInput>
   }
 
   export type ReceitaFavoritaUpdateManyWithoutReceitaNestedInput = {
@@ -15789,24 +15789,16 @@ export namespace Prisma {
     update?: XOR<XOR<ReceitaUpdateToOneWithWhereWithoutPassosInput, ReceitaUpdateWithoutPassosInput>, ReceitaUncheckedUpdateWithoutPassosInput>
   }
 
-  export type UsuarioCreateNestedOneWithoutReceitasFavoritasInput = {
-    create?: XOR<UsuarioCreateWithoutReceitasFavoritasInput, UsuarioUncheckedCreateWithoutReceitasFavoritasInput>
-    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasFavoritasInput
-    connect?: UsuarioWhereUniqueInput
-  }
-
   export type ReceitaCreateNestedOneWithoutFavoritosInput = {
     create?: XOR<ReceitaCreateWithoutFavoritosInput, ReceitaUncheckedCreateWithoutFavoritosInput>
     connectOrCreate?: ReceitaCreateOrConnectWithoutFavoritosInput
     connect?: ReceitaWhereUniqueInput
   }
 
-  export type UsuarioUpdateOneRequiredWithoutReceitasFavoritasNestedInput = {
+  export type UsuarioCreateNestedOneWithoutReceitasFavoritasInput = {
     create?: XOR<UsuarioCreateWithoutReceitasFavoritasInput, UsuarioUncheckedCreateWithoutReceitasFavoritasInput>
     connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasFavoritasInput
-    upsert?: UsuarioUpsertWithoutReceitasFavoritasInput
     connect?: UsuarioWhereUniqueInput
-    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutReceitasFavoritasInput, UsuarioUpdateWithoutReceitasFavoritasInput>, UsuarioUncheckedUpdateWithoutReceitasFavoritasInput>
   }
 
   export type ReceitaUpdateOneRequiredWithoutFavoritosNestedInput = {
@@ -15815,6 +15807,14 @@ export namespace Prisma {
     upsert?: ReceitaUpsertWithoutFavoritosInput
     connect?: ReceitaWhereUniqueInput
     update?: XOR<XOR<ReceitaUpdateToOneWithWhereWithoutFavoritosInput, ReceitaUpdateWithoutFavoritosInput>, ReceitaUncheckedUpdateWithoutFavoritosInput>
+  }
+
+  export type UsuarioUpdateOneRequiredWithoutReceitasFavoritasNestedInput = {
+    create?: XOR<UsuarioCreateWithoutReceitasFavoritasInput, UsuarioUncheckedCreateWithoutReceitasFavoritasInput>
+    connectOrCreate?: UsuarioCreateOrConnectWithoutReceitasFavoritasInput
+    upsert?: UsuarioUpsertWithoutReceitasFavoritasInput
+    connect?: UsuarioWhereUniqueInput
+    update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutReceitasFavoritasInput, UsuarioUpdateWithoutReceitasFavoritasInput>, UsuarioUncheckedUpdateWithoutReceitasFavoritasInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -16034,82 +16034,6 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type RefeicaoCreateWithoutUsuarioInput = {
-    id?: string
-    horario: string
-    descricao: string
-  }
-
-  export type RefeicaoUncheckedCreateWithoutUsuarioInput = {
-    id?: string
-    horario: string
-    descricao: string
-  }
-
-  export type RefeicaoCreateOrConnectWithoutUsuarioInput = {
-    where: RefeicaoWhereUniqueInput
-    create: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput>
-  }
-
-  export type RefeicaoCreateManyUsuarioInputEnvelope = {
-    data: RefeicaoCreateManyUsuarioInput | RefeicaoCreateManyUsuarioInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type RegistroRefeicaoCreateWithoutUsuarioInput = {
-    id?: string
-    data: Date | string
-    horario: string
-    descricao: string
-    tipoIcone?: string | null
-    foto?: string | null
-  }
-
-  export type RegistroRefeicaoUncheckedCreateWithoutUsuarioInput = {
-    id?: string
-    data: Date | string
-    horario: string
-    descricao: string
-    tipoIcone?: string | null
-    foto?: string | null
-  }
-
-  export type RegistroRefeicaoCreateOrConnectWithoutUsuarioInput = {
-    where: RegistroRefeicaoWhereUniqueInput
-    create: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput>
-  }
-
-  export type RegistroRefeicaoCreateManyUsuarioInputEnvelope = {
-    data: RegistroRefeicaoCreateManyUsuarioInput | RegistroRefeicaoCreateManyUsuarioInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type RegistroSonoCreateWithoutUsuarioInput = {
-    id?: string
-    inicio: Date | string
-    fim?: Date | string | null
-    qualidade?: number | null
-    notas?: string | null
-  }
-
-  export type RegistroSonoUncheckedCreateWithoutUsuarioInput = {
-    id?: string
-    inicio: Date | string
-    fim?: Date | string | null
-    qualidade?: number | null
-    notas?: string | null
-  }
-
-  export type RegistroSonoCreateOrConnectWithoutUsuarioInput = {
-    where: RegistroSonoWhereUniqueInput
-    create: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput>
-  }
-
-  export type RegistroSonoCreateManyUsuarioInputEnvelope = {
-    data: RegistroSonoCreateManyUsuarioInput | RegistroSonoCreateManyUsuarioInput[]
-    skipDuplicates?: boolean
-  }
-
   export type LembreteSonoCreateWithoutUsuarioInput = {
     id?: string
     tipo: string
@@ -16196,87 +16120,80 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput = {
+  export type RefeicaoCreateWithoutUsuarioInput = {
+    id?: string
+    horario: string
+    descricao: string
+  }
+
+  export type RefeicaoUncheckedCreateWithoutUsuarioInput = {
+    id?: string
+    horario: string
+    descricao: string
+  }
+
+  export type RefeicaoCreateOrConnectWithoutUsuarioInput = {
     where: RefeicaoWhereUniqueInput
-    update: XOR<RefeicaoUpdateWithoutUsuarioInput, RefeicaoUncheckedUpdateWithoutUsuarioInput>
     create: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput>
   }
 
-  export type RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput = {
-    where: RefeicaoWhereUniqueInput
-    data: XOR<RefeicaoUpdateWithoutUsuarioInput, RefeicaoUncheckedUpdateWithoutUsuarioInput>
+  export type RefeicaoCreateManyUsuarioInputEnvelope = {
+    data: RefeicaoCreateManyUsuarioInput | RefeicaoCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
   }
 
-  export type RefeicaoUpdateManyWithWhereWithoutUsuarioInput = {
-    where: RefeicaoScalarWhereInput
-    data: XOR<RefeicaoUpdateManyMutationInput, RefeicaoUncheckedUpdateManyWithoutUsuarioInput>
+  export type RegistroRefeicaoCreateWithoutUsuarioInput = {
+    id?: string
+    data: Date | string
+    horario: string
+    descricao: string
+    tipoIcone?: string | null
+    foto?: string | null
   }
 
-  export type RefeicaoScalarWhereInput = {
-    AND?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
-    OR?: RefeicaoScalarWhereInput[]
-    NOT?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
-    id?: StringFilter<"Refeicao"> | string
-    horario?: StringFilter<"Refeicao"> | string
-    descricao?: StringFilter<"Refeicao"> | string
-    usuarioId?: StringFilter<"Refeicao"> | string
+  export type RegistroRefeicaoUncheckedCreateWithoutUsuarioInput = {
+    id?: string
+    data: Date | string
+    horario: string
+    descricao: string
+    tipoIcone?: string | null
+    foto?: string | null
   }
 
-  export type RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput = {
+  export type RegistroRefeicaoCreateOrConnectWithoutUsuarioInput = {
     where: RegistroRefeicaoWhereUniqueInput
-    update: XOR<RegistroRefeicaoUpdateWithoutUsuarioInput, RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput>
     create: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput>
   }
 
-  export type RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput = {
-    where: RegistroRefeicaoWhereUniqueInput
-    data: XOR<RegistroRefeicaoUpdateWithoutUsuarioInput, RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput>
+  export type RegistroRefeicaoCreateManyUsuarioInputEnvelope = {
+    data: RegistroRefeicaoCreateManyUsuarioInput | RegistroRefeicaoCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
   }
 
-  export type RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput = {
-    where: RegistroRefeicaoScalarWhereInput
-    data: XOR<RegistroRefeicaoUpdateManyMutationInput, RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioInput>
+  export type RegistroSonoCreateWithoutUsuarioInput = {
+    id?: string
+    inicio: Date | string
+    fim?: Date | string | null
+    qualidade?: number | null
+    notas?: string | null
   }
 
-  export type RegistroRefeicaoScalarWhereInput = {
-    AND?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
-    OR?: RegistroRefeicaoScalarWhereInput[]
-    NOT?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
-    id?: StringFilter<"RegistroRefeicao"> | string
-    data?: DateTimeFilter<"RegistroRefeicao"> | Date | string
-    horario?: StringFilter<"RegistroRefeicao"> | string
-    descricao?: StringFilter<"RegistroRefeicao"> | string
-    tipoIcone?: StringNullableFilter<"RegistroRefeicao"> | string | null
-    foto?: StringNullableFilter<"RegistroRefeicao"> | string | null
-    usuarioId?: StringFilter<"RegistroRefeicao"> | string
+  export type RegistroSonoUncheckedCreateWithoutUsuarioInput = {
+    id?: string
+    inicio: Date | string
+    fim?: Date | string | null
+    qualidade?: number | null
+    notas?: string | null
   }
 
-  export type RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput = {
+  export type RegistroSonoCreateOrConnectWithoutUsuarioInput = {
     where: RegistroSonoWhereUniqueInput
-    update: XOR<RegistroSonoUpdateWithoutUsuarioInput, RegistroSonoUncheckedUpdateWithoutUsuarioInput>
     create: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput>
   }
 
-  export type RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput = {
-    where: RegistroSonoWhereUniqueInput
-    data: XOR<RegistroSonoUpdateWithoutUsuarioInput, RegistroSonoUncheckedUpdateWithoutUsuarioInput>
-  }
-
-  export type RegistroSonoUpdateManyWithWhereWithoutUsuarioInput = {
-    where: RegistroSonoScalarWhereInput
-    data: XOR<RegistroSonoUpdateManyMutationInput, RegistroSonoUncheckedUpdateManyWithoutUsuarioInput>
-  }
-
-  export type RegistroSonoScalarWhereInput = {
-    AND?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
-    OR?: RegistroSonoScalarWhereInput[]
-    NOT?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
-    id?: StringFilter<"RegistroSono"> | string
-    inicio?: DateTimeFilter<"RegistroSono"> | Date | string
-    fim?: DateTimeNullableFilter<"RegistroSono"> | Date | string | null
-    qualidade?: IntNullableFilter<"RegistroSono"> | number | null
-    notas?: StringNullableFilter<"RegistroSono"> | string | null
-    usuarioId?: StringFilter<"RegistroSono"> | string
+  export type RegistroSonoCreateManyUsuarioInputEnvelope = {
+    data: RegistroSonoCreateManyUsuarioInput | RegistroSonoCreateManyUsuarioInput[]
+    skipDuplicates?: boolean
   }
 
   export type LembreteSonoUpsertWithWhereUniqueWithoutUsuarioInput = {
@@ -16364,6 +16281,89 @@ export namespace Prisma {
     receitaId?: StringFilter<"ReceitaFavorita"> | string
   }
 
+  export type RefeicaoUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: RefeicaoWhereUniqueInput
+    update: XOR<RefeicaoUpdateWithoutUsuarioInput, RefeicaoUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<RefeicaoCreateWithoutUsuarioInput, RefeicaoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type RefeicaoUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: RefeicaoWhereUniqueInput
+    data: XOR<RefeicaoUpdateWithoutUsuarioInput, RefeicaoUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type RefeicaoUpdateManyWithWhereWithoutUsuarioInput = {
+    where: RefeicaoScalarWhereInput
+    data: XOR<RefeicaoUpdateManyMutationInput, RefeicaoUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type RefeicaoScalarWhereInput = {
+    AND?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
+    OR?: RefeicaoScalarWhereInput[]
+    NOT?: RefeicaoScalarWhereInput | RefeicaoScalarWhereInput[]
+    id?: StringFilter<"Refeicao"> | string
+    horario?: StringFilter<"Refeicao"> | string
+    descricao?: StringFilter<"Refeicao"> | string
+    usuarioId?: StringFilter<"Refeicao"> | string
+  }
+
+  export type RegistroRefeicaoUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: RegistroRefeicaoWhereUniqueInput
+    update: XOR<RegistroRefeicaoUpdateWithoutUsuarioInput, RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<RegistroRefeicaoCreateWithoutUsuarioInput, RegistroRefeicaoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type RegistroRefeicaoUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: RegistroRefeicaoWhereUniqueInput
+    data: XOR<RegistroRefeicaoUpdateWithoutUsuarioInput, RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type RegistroRefeicaoUpdateManyWithWhereWithoutUsuarioInput = {
+    where: RegistroRefeicaoScalarWhereInput
+    data: XOR<RegistroRefeicaoUpdateManyMutationInput, RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type RegistroRefeicaoScalarWhereInput = {
+    AND?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
+    OR?: RegistroRefeicaoScalarWhereInput[]
+    NOT?: RegistroRefeicaoScalarWhereInput | RegistroRefeicaoScalarWhereInput[]
+    id?: StringFilter<"RegistroRefeicao"> | string
+    data?: DateTimeFilter<"RegistroRefeicao"> | Date | string
+    horario?: StringFilter<"RegistroRefeicao"> | string
+    descricao?: StringFilter<"RegistroRefeicao"> | string
+    tipoIcone?: StringNullableFilter<"RegistroRefeicao"> | string | null
+    foto?: StringNullableFilter<"RegistroRefeicao"> | string | null
+    usuarioId?: StringFilter<"RegistroRefeicao"> | string
+  }
+
+  export type RegistroSonoUpsertWithWhereUniqueWithoutUsuarioInput = {
+    where: RegistroSonoWhereUniqueInput
+    update: XOR<RegistroSonoUpdateWithoutUsuarioInput, RegistroSonoUncheckedUpdateWithoutUsuarioInput>
+    create: XOR<RegistroSonoCreateWithoutUsuarioInput, RegistroSonoUncheckedCreateWithoutUsuarioInput>
+  }
+
+  export type RegistroSonoUpdateWithWhereUniqueWithoutUsuarioInput = {
+    where: RegistroSonoWhereUniqueInput
+    data: XOR<RegistroSonoUpdateWithoutUsuarioInput, RegistroSonoUncheckedUpdateWithoutUsuarioInput>
+  }
+
+  export type RegistroSonoUpdateManyWithWhereWithoutUsuarioInput = {
+    where: RegistroSonoScalarWhereInput
+    data: XOR<RegistroSonoUpdateManyMutationInput, RegistroSonoUncheckedUpdateManyWithoutUsuarioInput>
+  }
+
+  export type RegistroSonoScalarWhereInput = {
+    AND?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
+    OR?: RegistroSonoScalarWhereInput[]
+    NOT?: RegistroSonoScalarWhereInput | RegistroSonoScalarWhereInput[]
+    id?: StringFilter<"RegistroSono"> | string
+    inicio?: DateTimeFilter<"RegistroSono"> | Date | string
+    fim?: DateTimeNullableFilter<"RegistroSono"> | Date | string | null
+    qualidade?: IntNullableFilter<"RegistroSono"> | number | null
+    notas?: StringNullableFilter<"RegistroSono"> | string | null
+    usuarioId?: StringFilter<"RegistroSono"> | string
+  }
+
   export type UsuarioCreateWithoutRefeicoesInput = {
     id?: string
     email: string
@@ -16379,11 +16379,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutRefeicoesInput = {
@@ -16401,11 +16401,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutRefeicoesInput = {
@@ -16439,11 +16439,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutRefeicoesInput = {
@@ -16461,11 +16461,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateWithoutRegistrosRefeicaoInput = {
@@ -16483,11 +16483,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutRegistrosRefeicaoInput = {
@@ -16505,11 +16505,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutRegistrosRefeicaoInput = {
@@ -16543,11 +16543,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutRegistrosRefeicaoInput = {
@@ -16565,11 +16565,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateWithoutRegistrosSonoInput = {
@@ -16587,11 +16587,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutRegistrosSonoInput = {
@@ -16609,11 +16609,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
-    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
     lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
     receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
     receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutRegistrosSonoInput = {
@@ -16647,11 +16647,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutRegistrosSonoInput = {
@@ -16669,11 +16669,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
     lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
     receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
     receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioCreateWithoutLembretesSonoInput = {
@@ -16691,11 +16691,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
+    receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
+    receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
     refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
     registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
     registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
-    receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
-    receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioUncheckedCreateWithoutLembretesSonoInput = {
@@ -16713,11 +16713,11 @@ export namespace Prisma {
     metaPausasProgramadas?: number
     notificacoesAtivas?: boolean
     pausasAtivas?: boolean
+    receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
+    receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
     refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
     registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
     registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
-    receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
-    receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
   export type UsuarioCreateOrConnectWithoutLembretesSonoInput = {
@@ -16751,11 +16751,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
+    receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
     refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
     registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
     registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
-    receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
-    receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutLembretesSonoInput = {
@@ -16773,60 +16773,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
+    receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
     refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
     registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
     registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
-    receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
-    receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
-  }
-
-  export type UsuarioCreateWithoutReceitasInput = {
-    id?: string
-    email: string
-    nome: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    altoContraste?: boolean
-    reducaoEstimulos?: boolean
-    textoGrande?: boolean
-    metaHorasSono?: number
-    metaTarefasPrioritarias?: number
-    metaCoposAgua?: number
-    metaPausasProgramadas?: number
-    notificacoesAtivas?: boolean
-    pausasAtivas?: boolean
-    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
-    lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
-    receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
-  }
-
-  export type UsuarioUncheckedCreateWithoutReceitasInput = {
-    id?: string
-    email: string
-    nome: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    altoContraste?: boolean
-    reducaoEstimulos?: boolean
-    textoGrande?: boolean
-    metaHorasSono?: number
-    metaTarefasPrioritarias?: number
-    metaCoposAgua?: number
-    metaPausasProgramadas?: number
-    notificacoesAtivas?: boolean
-    pausasAtivas?: boolean
-    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
-    lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
-    receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
-  }
-
-  export type UsuarioCreateOrConnectWithoutReceitasInput = {
-    where: UsuarioWhereUniqueInput
-    create: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
   }
 
   export type IngredienteCreateWithoutReceitaInput = {
@@ -16875,6 +16826,55 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UsuarioCreateWithoutReceitasInput = {
+    id?: string
+    email: string
+    nome: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    altoContraste?: boolean
+    reducaoEstimulos?: boolean
+    textoGrande?: boolean
+    metaHorasSono?: number
+    metaTarefasPrioritarias?: number
+    metaCoposAgua?: number
+    metaPausasProgramadas?: number
+    notificacoesAtivas?: boolean
+    pausasAtivas?: boolean
+    lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
+    receitasFavoritas?: ReceitaFavoritaCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutReceitasInput = {
+    id?: string
+    email: string
+    nome: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    altoContraste?: boolean
+    reducaoEstimulos?: boolean
+    textoGrande?: boolean
+    metaHorasSono?: number
+    metaTarefasPrioritarias?: number
+    metaCoposAgua?: number
+    metaPausasProgramadas?: number
+    notificacoesAtivas?: boolean
+    pausasAtivas?: boolean
+    lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
+    receitasFavoritas?: ReceitaFavoritaUncheckedCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutReceitasInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
+  }
+
   export type ReceitaFavoritaCreateWithoutReceitaInput = {
     id?: string
     usuario: UsuarioCreateNestedOneWithoutReceitasFavoritasInput
@@ -16893,61 +16893,6 @@ export namespace Prisma {
   export type ReceitaFavoritaCreateManyReceitaInputEnvelope = {
     data: ReceitaFavoritaCreateManyReceitaInput | ReceitaFavoritaCreateManyReceitaInput[]
     skipDuplicates?: boolean
-  }
-
-  export type UsuarioUpsertWithoutReceitasInput = {
-    update: XOR<UsuarioUpdateWithoutReceitasInput, UsuarioUncheckedUpdateWithoutReceitasInput>
-    create: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
-    where?: UsuarioWhereInput
-  }
-
-  export type UsuarioUpdateToOneWithWhereWithoutReceitasInput = {
-    where?: UsuarioWhereInput
-    data: XOR<UsuarioUpdateWithoutReceitasInput, UsuarioUncheckedUpdateWithoutReceitasInput>
-  }
-
-  export type UsuarioUpdateWithoutReceitasInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    nome?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    altoContraste?: BoolFieldUpdateOperationsInput | boolean
-    reducaoEstimulos?: BoolFieldUpdateOperationsInput | boolean
-    textoGrande?: BoolFieldUpdateOperationsInput | boolean
-    metaHorasSono?: IntFieldUpdateOperationsInput | number
-    metaTarefasPrioritarias?: IntFieldUpdateOperationsInput | number
-    metaCoposAgua?: IntFieldUpdateOperationsInput | number
-    metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
-    notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
-    pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
-    lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
-    receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
-  }
-
-  export type UsuarioUncheckedUpdateWithoutReceitasInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    nome?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    altoContraste?: BoolFieldUpdateOperationsInput | boolean
-    reducaoEstimulos?: BoolFieldUpdateOperationsInput | boolean
-    textoGrande?: BoolFieldUpdateOperationsInput | boolean
-    metaHorasSono?: IntFieldUpdateOperationsInput | number
-    metaTarefasPrioritarias?: IntFieldUpdateOperationsInput | number
-    metaCoposAgua?: IntFieldUpdateOperationsInput | number
-    metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
-    notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
-    pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
-    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
-    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
-    lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
-    receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
   export type IngredienteUpsertWithWhereUniqueWithoutReceitaInput = {
@@ -17003,6 +16948,61 @@ export namespace Prisma {
     receitaId?: StringFilter<"PassoReceita"> | string
   }
 
+  export type UsuarioUpsertWithoutReceitasInput = {
+    update: XOR<UsuarioUpdateWithoutReceitasInput, UsuarioUncheckedUpdateWithoutReceitasInput>
+    create: XOR<UsuarioCreateWithoutReceitasInput, UsuarioUncheckedCreateWithoutReceitasInput>
+    where?: UsuarioWhereInput
+  }
+
+  export type UsuarioUpdateToOneWithWhereWithoutReceitasInput = {
+    where?: UsuarioWhereInput
+    data: XOR<UsuarioUpdateWithoutReceitasInput, UsuarioUncheckedUpdateWithoutReceitasInput>
+  }
+
+  export type UsuarioUpdateWithoutReceitasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    altoContraste?: BoolFieldUpdateOperationsInput | boolean
+    reducaoEstimulos?: BoolFieldUpdateOperationsInput | boolean
+    textoGrande?: BoolFieldUpdateOperationsInput | boolean
+    metaHorasSono?: IntFieldUpdateOperationsInput | number
+    metaTarefasPrioritarias?: IntFieldUpdateOperationsInput | number
+    metaCoposAgua?: IntFieldUpdateOperationsInput | number
+    metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
+    notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
+    pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
+    receitasFavoritas?: ReceitaFavoritaUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
+  }
+
+  export type UsuarioUncheckedUpdateWithoutReceitasInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    altoContraste?: BoolFieldUpdateOperationsInput | boolean
+    reducaoEstimulos?: BoolFieldUpdateOperationsInput | boolean
+    textoGrande?: BoolFieldUpdateOperationsInput | boolean
+    metaHorasSono?: IntFieldUpdateOperationsInput | number
+    metaTarefasPrioritarias?: IntFieldUpdateOperationsInput | number
+    metaCoposAgua?: IntFieldUpdateOperationsInput | number
+    metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
+    notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
+    pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
+    receitasFavoritas?: ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioNestedInput
+    refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
+    registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
+  }
+
   export type ReceitaFavoritaUpsertWithWhereUniqueWithoutReceitaInput = {
     where: ReceitaFavoritaWhereUniqueInput
     update: XOR<ReceitaFavoritaUpdateWithoutReceitaInput, ReceitaFavoritaUncheckedUpdateWithoutReceitaInput>
@@ -17029,8 +17029,8 @@ export namespace Prisma {
     porcoes: number
     calorias: string
     imagem?: string | null
-    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     passos?: PassoReceitaCreateNestedManyWithoutReceitaInput
+    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     favoritos?: ReceitaFavoritaCreateNestedManyWithoutReceitaInput
   }
 
@@ -17075,8 +17075,8 @@ export namespace Prisma {
     porcoes?: IntFieldUpdateOperationsInput | number
     calorias?: StringFieldUpdateOperationsInput | string
     imagem?: NullableStringFieldUpdateOperationsInput | string | null
-    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     passos?: PassoReceitaUpdateManyWithoutReceitaNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     favoritos?: ReceitaFavoritaUpdateManyWithoutReceitaNestedInput
   }
 
@@ -17105,8 +17105,8 @@ export namespace Prisma {
     porcoes: number
     calorias: string
     imagem?: string | null
-    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     ingredientes?: IngredienteCreateNestedManyWithoutReceitaInput
+    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     favoritos?: ReceitaFavoritaCreateNestedManyWithoutReceitaInput
   }
 
@@ -17151,8 +17151,8 @@ export namespace Prisma {
     porcoes?: IntFieldUpdateOperationsInput | number
     calorias?: StringFieldUpdateOperationsInput | string
     imagem?: NullableStringFieldUpdateOperationsInput | string | null
-    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     ingredientes?: IngredienteUpdateManyWithoutReceitaNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
     favoritos?: ReceitaFavoritaUpdateManyWithoutReceitaNestedInput
   }
 
@@ -17171,55 +17171,6 @@ export namespace Prisma {
     favoritos?: ReceitaFavoritaUncheckedUpdateManyWithoutReceitaNestedInput
   }
 
-  export type UsuarioCreateWithoutReceitasFavoritasInput = {
-    id?: string
-    email: string
-    nome: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    altoContraste?: boolean
-    reducaoEstimulos?: boolean
-    textoGrande?: boolean
-    metaHorasSono?: number
-    metaTarefasPrioritarias?: number
-    metaCoposAgua?: number
-    metaPausasProgramadas?: number
-    notificacoesAtivas?: boolean
-    pausasAtivas?: boolean
-    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
-    lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
-    receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
-  }
-
-  export type UsuarioUncheckedCreateWithoutReceitasFavoritasInput = {
-    id?: string
-    email: string
-    nome: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    altoContraste?: boolean
-    reducaoEstimulos?: boolean
-    textoGrande?: boolean
-    metaHorasSono?: number
-    metaTarefasPrioritarias?: number
-    metaCoposAgua?: number
-    metaPausasProgramadas?: number
-    notificacoesAtivas?: boolean
-    pausasAtivas?: boolean
-    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
-    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
-    lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
-    receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
-  }
-
-  export type UsuarioCreateOrConnectWithoutReceitasFavoritasInput = {
-    where: UsuarioWhereUniqueInput
-    create: XOR<UsuarioCreateWithoutReceitasFavoritasInput, UsuarioUncheckedCreateWithoutReceitasFavoritasInput>
-  }
-
   export type ReceitaCreateWithoutFavoritosInput = {
     id?: string
     nome: string
@@ -17230,9 +17181,9 @@ export namespace Prisma {
     porcoes: number
     calorias: string
     imagem?: string | null
-    usuario: UsuarioCreateNestedOneWithoutReceitasInput
     ingredientes?: IngredienteCreateNestedManyWithoutReceitaInput
     passos?: PassoReceitaCreateNestedManyWithoutReceitaInput
+    usuario: UsuarioCreateNestedOneWithoutReceitasInput
   }
 
   export type ReceitaUncheckedCreateWithoutFavoritosInput = {
@@ -17253,6 +17204,96 @@ export namespace Prisma {
   export type ReceitaCreateOrConnectWithoutFavoritosInput = {
     where: ReceitaWhereUniqueInput
     create: XOR<ReceitaCreateWithoutFavoritosInput, ReceitaUncheckedCreateWithoutFavoritosInput>
+  }
+
+  export type UsuarioCreateWithoutReceitasFavoritasInput = {
+    id?: string
+    email: string
+    nome: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    altoContraste?: boolean
+    reducaoEstimulos?: boolean
+    textoGrande?: boolean
+    metaHorasSono?: number
+    metaTarefasPrioritarias?: number
+    metaCoposAgua?: number
+    metaPausasProgramadas?: number
+    notificacoesAtivas?: boolean
+    pausasAtivas?: boolean
+    lembretesSono?: LembreteSonoCreateNestedManyWithoutUsuarioInput
+    receitas?: ReceitaCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioUncheckedCreateWithoutReceitasFavoritasInput = {
+    id?: string
+    email: string
+    nome: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    altoContraste?: boolean
+    reducaoEstimulos?: boolean
+    textoGrande?: boolean
+    metaHorasSono?: number
+    metaTarefasPrioritarias?: number
+    metaCoposAgua?: number
+    metaPausasProgramadas?: number
+    notificacoesAtivas?: boolean
+    pausasAtivas?: boolean
+    lembretesSono?: LembreteSonoUncheckedCreateNestedManyWithoutUsuarioInput
+    receitas?: ReceitaUncheckedCreateNestedManyWithoutUsuarioInput
+    refeicoes?: RefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosRefeicao?: RegistroRefeicaoUncheckedCreateNestedManyWithoutUsuarioInput
+    registrosSono?: RegistroSonoUncheckedCreateNestedManyWithoutUsuarioInput
+  }
+
+  export type UsuarioCreateOrConnectWithoutReceitasFavoritasInput = {
+    where: UsuarioWhereUniqueInput
+    create: XOR<UsuarioCreateWithoutReceitasFavoritasInput, UsuarioUncheckedCreateWithoutReceitasFavoritasInput>
+  }
+
+  export type ReceitaUpsertWithoutFavoritosInput = {
+    update: XOR<ReceitaUpdateWithoutFavoritosInput, ReceitaUncheckedUpdateWithoutFavoritosInput>
+    create: XOR<ReceitaCreateWithoutFavoritosInput, ReceitaUncheckedCreateWithoutFavoritosInput>
+    where?: ReceitaWhereInput
+  }
+
+  export type ReceitaUpdateToOneWithWhereWithoutFavoritosInput = {
+    where?: ReceitaWhereInput
+    data: XOR<ReceitaUpdateWithoutFavoritosInput, ReceitaUncheckedUpdateWithoutFavoritosInput>
+  }
+
+  export type ReceitaUpdateWithoutFavoritosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+    categorias?: ReceitaUpdatecategoriasInput | string[]
+    tags?: ReceitaUpdatetagsInput | string[]
+    tempoPreparo?: IntFieldUpdateOperationsInput | number
+    porcoes?: IntFieldUpdateOperationsInput | number
+    calorias?: StringFieldUpdateOperationsInput | string
+    imagem?: NullableStringFieldUpdateOperationsInput | string | null
+    ingredientes?: IngredienteUpdateManyWithoutReceitaNestedInput
+    passos?: PassoReceitaUpdateManyWithoutReceitaNestedInput
+    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
+  }
+
+  export type ReceitaUncheckedUpdateWithoutFavoritosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    nome?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+    categorias?: ReceitaUpdatecategoriasInput | string[]
+    tags?: ReceitaUpdatetagsInput | string[]
+    tempoPreparo?: IntFieldUpdateOperationsInput | number
+    porcoes?: IntFieldUpdateOperationsInput | number
+    calorias?: StringFieldUpdateOperationsInput | string
+    imagem?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    ingredientes?: IngredienteUncheckedUpdateManyWithoutReceitaNestedInput
+    passos?: PassoReceitaUncheckedUpdateManyWithoutReceitaNestedInput
   }
 
   export type UsuarioUpsertWithoutReceitasFavoritasInput = {
@@ -17281,11 +17322,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
+    receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
     refeicoes?: RefeicaoUpdateManyWithoutUsuarioNestedInput
     registrosRefeicao?: RegistroRefeicaoUpdateManyWithoutUsuarioNestedInput
     registrosSono?: RegistroSonoUpdateManyWithoutUsuarioNestedInput
-    lembretesSono?: LembreteSonoUpdateManyWithoutUsuarioNestedInput
-    receitas?: ReceitaUpdateManyWithoutUsuarioNestedInput
   }
 
   export type UsuarioUncheckedUpdateWithoutReceitasFavoritasInput = {
@@ -17303,75 +17344,11 @@ export namespace Prisma {
     metaPausasProgramadas?: IntFieldUpdateOperationsInput | number
     notificacoesAtivas?: BoolFieldUpdateOperationsInput | boolean
     pausasAtivas?: BoolFieldUpdateOperationsInput | boolean
+    lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
+    receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
     refeicoes?: RefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
     registrosRefeicao?: RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioNestedInput
     registrosSono?: RegistroSonoUncheckedUpdateManyWithoutUsuarioNestedInput
-    lembretesSono?: LembreteSonoUncheckedUpdateManyWithoutUsuarioNestedInput
-    receitas?: ReceitaUncheckedUpdateManyWithoutUsuarioNestedInput
-  }
-
-  export type ReceitaUpsertWithoutFavoritosInput = {
-    update: XOR<ReceitaUpdateWithoutFavoritosInput, ReceitaUncheckedUpdateWithoutFavoritosInput>
-    create: XOR<ReceitaCreateWithoutFavoritosInput, ReceitaUncheckedCreateWithoutFavoritosInput>
-    where?: ReceitaWhereInput
-  }
-
-  export type ReceitaUpdateToOneWithWhereWithoutFavoritosInput = {
-    where?: ReceitaWhereInput
-    data: XOR<ReceitaUpdateWithoutFavoritosInput, ReceitaUncheckedUpdateWithoutFavoritosInput>
-  }
-
-  export type ReceitaUpdateWithoutFavoritosInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    nome?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-    categorias?: ReceitaUpdatecategoriasInput | string[]
-    tags?: ReceitaUpdatetagsInput | string[]
-    tempoPreparo?: IntFieldUpdateOperationsInput | number
-    porcoes?: IntFieldUpdateOperationsInput | number
-    calorias?: StringFieldUpdateOperationsInput | string
-    imagem?: NullableStringFieldUpdateOperationsInput | string | null
-    usuario?: UsuarioUpdateOneRequiredWithoutReceitasNestedInput
-    ingredientes?: IngredienteUpdateManyWithoutReceitaNestedInput
-    passos?: PassoReceitaUpdateManyWithoutReceitaNestedInput
-  }
-
-  export type ReceitaUncheckedUpdateWithoutFavoritosInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    nome?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-    categorias?: ReceitaUpdatecategoriasInput | string[]
-    tags?: ReceitaUpdatetagsInput | string[]
-    tempoPreparo?: IntFieldUpdateOperationsInput | number
-    porcoes?: IntFieldUpdateOperationsInput | number
-    calorias?: StringFieldUpdateOperationsInput | string
-    imagem?: NullableStringFieldUpdateOperationsInput | string | null
-    usuarioId?: StringFieldUpdateOperationsInput | string
-    ingredientes?: IngredienteUncheckedUpdateManyWithoutReceitaNestedInput
-    passos?: PassoReceitaUncheckedUpdateManyWithoutReceitaNestedInput
-  }
-
-  export type RefeicaoCreateManyUsuarioInput = {
-    id?: string
-    horario: string
-    descricao: string
-  }
-
-  export type RegistroRefeicaoCreateManyUsuarioInput = {
-    id?: string
-    data: Date | string
-    horario: string
-    descricao: string
-    tipoIcone?: string | null
-    foto?: string | null
-  }
-
-  export type RegistroSonoCreateManyUsuarioInput = {
-    id?: string
-    inicio: Date | string
-    fim?: Date | string | null
-    qualidade?: number | null
-    notas?: string | null
   }
 
   export type LembreteSonoCreateManyUsuarioInput = {
@@ -17399,73 +17376,27 @@ export namespace Prisma {
     receitaId: string
   }
 
-  export type RefeicaoUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
+  export type RefeicaoCreateManyUsuarioInput = {
+    id?: string
+    horario: string
+    descricao: string
   }
 
-  export type RefeicaoUncheckedUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
+  export type RegistroRefeicaoCreateManyUsuarioInput = {
+    id?: string
+    data: Date | string
+    horario: string
+    descricao: string
+    tipoIcone?: string | null
+    foto?: string | null
   }
 
-  export type RefeicaoUncheckedUpdateManyWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type RegistroRefeicaoUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
-    foto?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
-    foto?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    data?: DateTimeFieldUpdateOperationsInput | Date | string
-    horario?: StringFieldUpdateOperationsInput | string
-    descricao?: StringFieldUpdateOperationsInput | string
-    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
-    foto?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type RegistroSonoUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
-    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
-    notas?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type RegistroSonoUncheckedUpdateWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
-    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
-    notas?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type RegistroSonoUncheckedUpdateManyWithoutUsuarioInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
-    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
-    notas?: NullableStringFieldUpdateOperationsInput | string | null
+  export type RegistroSonoCreateManyUsuarioInput = {
+    id?: string
+    inicio: Date | string
+    fim?: Date | string | null
+    qualidade?: number | null
+    notas?: string | null
   }
 
   export type LembreteSonoUpdateWithoutUsuarioInput = {
@@ -17547,6 +17478,75 @@ export namespace Prisma {
   export type ReceitaFavoritaUncheckedUpdateManyWithoutUsuarioInput = {
     id?: StringFieldUpdateOperationsInput | string
     receitaId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RefeicaoUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RefeicaoUncheckedUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RefeicaoUncheckedUpdateManyWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type RegistroRefeicaoUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
+    foto?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type RegistroRefeicaoUncheckedUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
+    foto?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type RegistroRefeicaoUncheckedUpdateManyWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    horario?: StringFieldUpdateOperationsInput | string
+    descricao?: StringFieldUpdateOperationsInput | string
+    tipoIcone?: NullableStringFieldUpdateOperationsInput | string | null
+    foto?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type RegistroSonoUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
+    notas?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type RegistroSonoUncheckedUpdateWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
+    notas?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type RegistroSonoUncheckedUpdateManyWithoutUsuarioInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    fim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qualidade?: NullableIntFieldUpdateOperationsInput | number | null
+    notas?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type IngredienteCreateManyReceitaInput = {
