@@ -2,16 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Utensils, Book, BookOpen, Heart, Smile, DollarSign, Rocket, X } from 'lucide-react' // Added Book icon
-
-type NavItem = {
-  name: string
-  href: string
-  icon: React.ElementType
-  color: string
-  activeColor: string
-  iconClasses?: string
-}
+import { Home, Utensils, Book, BookOpen, Heart, Smile, DollarSign, Rocket, X } from 'lucide-react'
+import { NavItem } from '@/app/types'
 
 const navItems: NavItem[] = [
   {
@@ -31,9 +23,9 @@ const navItems: NavItem[] = [
   {
     name: 'Receitas',
     href: '/receitas',
-    icon: Book, // Using the Book icon
-    color: 'text-blue-600', // Placeholder color
-    activeColor: 'bg-blue-100', // Placeholder active color
+    icon: Book,
+    color: 'text-blue-600',
+    activeColor: 'bg-blue-100',
   },
   {
     name: 'Estudos',
@@ -77,36 +69,54 @@ type SidebarProps = {
 }
 
 export function Sidebar({ onClose }: SidebarProps) {
-  // Get pathname, default to empty string if null
-  const currentPathname = usePathname();
-  const pathname = currentPathname ?? ''; 
+  const pathname = usePathname() ?? '';
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Overlay escuro */}
+    <div 
+      className="fixed inset-0 z-50 flex" 
+      role="dialog" 
+      aria-modal="true" 
+      aria-label="Menu principal"
+      onKeyDown={handleKeyDown}
+    >
+      {/* Overlay escuro com acessibilidade melhorada */}
       <div 
         className="fixed inset-0 bg-gray-900/60" 
         onClick={onClose}
         aria-hidden="true"
       />
       
-      {/* Sidebar */}
-      <div className="relative flex-1 flex flex-col w-64 max-w-xs bg-white dark:bg-gray-800 shadow-xl">
+      {/* Sidebar com estrutura semântica melhorada */}
+      <div 
+        className="relative flex-1 flex flex-col w-64 max-w-xs bg-white dark:bg-gray-800 shadow-xl"
+        tabIndex={-1}
+        role="document"
+      >
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white" id="sidebar-title">Menu</h2>
           <button
-            className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onClick={onClose}
             aria-label="Fechar menu"
+            tabIndex={0}
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
+            <span className="sr-only">Fechar</span>
           </button>
         </div>
         
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav 
+          className="flex-1 p-4 overflow-y-auto"
+          aria-labelledby="sidebar-title"
+        >
           <div className="space-y-2">
             {navItems.map((item) => {
-              // Now pathname is guaranteed to be a string
               const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
               
               return (
@@ -121,9 +131,13 @@ export function Sidebar({ onClose }: SidebarProps) {
                   `}
                   onClick={onClose}
                   aria-current={isActive ? 'page' : undefined}
+                  tabIndex={0}
                 >
-                  <item.icon className={`mr-3 h-5 w-5 ${item.iconClasses || ''}`} aria-hidden="true" />
-                  {item.name}
+                  <item.icon 
+                    className={`mr-3 h-5 w-5 ${item.iconClasses || ''}`} 
+                    aria-hidden="true" 
+                  />
+                  <span>{item.name}</span>
                 </Link>
               )
             })}

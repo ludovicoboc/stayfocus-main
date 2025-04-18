@@ -1,6 +1,6 @@
 'use client'
 
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonHTMLAttributes, ReactNode, forwardRef, ElementRef, ComponentPropsWithoutRef } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/app/lib/utils'
 
@@ -38,25 +38,36 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  children: ReactNode
   icon?: ReactNode
+  asChild?: boolean
 }
 
-export function Button({
-  className,
-  variant,
-  size,
-  children,
-  icon,
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    >
-      {icon && <span className="mr-2">{icon}</span>}
-      {children}
-    </button>
-  )
-}
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, children, icon, asChild, ...props }, ref) => {
+    if (asChild) {
+      // Se asChild for true, aplicamos as classes ao primeiro filho
+      // mas não renderizamos um <button> diretamente
+      return (
+        <div className={cn(buttonVariants({ variant, size, className }))}>
+          {icon && <span className="mr-2">{icon}</span>}
+          {children}
+        </div>
+      );
+    }
+    
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      >
+        {icon && <span className="mr-2">{icon}</span>}
+        {children}
+      </button>
+    );
+  }
+);
+
+Button.displayName = "Button";
+
+export { Button, buttonVariants };

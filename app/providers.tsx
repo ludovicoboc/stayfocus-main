@@ -5,8 +5,16 @@ import { type ThemeProviderProps } from 'next-themes/dist/types'
 
 export function Providers({ children, ...props }: ThemeProviderProps) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem {...props}>
-      {children}
+    <NextThemesProvider 
+      attribute="class" 
+      defaultTheme="system" 
+      enableSystem 
+      disableTransitionOnChange
+      {...props}
+    >
+      <div suppressHydrationWarning>
+        {children}
+      </div>
     </NextThemesProvider>
   )
 }

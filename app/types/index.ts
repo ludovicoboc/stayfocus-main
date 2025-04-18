@@ -65,3 +65,37 @@ export type SessaoEstudo = {
   produtividade: 1 | 2 | 3 | 4 | 5 // escala de 1 a 5
   notas?: string
 }
+
+// Tipos para componentes do Dashboard
+export type NavItem = {
+  name: string
+  href: string
+  icon: React.ElementType
+  color: string
+  activeColor: string
+  iconClasses?: string
+}
+
+export type PlaceholderProps = {
+  className?: string
+}
+
+export type DashboardCardProps = {
+  children: React.ReactNode
+  title?: string
+  className?: string
+  isLoading?: boolean
+}
+
+export type DashboardSectionProps = {
+  id?: string
+  title?: string
+  children: React.ReactNode
+  className?: string
+}
+
+// Tipos para componentes de Suspense do Dashboard
+export type SuspenseWrapperProps = {
+  children: React.ReactNode
+  fallback: React.ReactNode
+}
