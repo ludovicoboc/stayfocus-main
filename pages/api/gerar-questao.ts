@@ -25,7 +25,7 @@ const PPLX_API_KEY = process.env.PPLX_API_KEY;
 if (!PPLX_API_KEY) {
   throw new Error('A variável de ambiente PPLX_API_KEY não está definida.');
 }
-const PPLX_MODEL = 'pplx-7b-online';
+const PPLX_MODEL = 'sonar-pro';
 
 // Chamada real à Perplexity API
 async function gerarQuestoesPerplexity({ disciplina, topico, resumo, quantidade, dificuldade, max_tokens }: GerarQuestaoRequest): Promise<QuestaoLLM[]> {
