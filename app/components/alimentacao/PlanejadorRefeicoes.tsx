@@ -1,47 +1,143 @@
 'use client'
 
-import { useState } from 'react'
-import { Clock, Plus, Save, Trash2 } from 'lucide-react'
-import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore'
+import { useState, useEffect } from 'react'
+import { Clock, Plus, Save, Trash2, Edit3 } from 'lucide-react' // Using Edit3 for a different edit icon
 
-type Refeicao = {
+type RefeicaoPlanejada = {
   id: string
-  horario: string
+  horario: string // HH:MM
   descricao: string
 }
 
+// Regex for HH:MM format
+const TIME_REGEX = /^\d{2}:\d{2}$/;
+
 export function PlanejadorRefeicoes() {
-  const { refeicoes, adicionarRefeicao, atualizarRefeicao, removerRefeicao } = useAlimentacaoStore()
-  const [novaRefeicao, setNovaRefeicao] = useState({ horario: '', descricao: '' })
-  const [editando, setEditando] = useState<string | null>(null)
+  const [refeicoes, setRefeicoes] = useState<RefeicaoPlanejada[]>([])
+  const [formState, setFormState] = useState({ horario: '', descricao: '' })
+  const [editandoId, setEditandoId] = useState<string | null>(null)
 
-  const handleAdicionarRefeicao = () => {
-    if (!novaRefeicao.horario || !novaRefeicao.descricao) return
+  const [isLoading, setIsLoading] = useState(true)
+  const [apiError, setApiError] = useState<string | null>(null)
 
-    adicionarRefeicao(novaRefeicao.horario, novaRefeicao.descricao)
-    setNovaRefeicao({ horario: '', descricao: '' })
+  // Fetch initial data
+  useEffect(() => {
+    const fetchRefeicoes = async () => {
+      setIsLoading(true)
+      setApiError(null)
+      try {
+        const response = await fetch('/api/alimentacao/refeicoes-planejadas')
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar refeições: ${response.statusText}`)
+        }
+        let data: RefeicaoPlanejada[] = await response.json()
+        // Sort by horario
+        data.sort((a, b) => a.horario.localeCompare(b.horario));
+        setRefeicoes(data)
+      } catch (err) {
+        setApiError(err instanceof Error ? err.message : 'Erro desconhecido')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchRefeicoes()
+  }, [])
+
+  const handleFormInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    if (!formState.horario || !TIME_REGEX.test(formState.horario)) {
+      setApiError("Horário inválido. Use o formato HH:MM.");
+      return false;
+    }
+    if (!formState.descricao.trim()) {
+      setApiError("Descrição não pode ser vazia.");
+      return false;
+    }
+    setApiError(null); // Clear previous errors
+    return true;
   }
 
-  const iniciarEdicao = (id: string, horario: string, descricao: string) => {
-    setEditando(id)
-    setNovaRefeicao({ horario, descricao })
+  const handleAdicionarRefeicaoAPI = async () => {
+    if (!validateForm()) return;
+    setApiError(null)
+    try {
+      const response = await fetch('/api/alimentacao/refeicoes-planejadas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || `Erro ao adicionar refeição`);
+      }
+      const novaRefeicao: RefeicaoPlanejada = await response.json()
+      setRefeicoes(prev => [...prev, novaRefeicao].sort((a,b) => a.horario.localeCompare(b.horario)))
+      setFormState({ horario: '', descricao: '' }) // Reset form
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Erro desconhecido ao adicionar')
+    }
   }
 
-  const salvarEdicao = () => {
-    if (!editando || !novaRefeicao.horario || !novaRefeicao.descricao) return
+  const iniciarEdicao = (refeicao: RefeicaoPlanejada) => {
+    setEditandoId(refeicao.id)
+    setFormState({ horario: refeicao.horario, descricao: refeicao.descricao })
+  }
 
-    atualizarRefeicao(editando, novaRefeicao.horario, novaRefeicao.descricao)
-    setEditando(null)
-    setNovaRefeicao({ horario: '', descricao: '' })
+  const handleSalvarEdicaoAPI = async () => {
+    if (!editandoId || !validateForm()) return;
+    setApiError(null)
+    try {
+      const response = await fetch(`/api/alimentacao/refeicoes-planejadas/${editandoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || `Erro ao atualizar refeição`);
+      }
+      const refeicaoAtualizada: RefeicaoPlanejada = await response.json()
+      setRefeicoes(prev =>
+        prev.map(r => (r.id === editandoId ? refeicaoAtualizada : r))
+            .sort((a,b) => a.horario.localeCompare(b.horario))
+      )
+      setEditandoId(null)
+      setFormState({ horario: '', descricao: '' })
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Erro desconhecido ao salvar')
+    }
   }
 
   const cancelarEdicao = () => {
-    setEditando(null)
-    setNovaRefeicao({ horario: '', descricao: '' })
+    setEditandoId(null)
+    setFormState({ horario: '', descricao: '' })
+    setApiError(null)
   }
+
+  const handleRemoverRefeicaoAPI = async (id: string) => {
+    setApiError(null)
+    if (!window.confirm("Tem certeza que deseja remover esta refeição?")) return;
+    try {
+      const response = await fetch(`/api/alimentacao/refeicoes-planejadas/${id}`, { method: 'DELETE' })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || `Erro ao remover refeição`);
+      }
+      setRefeicoes(prev => prev.filter(r => r.id !== id))
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Erro desconhecido ao remover')
+    }
+  }
+
+  if (isLoading) return <p>Carregando planejador de refeições...</p>
 
   return (
     <div className="space-y-4">
+      {apiError && <p className="text-red-500 bg-red-100 p-2 rounded-md">{apiError}</p>}
       <div className="space-y-2">
         {refeicoes.map((refeicao) => (
           <div
@@ -52,23 +148,25 @@ export function PlanejadorRefeicoes() {
               <Clock className="h-5 w-5" />
             </div>
             
-            {editando === refeicao.id ? (
+            {editandoId === refeicao.id ? (
               <>
                 <input
                   type="time"
-                  value={novaRefeicao.horario}
-                  onChange={(e) => setNovaRefeicao({ ...novaRefeicao, horario: e.target.value })}
+                  name="horario"
+                  value={formState.horario}
+                  onChange={handleFormInputChange}
                   className="w-24 px-2 py-1 mr-2 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                 />
                 <input
                   type="text"
-                  value={novaRefeicao.descricao}
-                  onChange={(e) => setNovaRefeicao({ ...novaRefeicao, descricao: e.target.value })}
+                  name="descricao"
+                  value={formState.descricao}
+                  onChange={handleFormInputChange}
                   className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white"
                   placeholder="Descrição da refeição"
                 />
                 <button
-                  onClick={salvarEdicao}
+                  onClick={handleSalvarEdicaoAPI}
                   className="ml-2 p-1 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
                   aria-label="Salvar edição"
                 >
@@ -79,7 +177,7 @@ export function PlanejadorRefeicoes() {
                   className="ml-1 p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                   aria-label="Cancelar edição"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-5 w-5" /> {/* Using Trash2 for cancel here is a bit odd, consider X icon */}
                 </button>
               </>
             ) : (
@@ -91,16 +189,14 @@ export function PlanejadorRefeicoes() {
                   {refeicao.descricao}
                 </span>
                 <button
-                  onClick={() => iniciarEdicao(refeicao.id, refeicao.horario, refeicao.descricao)}
+                  onClick={() => iniciarEdicao(refeicao)}
                   className="ml-2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   aria-label="Editar refeição"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
+                  <Edit3 className="h-5 w-5" />
                 </button>
                 <button
-                  onClick={() => removerRefeicao(refeicao.id)}
+                  onClick={() => handleRemoverRefeicaoAPI(refeicao.id)}
                   className="ml-1 p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                   aria-label="Remover refeição"
                 >
@@ -112,34 +208,39 @@ export function PlanejadorRefeicoes() {
         ))}
       </div>
 
-      <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Adicionar Nova Refeição
-        </h3>
-        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-          <input
-            type="time"
-            value={novaRefeicao.horario}
-            onChange={(e) => setNovaRefeicao({ ...novaRefeicao, horario: e.target.value })}
-            className="w-full sm:w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-          />
-          <input
-            type="text"
-            value={novaRefeicao.descricao}
-            onChange={(e) => setNovaRefeicao({ ...novaRefeicao, descricao: e.target.value })}
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-            placeholder="Descrição da refeição"
-          />
-          <button
-            onClick={handleAdicionarRefeicao}
-            disabled={!novaRefeicao.horario || !novaRefeicao.descricao}
-            className="w-full sm:w-auto px-4 py-2 bg-alimentacao-primary text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Plus className="h-5 w-5 inline mr-1" />
-            Adicionar
-          </button>
+      {/* Add new meal form (not in editing mode) */}
+      {!editandoId && (
+        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Adicionar Nova Refeição
+          </h3>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+            <input
+              type="time"
+              name="horario"
+              value={formState.horario}
+              onChange={handleFormInputChange}
+              className="w-full sm:w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+            />
+            <input
+              type="text"
+              name="descricao"
+              value={formState.descricao}
+              onChange={handleFormInputChange}
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+              placeholder="Descrição da refeição"
+            />
+            <button
+              onClick={handleAdicionarRefeicaoAPI}
+              disabled={!formState.horario || !formState.descricao.trim() || !TIME_REGEX.test(formState.horario)}
+              className="w-full sm:w-auto px-4 py-2 bg-alimentacao-primary text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Plus className="h-5 w-5 inline mr-1" />
+              Adicionar
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

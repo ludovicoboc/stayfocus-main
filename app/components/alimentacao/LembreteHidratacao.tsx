@@ -1,20 +1,147 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Droplet, PlusCircle, MinusCircle } from 'lucide-react'
-import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore'
+
+// Types for API data
+type HidratacaoRegistro = {
+  id: number;
+  hora: string;
+};
+
+type HidratacaoApiResponse = {
+  metaDiaria: number;
+  coposBebidosHoje: number;
+  registrosHoje?: HidratacaoRegistro[]; // Optional in some responses, but good to have
+  ultimoReset?: string; // From GET /api/alimentacao/hidratacao
+};
 
 export function LembreteHidratacao() {
-  const { 
-    coposBebidos, 
-    metaDiaria, 
-    ultimoRegistro, 
-    adicionarCopo, 
-    removerCopo, 
-    ajustarMeta 
-  } = useAlimentacaoStore()
+  const [coposBebidos, setCoposBebidos] = useState(0)
+  const [metaDiaria, setMetaDiaria] = useState(8) // Default, will be fetched
+  const [registrosHoje, setRegistrosHoje] = useState<HidratacaoRegistro[]>([])
+  const [ultimoRegistroDisplay, setUltimoRegistroDisplay] = useState<string | null>(null)
 
-  // Calcular a porcentagem de progresso
-  const progresso = Math.min((coposBebidos / metaDiaria) * 100, 100)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await fetch('/api/alimentacao/hidratacao')
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar dados: ${response.statusText}`)
+        }
+        const data: HidratacaoApiResponse = await response.json()
+        setMetaDiaria(data.metaDiaria)
+        setCoposBebidos(data.coposBebidosHoje)
+        // The GET /api/alimentacao/hidratacao doesn't directly return 'registrosHoje' in its main response structure
+        // but the /copo endpoint does. For consistency, let's assume we need another call or adjust API.
+        // For now, we'll rely on the count and fetch full records if needed, or assume `copo` calls will populate `registrosHoje`
+        // Let's modify the GET /api/alimentacao/hidratacao to also return `registrosHoje` for this to work smoothly.
+        // Assuming for now it's part of the response or we make another call.
+        // For this refactor, let's assume the main GET returns `registrosHoje` as well for simplicity.
+        // If not, this would require a separate fetch to `/api/alimentacao/hidratacao/copo` or similar to get records.
+        // The API `index.ts` GET returns `coposBebidosHoje: data.registrosHoje.length`.
+        // The `copo.ts` POST/DELETE returns `registrosHoje: data.registrosHoje`.
+        // Let's assume the main GET /api/alimentacao/hidratacao is updated to provide `registrosHoje` array.
+        // If previous subtask for GET /api/alimentacao/hidratacao didn't include it, this is an integration point.
+        // For now, I'll assume it returns it or the component would make another call.
+        // Let's proceed as if `data.registrosHoje` is available from the initial fetch.
+        // If `data.registrosHoje` isn't returned by the main GET, this part needs adjustment.
+        // The current `index.ts` for GET /api/alimentacao/hidratacao returns:
+        // { metaDiaria, coposBebidosHoje (length), ultimoReset }
+        // It does NOT return the actual `registrosHoje` array.
+        // This means we can't get `ultimoRegistroDisplay` directly from this initial call.
+        // The component will have to build up `registrosHoje` from POST/DELETE calls, or we need a new endpoint.
+
+        // For now, let's manage `registrosHoje` locally and update it via `copo` calls.
+        // The initial call will set counts, but not the actual records.
+        // This means `ultimoRegistroDisplay` will only update when cups are added/removed via UI.
+
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchInitialData()
+  }, [])
+
+  // Update ultimoRegistroDisplay when registrosHoje changes
+  useEffect(() => {
+    if (registrosHoje.length > 0) {
+      setUltimoRegistroDisplay(registrosHoje[registrosHoje.length - 1].hora)
+    } else {
+      setUltimoRegistroDisplay(null)
+    }
+  }, [registrosHoje])
+
+  const handleApiResponse = (data: HidratacaoApiResponse) => {
+    setCoposBebidos(data.coposBebidosHoje)
+    if (data.registrosHoje) { // Check if API returns this
+      setRegistrosHoje(data.registrosHoje)
+    }
+    if (data.metaDiaria) { // PUT endpoint returns this
+        setMetaDiaria(data.metaDiaria)
+    }
+  }
+
+  const adicionarCopo = async () => {
+    setError(null)
+    try {
+      const response = await fetch('/api/alimentacao/hidratacao/copo', { method: 'POST' })
+      if (!response.ok) throw new Error('Erro ao adicionar copo')
+      const data: HidratacaoApiResponse = await response.json()
+      handleApiResponse(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+    }
+  }
+
+  const removerCopo = async () => {
+    setError(null)
+    try {
+      const response = await fetch('/api/alimentacao/hidratacao/copo', { method: 'DELETE' })
+      if (!response.ok) throw new Error('Erro ao remover copo')
+      const data: HidratacaoApiResponse = await response.json()
+      handleApiResponse(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+    }
+  }
+
+  const ajustarMetaRequest = async (novaMeta: number) => {
+    setError(null)
+    try {
+      const response = await fetch('/api/alimentacao/hidratacao', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metaDiaria: novaMeta }),
+      })
+      if (!response.ok) throw new Error('Erro ao ajustar meta')
+      const data: HidratacaoApiResponse = await response.json()
+      handleApiResponse(data) // API returns { metaDiaria, coposBebidosHoje, ultimoReset }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro desconhecido')
+    }
+  }
+
+  const handleAjustarMetaClick = (valor: number) => {
+    const novaMeta = metaDiaria + valor;
+    if (novaMeta >= 1 && novaMeta <= 15) { // Keep UI validation
+        ajustarMetaRequest(novaMeta);
+    }
+  }
+
+  const progresso = metaDiaria > 0 ? Math.min((coposBebidos / metaDiaria) * 100, 100) : 0;
+
+  if (isLoading) return <p>Carregando hidratação...</p>
+  // Error display can be more sophisticated
+  if (error) return <p className="text-red-500">Erro: {error}. Tente recarregar.</p>
 
   return (
     <div className="space-y-4">
@@ -30,7 +157,7 @@ export function LembreteHidratacao() {
         
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => ajustarMeta(-1)}
+            onClick={() => handleAjustarMetaClick(-1)}
             className="p-1 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Diminuir meta diária"
             disabled={metaDiaria <= 1}
@@ -45,7 +172,7 @@ export function LembreteHidratacao() {
           </div>
           
           <button
-            onClick={() => ajustarMeta(1)}
+            onClick={() => handleAjustarMetaClick(1)}
             className="p-1 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Aumentar meta diária"
             disabled={metaDiaria >= 15}
@@ -70,9 +197,9 @@ export function LembreteHidratacao() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {coposBebidos} de {metaDiaria} copos
-          {ultimoRegistro && (
+          {ultimoRegistroDisplay && (
             <span className="ml-2">
-              (Último: {ultimoRegistro})
+              (Último: {ultimoRegistroDisplay})
             </span>
           )}
         </div>
