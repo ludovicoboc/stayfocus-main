@@ -1,79 +1,103 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { useAutoconhecimentoStore } from '@/app/stores/autoconhecimentoStore'
+import { useState, useEffect } from 'react'
+import { useAutoconhecimentoStore } from '@/app/stores/autoconhecimentoStore' // Kept for modoRefugio
 import { Card } from '@/app/components/ui/Card'
-import { Badge } from '@/app/components/ui/Badge'
-import { Input } from '@/app/components/ui/Input'
-import { Search, Edit, Trash2, Image as ImageIcon } from 'lucide-react'
+// import { Badge } from '@/app/components/ui/Badge' // Not used with API notes for now
+// import { Input } from '@/app/components/ui/Input' // Search removed for simplicity
+import { Edit, Trash2 } from 'lucide-react' // Search, Image icons removed
+
+// API Note type
+type ApiNote = {
+  id: number;
+  title: string;
+  content: string;
+  timestamp: number;
+};
 
 type ListaNotasProps = {
-  secaoAtual: 'quem-sou' | 'meus-porques' | 'meus-padroes'
-  onSelectNota: (id: string) => void
+  // secaoAtual: 'quem-sou' | 'meus-porques' | 'meus-padroes'; // Removed, API doesn't filter by section
+  onSelectNota: (id: string) => void // Editor still expects string ID
 }
 
-export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
-  const { notas, removerNota, buscarNotas, modoRefugio } = useAutoconhecimentoStore()
-  const [termoBusca, setTermoBusca] = useState('')
+export function ListaNotas({ onSelectNota }: ListaNotasProps) {
+  const { modoRefugio } = useAutoconhecimentoStore(state => ({ modoRefugio: state.modoRefugio }))
+  const [apiNotes, setApiNotes] = useState<ApiNote[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
-  // Filtrar notas da seção atual
-  const notasSecao = useMemo(() => {
-    const notasFiltradas = termoBusca 
-      ? buscarNotas(termoBusca) 
-      : notas
-    
-    return notasFiltradas
-      .filter(nota => nota.secao === secaoAtual)
-      .sort((a, b) => new Date(b.dataAtualizacao).getTime() - new Date(a.dataAtualizacao).getTime())
-  }, [notas, secaoAtual, termoBusca, buscarNotas])
-  
-  // Função para lidar com a exclusão
-  const handleRemoverNota = (id: string, e: React.MouseEvent) => {
+  // Fetch notes from API
+  useEffect(() => {
+    const fetchNotas = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const response = await fetch('/api/notas')
+        if (!response.ok) {
+          throw new Error(`Falha ao buscar notas: ${response.statusText}`)
+        }
+        const data: ApiNote[] = await response.json()
+        // Sort by timestamp, newest first
+        data.sort((a, b) => b.timestamp - a.timestamp);
+        setApiNotes(data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchNotas()
+  }, []) // Empty dependency array to run once on mount
+
+  // Função para lidar com a exclusão via API
+  const handleRemoverNota = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation()
     
-    if (window.confirm('Tem certeza que deseja excluir esta nota?')) {
-      removerNota(id)
+    if (window.confirm('Tem certeza que deseja excluir esta nota via API?')) {
+      try {
+        const response = await fetch(`/api/notas/${id}`, { method: 'DELETE' })
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || `Falha ao excluir nota: ${response.statusText}`)
+        }
+        setApiNotes(prevNotes => prevNotes.filter(note => note.id !== id))
+        alert('Nota excluída com sucesso!')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido ao excluir')
+        alert(`Erro ao excluir nota: ${err instanceof Error ? err.message : 'Erro desconhecido'}`)
+        console.error(err)
+      }
     }
   }
   
-  // Formatação de data
-  const formatarData = (dataString: string) => {
-    const data = new Date(dataString)
-    return data.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
+  // Simple timestamp formatting
+  const formatarTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString('pt-BR')
   }
   
-  // Verifica se estamos no modo refúgio para simplificar a interface
   const interfaceSimplificada = modoRefugio
   
+  if (isLoading) {
+    return <p className="text-center text-gray-500 dark:text-gray-400 py-4">Carregando notas...</p>
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500 dark:text-red-400 py-4">Erro ao carregar notas: {error}</p>
+  }
+
   return (
     <div className="space-y-4">
-      {/* Barra de busca */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-        <Input
-          type="text"
-          placeholder="Buscar notas..."
-          value={termoBusca}
-          onChange={(e) => setTermoBusca(e.target.value)}
-          className="pl-10"
-          aria-label="Buscar notas"
-        />
-      </div>
+      {/* Barra de busca removida para simplificação */}
       
       {/* Lista de notas */}
       <div className="space-y-3">
-        {notasSecao.length === 0 ? (
+        {apiNotes.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400 py-4">
-            {termoBusca 
-              ? 'Nenhuma nota encontrada para esta busca' 
-              : 'Nenhuma nota registrada nesta seção ainda'}
+            Nenhuma nota encontrada.
           </p>
         ) : (
-          notasSecao.map((nota) => (
+          apiNotes.map((nota) => (
             <Card
               key={nota.id}
               className={`${
@@ -82,11 +106,11 @@ export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
             >
               <div 
                 className="p-4 cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-autoconhecimento-primary"
-                onClick={() => onSelectNota(nota.id)}
+                onClick={() => onSelectNota(String(nota.id))} // Convert number ID to string for editor
               >
                 <div className="flex justify-between items-start">
                   <h4 className="text-lg font-medium text-gray-800 dark:text-white line-clamp-1">
-                    {nota.titulo}
+                    {nota.title}
                   </h4>
                   
                   <div className="flex space-x-1">
@@ -96,7 +120,7 @@ export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
                           className="p-1 text-gray-500 hover:text-autoconhecimento-primary transition-colors"
                           onClick={(e) => {
                             e.stopPropagation()
-                            onSelectNota(nota.id)
+                            onSelectNota(String(nota.id)) // Convert number ID to string
                           }}
                           aria-label="Editar nota"
                         >
@@ -115,30 +139,14 @@ export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
                 </div>
                 
                 <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 line-clamp-2">
-                  {nota.conteudo}
+                  {nota.content}
                 </p>
                 
-                {!interfaceSimplificada && nota.tags.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {nota.tags.map((tag) => (
-                      <Badge 
-                        key={tag}
-                        className="bg-autoconhecimento-light text-autoconhecimento-primary px-2 py-0.5 text-xs"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                {/* Tags and ImageUrl removed as not available in ApiNote */}
                 
                 <div className="mt-2 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                  <span>Atualizado em {formatarData(nota.dataAtualizacao)}</span>
-                  {nota.imagemUrl && (
-                    <span className="flex items-center">
-                      <ImageIcon size={12} className="mr-1" />
-                      <span>Âncora visual</span>
-                    </span>
-                  )}
+                  <span>Registrado em: {formatarTimestamp(nota.timestamp)}</span>
+                  {/* Image icon removed */}
                 </div>
               </div>
             </Card>

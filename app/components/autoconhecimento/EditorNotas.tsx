@@ -103,25 +103,49 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
   }
   
   // Função para salvar a nota
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (titulo.trim() && conteudo.trim()) {
       if (id) {
-        // Atualizar nota existente
+        // Atualizar nota existente (Store logic - not changed for this subtask)
+        // TODO: Consider API call for PUT /api/notas/[id] in future
         atualizarNota(id, {
           titulo,
           conteudo,
           tags,
           imagemUrl
-        })
+        });
+        alert('Nota atualizada localmente (sem API)!'); // Placeholder
       } else {
-        // Criar nova nota
-        adicionarNota(
-          titulo,
-          conteudo,
-          secaoAtual,
-          tags,
-          imagemUrl
-        )
+        // Criar nova nota via API
+        try {
+          const response = await fetch('/api/notas', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title: titulo, content: conteudo }),
+          });
+
+          if (response.ok) {
+            const novaNotaApi = await response.json();
+            // Optionally, could call a store action here if it were to add an API-sourced note
+            // For now, just alert and rely on ListaNotas to refresh.
+            alert(`Nota "${novaNotaApi.title}" salva com sucesso via API! ID: ${novaNotaApi.id}`);
+            // Clear local form state after successful save
+            setTitulo('');
+            setConteudo('');
+            setTags([]);
+            setImagemUrl(undefined);
+            // The store's 'adicionarNota' is not called here, so the store state for 'notas'
+            // won't be updated by this action directly. ListaNotas will fetch.
+          } else {
+            const errorData = await response.json();
+            alert(`Erro ao salvar nota: ${errorData.message || response.statusText}`);
+          }
+        } catch (error) {
+          console.error('Erro ao salvar nota via API:', error);
+          alert('Erro de rede ou inesperado ao salvar nota.');
+        }
       }
       
       if (onSave) {
