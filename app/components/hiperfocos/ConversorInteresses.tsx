@@ -1,12 +1,24 @@
 'use client'
 
 import { useState, useRef, FormEvent } from 'react'
-import { Rocket, CheckCircle, PlusCircle, X, Save } from 'lucide-react'
-import { useHiperfocosStore, CORES_HIPERFOCOS } from '../../stores/hiperfocosStore'
+import { Rocket, CheckCircle, PlusCircle, X, Save, Loader2 } from 'lucide-react'
+import { useCreateHiperfoco, useUserId } from '../../hooks/useHiperfocos'
+import { useCreateTarefa } from '../../hooks/useTarefas'
+import { validateHiperfoco, validateTarefa, ValidationError } from '../../lib/services/hiperfocosValidation'
+
+// Cores disponíveis para hiperfocos
+const CORES_HIPERFOCOS = [
+  '#FF5252', '#E91E63', '#9C27B0', '#673AB7',
+  '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4',
+  '#009688', '#4CAF50', '#8BC34A', '#CDDC39',
+  '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'
+]
 
 export function ConversorInteresses() {
-  const { adicionarHiperfoco, adicionarTarefa } = useHiperfocosStore()
-  
+  const userId = useUserId()
+  const createHiperfocoMutation = useCreateHiperfoco()
+  const createTarefaMutation = useCreateTarefa()
+
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
@@ -14,13 +26,16 @@ export function ConversorInteresses() {
     tempoLimite: '',
     novasTarefas: [''] // Iniciar com um campo vazio
   })
-  
+
   const [feedback, setFeedback] = useState<{
     tipo: 'sucesso' | 'erro',
     mensagem: string
   } | null>(null)
-  
+
   const formRef = useRef<HTMLFormElement>(null)
+
+  // Estado de loading combinado
+  const isLoading = createHiperfocoMutation.isPending || createTarefaMutation.isPending
   
   // Função para adicionar mais campos de tarefas
   const adicionarCampoTarefa = () => {
@@ -52,49 +67,58 @@ export function ConversorInteresses() {
   }
   
   // Função para lidar com o envio do formulário
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    
-    // Validação
-    if (!formData.titulo) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'O título do hiperfoco é obrigatório'
-      })
-      return
-    }
-    
-    if (formData.novasTarefas.filter(t => t.trim() !== '').length === 0) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'Adicione pelo menos uma tarefa'
-      })
-      return
-    }
-    
+
     try {
-      // Criar um novo hiperfoco
+      // Validar dados do hiperfoco usando o service
       const tempoLimiteInt = formData.tempoLimite ? parseInt(formData.tempoLimite) : undefined
-      const hiperfocoId = adicionarHiperfoco(
-        formData.titulo,
-        formData.descricao,
-        formData.corSelecionada,
-        tempoLimiteInt
-      )
-      
-      // Adicionar as tarefas ao hiperfoco
-      formData.novasTarefas
-        .filter(tarefa => tarefa.trim() !== '')
-        .forEach(tarefa => {
-          adicionarTarefa(hiperfocoId, tarefa)
+
+      validateHiperfoco({
+        titulo: formData.titulo,
+        descricao: formData.descricao,
+        cor: formData.corSelecionada,
+        tempoLimite: tempoLimiteInt
+      })
+
+      // Validar tarefas não vazias
+      const tarefasValidas = formData.novasTarefas.filter(t => t.trim() !== '')
+
+      if (tarefasValidas.length === 0) {
+        throw new ValidationError('Adicione pelo menos uma tarefa')
+      }
+
+      // Validar cada tarefa individualmente
+      tarefasValidas.forEach(tarefa => {
+        validateTarefa({ texto: tarefa })
+      })
+
+      // Criar o hiperfoco via API
+      const hiperfocoResult = await createHiperfocoMutation.mutateAsync({
+        user_id: userId,
+        titulo: formData.titulo,
+        descricao: formData.descricao || undefined,
+        cor: formData.corSelecionada,
+        tempo_limite: tempoLimiteInt
+      })
+
+      // Criar as tarefas via API
+      const hiperfocoId = hiperfocoResult.data.id
+      for (let i = 0; i < tarefasValidas.length; i++) {
+        await createTarefaMutation.mutateAsync({
+          hiperfoco_id: hiperfocoId,
+          user_id: userId,
+          texto: tarefasValidas[i],
+          ordem: i
         })
-      
+      }
+
       // Feedback de sucesso
       setFeedback({
         tipo: 'sucesso',
         mensagem: 'Hiperfoco criado com sucesso!'
       })
-      
+
       // Limpar o formulário
       setFormData({
         titulo: '',
@@ -103,16 +127,25 @@ export function ConversorInteresses() {
         tempoLimite: '',
         novasTarefas: ['']
       })
-      
+
       // Timer para remover o feedback
       setTimeout(() => {
         setFeedback(null)
       }, 3000)
     } catch (error) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'Ocorreu um erro ao criar o hiperfoco'
-      })
+      console.error('Erro ao criar hiperfoco:', error)
+
+      if (error instanceof ValidationError) {
+        setFeedback({
+          tipo: 'erro',
+          mensagem: error.message
+        })
+      } else {
+        setFeedback({
+          tipo: 'erro',
+          mensagem: 'Ocorreu um erro ao criar o hiperfoco. Tente novamente.'
+        })
+      }
     }
   }
   
@@ -274,11 +307,21 @@ export function ConversorInteresses() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-hiperfocos-primary hover:bg-hiperfocos-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-hiperfocos-primary"
+            disabled={isLoading}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-hiperfocos-primary hover:bg-hiperfocos-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-hiperfocos-primary disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Converter interesse em hiperfoco"
           >
-            <Save className="h-5 w-5 mr-2" aria-hidden="true" />
-            Converter em Hiperfoco
+            {isLoading ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" aria-hidden="true" />
+                Criando...
+              </>
+            ) : (
+              <>
+                <Save className="h-5 w-5 mr-2" aria-hidden="true" />
+                Converter em Hiperfoco
+              </>
+            )}
           </button>
         </div>
       </form>
