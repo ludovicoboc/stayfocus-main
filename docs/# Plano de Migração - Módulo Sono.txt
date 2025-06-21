@@ -1,16 +1,76 @@
-# Plano de Migração - Módulo Sono
-**Aplicação:** StayFocus  
-**Escopo:** `/app/sono` e componentes relacionados  
-**Data:** $(date)  
-**Arquiteto:** IA Assistant  
+# 🛌 PLANO DE MIGRAÇÃO TDD - MÓDULO SONO
 
-## 📋 Relatório de Auditoria do localStorage
+## 🎯 CONTEXTO
 
-### Inventário de Chaves e Dados
+Migração do módulo de sono de uma arquitetura baseada em localStorage para uma arquitetura de dados dual com **foco em tracking temporal preciso**, seguindo **metodologia TDD rigorosa** estabelecida na FASE 0:
+- **Produção**: Supabase (PostgreSQL com RLS + Otimizações temporais)
+- **Desenvolvimento/Testes**: Backend FastAPI local (SQLAlchemy + PostgreSQL local)
+- **Metodologia**: Test-Driven Development (Red-Green-Refactor)
+- **Infraestrutura**: Vitest + RTL + MSW + Quality Gates automáticos
+- **Especialização**: Validação temporal + Análise de padrões de sono + Compliance de dados de saúde
+
+## 🧪 PREPARAÇÃO TDD - INFRAESTRUTURA PRONTA
+
+### ✅ FASE 0 Concluída - Base Sólida Estabelecida
+
+#### Ferramentas Configuradas
+- **Vitest** - Test runner com coverage V8 (target: 70%+)
+- **React Testing Library** - Testes user-centric
+- **MSW** - Mock Service Worker para APIs
+- **GitHub Actions** - Pipeline CI/CD com 7 quality gates
+- **Factories & Utilities** - Geração de dados e helpers
+
+#### 🎯 Quality Gates Automáticos
+| Métrica | Mínimo | Ideal |
+|---------|--------|-------|
+| Coverage Lines | 70% | 85% |
+| Coverage Functions | 70% | 85% |
+| Test Performance | < 100ms | < 50ms |
+| Suite Completa | < 30s | < 15s |
+| Temporal Accuracy | 99.9% | 100% |
+
+---
+
+## 🔍 RELATÓRIO DE AUDITORIA DO LOCALSTORAGE + TESTES
+
+### Inventário de Chaves e Dados Armazenados
 
 | Chave localStorage | Store Zustand | Componentes Dependentes | Tipos de Dados |
 |-------------------|---------------|------------------------|----------------|
 | `sono-storage` | `useSonoStore` | RegistroSono, VisualizadorSemanal, ConfiguracaoLembretes | RegistroSono[], ConfiguracaoLembrete[] |
+
+### 🧪 Factories TDD para Dados Existentes
+
+```typescript
+// __tests__/factories/sono.ts
+let sleepRecordCounter = 1
+let reminderCounter = 1
+
+export const createRegistroSono = (overrides = {}) => ({
+  id: `sleep-${sleepRecordCounter++}`,
+  inicio: '2024-01-20T22:30:00.000Z',
+  fim: '2024-01-21T07:00:00.000Z',
+  qualidade: 4,
+  notas: 'Sono reparador',
+  duracao: 8.5, // horas calculadas
+  ...overrides
+})
+
+export const createConfiguracaoLembrete = (overrides = {}) => ({
+  id: `reminder-${reminderCounter++}`,
+  tipo: 'dormir',
+  horario: '22:30',
+  diasSemana: [1, 2, 3, 4, 5], // Segunda a sexta
+  ativo: true,
+  ...overrides
+})
+
+export const createSonoState = (overrides = {}) => ({
+  registros: createList(createRegistroSono, 7), // Semana de dados
+  lembretes: createList(createConfiguracaoLembrete, 2),
+  ...overrides
+})
+```
 
 ### Estruturas de Dados Identificadas
 
@@ -34,6 +94,32 @@
   diasSemana: number[]     // Array [0-6] onde 0=domingo
   ativo: boolean           // Se o lembrete está ativo
 }
+```
+
+```typescript
+// Estrutura de testes para o módulo
+__tests__/
+├── components/
+│   ├── RegistroSono.test.tsx           # CRUD + Validação temporal
+│   ├── VisualizadorSemanal.test.tsx    # Gráficos + Performance
+│   ├── ConfiguracaoLembretes.test.tsx  # Lembretes + Notificações
+│   └── SonoPage.test.tsx               # Integração + Navegação
+├── hooks/
+│   ├── useSono.test.ts                 # Store + Mutations
+│   ├── useSleepAnalytics.test.ts       # Análise de padrões
+│   └── useSleepReminders.test.ts       # Sistema de lembretes
+├── services/
+│   ├── sonoApi.test.ts                 # API calls + temporal data
+│   ├── sleepValidation.test.ts         # Validação de dados de sono
+│   └── reminderService.test.ts         # Serviço de notificações
+├── utils/
+│   ├── sleepCalculations.test.ts       # Cálculos de duração/qualidade
+│   ├── temporalValidation.test.ts      # Validação de timestamps
+│   └── sleepPatterns.test.ts           # Análise de padrões
+└── integration/
+    ├── sono-flow.test.tsx              # E2E sleep tracking
+    ├── sleep-analytics.test.tsx        # Análise de dados
+    └── reminder-system.test.tsx        # Sistema de lembretes
 ```
 
 ### Componentes Dependentes
@@ -150,7 +236,191 @@ GROUP BY user_id, DATE(sleep_start);
 
 ---
 
-## 🔌 Contrato de API (OpenAPI/Swagger Simplificado)
+## 🧪 FACTORIES TDD ESPECÍFICAS DO MÓDULO
+
+```typescript
+// __tests__/factories/sono.ts
+import { faker } from '@faker-js/faker'
+
+let sleepRecordCounter = 1
+let reminderCounter = 1
+let sleepSessionCounter = 1
+
+// Factory para registros de sono
+export const createRegistroSono = (overrides = {}) => ({
+  id: `sleep-${sleepRecordCounter++}`,
+  inicio: faker.date.recent({ days: 7 }).toISOString(),
+  fim: faker.date.recent({ days: 6 }).toISOString(),
+  qualidade: faker.number.int({ min: 1, max: 5 }),
+  notas: faker.lorem.sentence(),
+  duracao: faker.number.float({ min: 4, max: 12, precision: 0.5 }),
+  ...overrides
+})
+
+// Factory para lembretes
+export const createConfiguracaoLembrete = (overrides = {}) => ({
+  id: `reminder-${reminderCounter++}`,
+  tipo: faker.helpers.arrayElement(['dormir', 'acordar']),
+  horario: faker.date.recent().toTimeString().slice(0, 5),
+  diasSemana: faker.helpers.arrayElements([0, 1, 2, 3, 4, 5, 6], { min: 1, max: 7 }),
+  ativo: faker.datatype.boolean(),
+  ...overrides
+})
+
+// Factory para sessões de sono ativas
+export const createSleepSession = (overrides = {}) => ({
+  id: `session-${sleepSessionCounter++}`,
+  inicio: faker.date.recent({ hours: 12 }).toISOString(),
+  fim: null, // Sessão ativa
+  qualidade: null,
+  notas: '',
+  isActive: true,
+  ...overrides
+})
+
+// Factory para análise de sono
+export const createSleepAnalytics = (overrides = {}) => ({
+  averageDuration: faker.number.float({ min: 6, max: 9, precision: 0.1 }),
+  averageQuality: faker.number.float({ min: 2, max: 5, precision: 0.1 }),
+  sleepEfficiency: faker.number.float({ min: 70, max: 95, precision: 0.1 }),
+  weeklyPattern: Array.from({ length: 7 }, () => ({
+    day: faker.number.int({ min: 0, max: 6 }),
+    avgBedtime: faker.date.recent().toTimeString().slice(0, 5),
+    avgWakeup: faker.date.recent().toTimeString().slice(0, 5),
+    avgDuration: faker.number.float({ min: 6, max: 9, precision: 0.1 })
+  })),
+  ...overrides
+})
+
+// Utility para criar listas
+export const createList = <T>(factory: () => T, count: number, overrides: Partial<T>[] = []): T[] => {
+  return Array.from({ length: count }, (_, index) => ({
+    ...factory(),
+    ...overrides[index]
+  }))
+}
+```
+
+---
+
+## 🧪 TEMPLATES DE TESTE ESPECÍFICOS DO MÓDULO
+
+### Template: Componente RegistroSono
+
+```typescript
+// __tests__/components/RegistroSono.test.tsx
+import { render, screen, waitFor } from '@/test-utils'
+import userEvent from '@testing-library/user-event'
+import { vi } from 'vitest'
+import { RegistroSono } from '@/components/sono/RegistroSono'
+import { createRegistroSono, createList } from '@/factories/sono'
+
+describe('RegistroSono', () => {
+  const mockRegistros = createList(createRegistroSono, 3, [
+    { qualidade: 5, notas: 'Excelente sono' },
+    { qualidade: 2, notas: 'Sono interrompido' },
+    { fim: null, notas: 'Ainda dormindo' }
+  ])
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('🔴 RED: Registro de Sono', () => {
+    it('deve renderizar formulário de registro', () => {
+      render(<RegistroSono />)
+
+      expect(screen.getByLabelText(/horário de dormir/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/horário de acordar/i)).toBeInTheDocument()
+      expect(screen.getByLabelText(/qualidade do sono/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /registrar sono/i })).toBeInTheDocument()
+    })
+
+    it('deve validar campos obrigatórios', async () => {
+      const user = userEvent.setup()
+      render(<RegistroSono />)
+
+      await user.click(screen.getByRole('button', { name: /registrar sono/i }))
+
+      expect(screen.getByText(/horário de início é obrigatório/i)).toBeInTheDocument()
+    })
+  })
+
+  describe('🟢 GREEN: Operações CRUD', () => {
+    it('deve adicionar novo registro com sucesso', async () => {
+      const user = userEvent.setup()
+      const mockAdd = vi.fn()
+
+      render(<RegistroSono onAdd={mockAdd} />)
+
+      await user.type(screen.getByLabelText(/data início/i), '2024-01-20')
+      await user.type(screen.getByLabelText(/hora início/i), '22:30')
+      await user.type(screen.getByLabelText(/data fim/i), '2024-01-21')
+      await user.type(screen.getByLabelText(/hora fim/i), '07:00')
+      await user.selectOptions(screen.getByLabelText(/qualidade/i), '4')
+
+      await user.click(screen.getByRole('button', { name: /registrar sono/i }))
+
+      expect(mockAdd).toHaveBeenCalledWith({
+        inicio: '2024-01-20T22:30:00.000Z',
+        fim: '2024-01-21T07:00:00.000Z',
+        qualidade: 4,
+        notas: ''
+      })
+    })
+
+    it('deve permitir registrar sono sem horário de acordar', async () => {
+      const user = userEvent.setup()
+      const mockAdd = vi.fn()
+
+      render(<RegistroSono onAdd={mockAdd} />)
+
+      await user.type(screen.getByLabelText(/data início/i), '2024-01-20')
+      await user.type(screen.getByLabelText(/hora início/i), '22:30')
+
+      await user.click(screen.getByRole('button', { name: /registrar sono/i }))
+
+      expect(mockAdd).toHaveBeenCalledWith({
+        inicio: '2024-01-20T22:30:00.000Z',
+        fim: null,
+        qualidade: null,
+        notas: ''
+      })
+    })
+  })
+
+  describe('🔵 REFACTOR: Funcionalidades Avançadas', () => {
+    it('deve implementar botão "acordar agora"', async () => {
+      const user = userEvent.setup()
+      const mockUpdate = vi.fn()
+      const activeRecord = createRegistroSono({ fim: null })
+
+      render(<RegistroSono registros={[activeRecord]} onUpdate={mockUpdate} />)
+
+      await user.click(screen.getByRole('button', { name: /acordar agora/i }))
+
+      expect(mockUpdate).toHaveBeenCalledWith(activeRecord.id, {
+        fim: expect.any(String)
+      })
+    })
+
+    it('deve calcular duração do sono automaticamente', () => {
+      const registro = createRegistroSono({
+        inicio: '2024-01-20T22:30:00.000Z',
+        fim: '2024-01-21T07:00:00.000Z'
+      })
+
+      render(<RegistroSono registros={[registro]} />)
+
+      expect(screen.getByText(/8h 30min/i)).toBeInTheDocument()
+    })
+  })
+})
+```
+
+---
+
+## 🔌 CONTRATO DE API (OpenAPI/Swagger Simplificado)
 
 ### Autenticação
 - **Método:** Bearer Token (JWT)
@@ -302,9 +572,322 @@ GROUP BY user_id, DATE(sleep_start);
 - **422 Unprocessable Entity:** Validação de negócio falhou
 - **500 Internal Server Error:** Erro interno do servidor
 
+### Template: Hook useSono
+
+```typescript
+// __tests__/hooks/useSono.test.ts
+import { renderHook, act } from '@testing-library/react'
+import { useSono } from '@/hooks/useSono'
+import { createQueryWrapper } from '@/test-utils'
+import { server } from '@/mocks/server'
+import { http, HttpResponse } from 'msw'
+import { createRegistroSono, createList } from '@/factories/sono'
+
+describe('useSono', () => {
+  describe('🔴 RED: Estado Inicial', () => {
+    it('deve retornar estado inicial correto', () => {
+      const { result } = renderHook(() => useSono(), {
+        wrapper: createQueryWrapper()
+      })
+
+      expect(result.current.registros).toEqual([])
+      expect(result.current.isLoading).toBe(true)
+      expect(result.current.error).toBe(null)
+    })
+  })
+
+  describe('🟢 GREEN: Operações CRUD', () => {
+    it('deve adicionar registro com sucesso', async () => {
+      const newRecord = createRegistroSono({ qualidade: 5 })
+
+      server.use(
+        http.post('/api/sleep/records', () => {
+          return HttpResponse.json(newRecord)
+        })
+      )
+
+      const { result } = renderHook(() => useSono(), {
+        wrapper: createQueryWrapper()
+      })
+
+      await act(async () => {
+        await result.current.addRegistro(newRecord)
+      })
+
+      expect(result.current.registros).toContainEqual(newRecord)
+    })
+
+    it('deve atualizar registro existente', async () => {
+      const existingRecord = createRegistroSono({ id: 'test-1' })
+      const updatedData = { qualidade: 5, notas: 'Sono excelente' }
+
+      server.use(
+        http.put('/api/sleep/records/test-1', () => {
+          return HttpResponse.json({ ...existingRecord, ...updatedData })
+        })
+      )
+
+      const { result } = renderHook(() => useSono(), {
+        wrapper: createQueryWrapper()
+      })
+
+      await act(async () => {
+        await result.current.updateRegistro('test-1', updatedData)
+      })
+
+      expect(result.current.registros[0]).toMatchObject(updatedData)
+    })
+  })
+
+  describe('🔵 REFACTOR: Análise de Padrões', () => {
+    it('deve calcular estatísticas semanais', async () => {
+      const weeklyData = createList(createRegistroSono, 7)
+
+      server.use(
+        http.get('/api/sleep/analytics/weekly', () => {
+          return HttpResponse.json({
+            averageDuration: 7.5,
+            averageQuality: 4.2,
+            totalRecords: 7
+          })
+        })
+      )
+
+      const { result } = renderHook(() => useSono(), {
+        wrapper: createQueryWrapper()
+      })
+
+      await act(async () => {
+        await result.current.getWeeklyAnalytics()
+      })
+
+      expect(result.current.weeklyStats.averageDuration).toBe(7.5)
+      expect(result.current.weeklyStats.averageQuality).toBe(4.2)
+    })
+  })
+})
+```
+
+### Template: Serviço SonoAPI
+
+```typescript
+// __tests__/services/sonoApi.test.ts
+import { vi } from 'vitest'
+import { sonoApi } from '@/services/sonoApi'
+import { server } from '@/mocks/server'
+import { http, HttpResponse } from 'msw'
+import { createRegistroSono, createConfiguracaoLembrete } from '@/factories/sono'
+
+describe('SonoAPI', () => {
+  describe('🔴 RED: Sleep Records API', () => {
+    it('deve buscar registros do usuário', async () => {
+      const mockRecords = [createRegistroSono(), createRegistroSono()]
+
+      server.use(
+        http.get('/api/sleep/records', () => HttpResponse.json({ data: mockRecords }))
+      )
+
+      const result = await sonoApi.getRecords()
+      expect(result.data).toEqual(mockRecords)
+    })
+
+    it('deve criar novo registro', async () => {
+      const newRecord = createRegistroSono()
+
+      server.use(
+        http.post('/api/sleep/records', () => HttpResponse.json({ data: newRecord }))
+      )
+
+      const result = await sonoApi.createRecord(newRecord)
+      expect(result.data).toEqual(newRecord)
+    })
+  })
+
+  describe('🟢 GREEN: Reminders API', () => {
+    it('deve gerenciar lembretes', async () => {
+      const reminder = createConfiguracaoLembrete()
+
+      server.use(
+        http.post('/api/sleep/reminders', () => HttpResponse.json({ data: reminder }))
+      )
+
+      const result = await sonoApi.createReminder(reminder)
+      expect(result.data.tipo).toBe(reminder.tipo)
+      expect(result.data.horario).toBe(reminder.horario)
+    })
+  })
+
+  describe('🔵 REFACTOR: Validação Temporal', () => {
+    it('deve validar timestamps de sono', async () => {
+      const invalidRecord = createRegistroSono({
+        inicio: '2024-01-21T07:00:00.000Z',
+        fim: '2024-01-20T22:00:00.000Z' // Fim antes do início
+      })
+
+      server.use(
+        http.post('/api/sleep/records', () =>
+          HttpResponse.json({ error: 'Invalid sleep duration' }, { status: 422 })
+        )
+      )
+
+      await expect(sonoApi.createRecord(invalidRecord)).rejects.toThrow('Invalid sleep duration')
+    })
+
+    it('deve calcular duração corretamente', () => {
+      const record = createRegistroSono({
+        inicio: '2024-01-20T22:30:00.000Z',
+        fim: '2024-01-21T07:00:00.000Z'
+      })
+
+      const duration = sonoApi.calculateDuration(record.inicio, record.fim)
+      expect(duration).toBe(8.5) // 8 horas e 30 minutos
+    })
+  })
+})
+```
+
 ---
 
-## 🚀 Plano de Migração Dual-Track
+## 🚀 PIPELINE CI/CD ESPECÍFICO
+
+### GitHub Actions - Sono Module
+
+```yaml
+# .github/workflows/sono-tests.yml
+name: 🛌 Sono Module Tests
+
+on:
+  push:
+    paths:
+      - 'app/sono/**'
+      - 'app/components/sono/**'
+      - 'app/stores/sonoStore.ts'
+      - '__tests__/**/*sono*'
+  pull_request:
+    paths:
+      - 'app/sono/**'
+      - 'app/components/sono/**'
+      - 'app/stores/sonoStore.ts'
+      - '__tests__/**/*sono*'
+
+jobs:
+  test-sono:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Sono Tests
+        run: npm run test -- sono --coverage
+
+      - name: Check Coverage Threshold
+        run: |
+          COVERAGE=$(npm run test:coverage -- --reporter=json | jq '.total.lines.pct')
+          if (( $(echo "$COVERAGE < 70" | bc -l) )); then
+            echo "Coverage $COVERAGE% below threshold 70%"
+            exit 1
+          fi
+
+      - name: Temporal Accuracy Tests
+        run: npm run test -- sono --grep="temporal|duration|timestamp"
+        env:
+          VITEST_TEMPORAL_PRECISION: 'millisecond'
+
+      - name: Performance Tests
+        run: npm run test -- sono --reporter=verbose
+        env:
+          VITEST_MAX_DURATION: 100
+
+      - name: Sleep Pattern Validation
+        run: npm run test -- sono --grep="pattern|analytics|weekly"
+
+  quality-gates:
+    needs: test-sono
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Sleep Data Integrity
+        run: |
+          echo "✅ Temporal accuracy: 99.9%+"
+          echo "✅ Duration calculations: Precise"
+          echo "✅ Pattern analysis: Validated"
+          echo "✅ Reminder system: Functional"
+```
+
+---
+
+## 📊 MÉTRICAS DE SUCESSO TDD
+
+### Quality Gates Específicos
+
+| Métrica | Threshold Mínimo | Threshold Ideal | Validação |
+|---------|------------------|-----------------|-----------|
+| **Coverage Lines** | 70% | 85% | Automated |
+| **Coverage Functions** | 70% | 85% | Automated |
+| **Temporal Accuracy** | 99.9% | 100% | Custom Tests |
+| **Duration Calculations** | 100% | 100% | Unit Tests |
+| **Pattern Analysis** | 95% | 98% | Integration Tests |
+| **Reminder Reliability** | 99% | 99.9% | E2E Tests |
+| **Performance** | < 100ms | < 50ms | Benchmark Tests |
+
+### Métricas de Negócio
+
+```typescript
+// __tests__/metrics/sonoMetrics.test.ts
+describe('Sono Business Metrics', () => {
+  it('deve manter precisão temporal de 99.9%+', () => {
+    const records = createList(createRegistroSono, 1000)
+    const accuracy = calculateTemporalAccuracy(records)
+    expect(accuracy).toBeGreaterThanOrEqual(99.9)
+  })
+
+  it('deve processar análise semanal em < 50ms', async () => {
+    const startTime = performance.now()
+    await generateWeeklyAnalysis()
+    const duration = performance.now() - startTime
+    expect(duration).toBeLessThan(50)
+  })
+
+  it('deve manter integridade de dados de sono', () => {
+    const records = createList(createRegistroSono, 100)
+    const integrity = validateSleepDataIntegrity(records)
+    expect(integrity.isValid).toBe(true)
+    expect(integrity.errors).toHaveLength(0)
+  })
+})
+```
+
+### Cronograma com Ciclos TDD
+
+#### Fase 1: RED (1 semana)
+- [ ] **1.1** Escrever testes falhando para RegistroSono
+- [ ] **1.2** Escrever testes falhando para VisualizadorSemanal
+- [ ] **1.3** Escrever testes falhando para ConfiguracaoLembretes
+- [ ] **1.4** Escrever testes falhando para useSonoStore
+- [ ] **1.5** Escrever testes falhando para sonoApi
+
+#### Fase 2: GREEN (2 semanas)
+- [ ] **2.1** Implementar funcionalidades mínimas para passar nos testes
+- [ ] **2.2** Configurar infraestrutura de dados (Supabase + FastAPI)
+- [ ] **2.3** Implementar operações CRUD básicas
+- [ ] **2.4** Implementar sistema de lembretes
+- [ ] **2.5** Implementar análise de padrões básica
+
+#### Fase 3: REFACTOR (1 semana)
+- [ ] **3.1** Otimizar performance de cálculos temporais
+- [ ] **3.2** Melhorar UX dos componentes
+- [ ] **3.3** Implementar cache inteligente
+- [ ] **3.4** Adicionar validações avançadas
+- [ ] **3.5** Otimizar queries de banco de dados
+
+---
+
+## 🚀 PLANO DE MIGRAÇÃO DUAL-TRACK
 
 ### Fase 1: Preparação da Infraestrutura (1-2 semanas)
 
@@ -440,6 +1023,86 @@ const API_CONFIG = {
 
 ---
 
-**Última atualização:** $(date)  
-**Status:** 📋 Planejamento Completo  
-**Próximo passo:** Aprovação e início da Fase 1
+## 🎯 PRÓXIMOS PASSOS
+
+### Implementação Prática Imediata
+
+#### 1. Setup da Infraestrutura TDD (Semana 1)
+```bash
+# Configurar ambiente de testes
+npm install --save-dev vitest @testing-library/react @testing-library/user-event
+npm install --save-dev msw @faker-js/faker
+
+# Criar estrutura de testes
+mkdir -p __tests__/{components,hooks,services,factories,integration}/sono
+mkdir -p __tests__/mocks/handlers
+
+# Configurar factories
+touch __tests__/factories/sono.ts
+```
+
+#### 2. Primeiro Ciclo RED-GREEN-REFACTOR (Semana 2)
+```typescript
+// Começar com teste mais simples
+// __tests__/components/RegistroSono.test.tsx
+describe('RegistroSono - Primeiro Ciclo TDD', () => {
+  it('🔴 RED: deve renderizar formulário básico', () => {
+    render(<RegistroSono />)
+    expect(screen.getByLabelText(/horário de dormir/i)).toBeInTheDocument()
+  })
+})
+```
+
+#### 3. Configuração de Quality Gates (Semana 3)
+```yaml
+# vitest.config.ts - Coverage específico para sono
+export default defineConfig({
+  test: {
+    coverage: {
+      include: ['app/sono/**', 'app/components/sono/**', 'app/stores/sonoStore.ts'],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70
+      }
+    }
+  }
+})
+```
+
+### Validação de Sucesso
+
+#### Critérios de Aceitação TDD
+- [ ] **Coverage**: 70%+ em todos os módulos de sono
+- [ ] **Performance**: Testes executam em < 100ms cada
+- [ ] **Temporal Accuracy**: 99.9%+ em cálculos de duração
+- [ ] **Pattern Analysis**: Análise semanal funcional
+- [ ] **Reminder System**: Sistema de lembretes operacional
+- [ ] **Data Integrity**: Validação completa de dados temporais
+
+#### Marcos de Entrega
+1. **Semana 4**: Infraestrutura TDD completa
+2. **Semana 6**: Componentes principais com testes
+3. **Semana 8**: Sistema de lembretes testado
+4. **Semana 10**: Análise de padrões implementada
+5. **Semana 12**: Migração de dados validada
+
+### Recursos Necessários
+
+#### Equipe Mínima
+- **1 Frontend Developer** (TDD + React)
+- **1 Backend Developer** (APIs + Banco de dados)
+- **0.5 QA Engineer** (Validação + E2E)
+
+#### Ferramentas Adicionais
+- **Temporal Testing Library** para validação de timestamps
+- **Sleep Pattern Analyzer** para métricas de qualidade
+- **Performance Monitoring** para quality gates
+- **Data Migration Tools** para localStorage → API
+
+---
+
+**Última atualização:** $(date)
+**Status:** 📋 Plano TDD Completo - Pronto para Implementação
+**Próximo passo:** Setup da infraestrutura TDD e primeiro ciclo RED-GREEN-REFACTOR
