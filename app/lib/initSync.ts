@@ -191,6 +191,17 @@ export async function forceSyncNow() {
 }
 
 /**
+ * Força carregamento de dados da nuvem
+ */
+export async function forceLoadFromCloud() {
+  if (!syncInitialized) {
+    throw new Error('Sincronização não foi inicializada');
+  }
+  
+  return await syncService.forceLoadFromCloud();
+}
+
+/**
  * Para a sincronização (útil para testes ou manutenção)
  */
 export function stopSync() {
@@ -237,6 +248,24 @@ export const syncDebug = {
     console.log(`🔄 Forçando sincronização da store: ${storeName}`);
     syncService.markPendingChanges();
     return await syncService.forcSync();
+  },
+
+  // NOVO: Forçar carregamento da nuvem
+  loadFromCloud: async () => {
+    console.log(`🔄 Forçando carregamento da nuvem...`);
+    return await syncService.forceLoadFromCloud();
+  },
+
+  // NOVO: Informações do dispositivo
+  getDeviceInfo: () => {
+    if (typeof window !== 'undefined') {
+      return {
+        deviceId: localStorage.getItem('stayfocus_device_id'),
+        lastSync: localStorage.getItem('stayfocus_last_sync'),
+        userAgent: navigator.userAgent.substring(0, 100)
+      };
+    }
+    return { deviceId: 'server', lastSync: null, userAgent: 'server' };
   }
 };
 

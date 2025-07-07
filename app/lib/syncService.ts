@@ -96,14 +96,11 @@ export class SyncService {
         }
       };
 
-      // Usar API existente do Google Drive
+      // CORREÇÃO: Enviar dados diretos (não envolver em objeto "data")
       const response = await fetch('/api/drive/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: syncData,
-          filename: 'stayfocus_sync.json'
-        })
+        body: JSON.stringify(syncData)  // Enviar dados diretos
       });
 
       if (!response.ok) {
@@ -183,28 +180,68 @@ export class SyncService {
    */
   private async loadFromCloudOnStartup(): Promise<void> {
     try {
+      console.log('🔍 Verificando dados na nuvem...');
       const cloudResult = await this.loadFromCloud();
       if (!cloudResult.success || !cloudResult.data) {
+        console.log('ℹ️ Nenhum backup encontrado na nuvem ou erro ao carregar');
         return;
       }
 
       const cloudTimestamp = cloudResult.data.timestamp;
       const localTimestamp = this.lastSyncTime;
+      
+      console.log('📅 Comparando timestamps:', {
+        nuvem: cloudTimestamp,
+        ultimaSyncLocal: localTimestamp
+      });
 
-      // Se dados da nuvem são mais recentes, perguntar ao usuário
-      if (!localTimestamp || new Date(cloudTimestamp) > new Date(localTimestamp)) {
-        const shouldImport = await this.showCloudDataPrompt(cloudTimestamp);
-        if (shouldImport) {
+      // CORREÇÃO: Lógica melhorada para detecção de dados novos
+      let shouldImport = false;
+      let reason = '';
+
+      if (!localTimestamp) {
+        // Dispositivo nunca sincronizou - verificar se há dados na nuvem mais recentes que 1 minuto
+        const cloudDate = new Date(cloudTimestamp);
+        const oneMinuteAgo = new Date(Date.now() - 60000);
+        
+        if (cloudDate > oneMinuteAgo) {
+          shouldImport = true;
+          reason = 'Primeiro acesso - dados recentes encontrados na nuvem';
+        }
+      } else {
+        // Dispositivo já sincronizou antes - comparar timestamps
+        const cloudDate = new Date(cloudTimestamp);
+        const localDate = new Date(localTimestamp);
+        
+        if (cloudDate > localDate) {
+          shouldImport = true;
+          reason = 'Dados da nuvem são mais recentes';
+        }
+      }
+
+      if (shouldImport) {
+        console.log(`🔄 ${reason} - solicitando importação ao usuário`);
+        const userConfirmed = await this.showCloudDataPrompt(cloudTimestamp);
+        
+        if (userConfirmed) {
+          console.log('👤 Usuário confirmou importação');
           const importResult = importarDadosFromObject(cloudResult.data);
+          
           if (importResult.sucesso) {
             this.lastSyncTime = cloudTimestamp;
             this.saveLastSyncTime();
             console.log('✅ Dados importados da nuvem na inicialização');
+          } else {
+            console.error('❌ Falha ao importar dados:', importResult.erro);
           }
+        } else {
+          console.log('👤 Usuário cancelou importação');
         }
+      } else {
+        console.log('✅ Dados locais estão atualizados');
       }
     } catch (error) {
-      console.error('Erro ao verificar dados da nuvem na inicialização:', error);
+      console.error('❌ Erro ao verificar dados da nuvem na inicialização:', error);
     }
   }
 
@@ -331,10 +368,50 @@ export class SyncService {
     if (typeof window === 'undefined') return false;
     
     const cloudDate = new Date(cloudTimestamp).toLocaleString('pt-BR');
+    const deviceId = this.getDeviceId().substring(0, 8);
+    
     return confirm(
-      `Encontramos dados mais recentes na nuvem (${cloudDate}).\n\n` +
-      'Deseja importar esses dados? Isso substituirá os dados locais atuais.'
+      `🔄 SINCRONIZAÇÃO ENTRE DISPOSITIVOS\n\n` +
+      `Encontramos dados mais recentes na nuvem:\n` +
+      `📅 Data: ${cloudDate}\n` +
+      `💻 Seu dispositivo: ${deviceId}...\n\n` +
+      `Deseja importar esses dados?\n` +
+      `⚠️ Isso substituirá os dados locais atuais.`
     );
+  }
+
+  /**
+   * Força carregamento de dados da nuvem (útil para debug e sincronização manual)
+   */
+  async forceLoadFromCloud(): Promise<{ success: boolean; imported?: boolean; error?: string }> {
+    try {
+      console.log('🔄 Forçando carregamento da nuvem...');
+      const cloudResult = await this.loadFromCloud();
+      
+      if (!cloudResult.success || !cloudResult.data) {
+        return { success: false, error: cloudResult.error || 'Nenhum dados encontrados na nuvem' };
+      }
+
+      const shouldImport = await this.showCloudDataPrompt(cloudResult.data.timestamp);
+      
+      if (shouldImport) {
+        const importResult = importarDadosFromObject(cloudResult.data);
+        
+        if (importResult.sucesso) {
+          this.lastSyncTime = cloudResult.data.timestamp;
+          this.saveLastSyncTime();
+          console.log('✅ Dados importados manualmente da nuvem');
+          return { success: true, imported: true };
+        } else {
+          return { success: false, error: importResult.erro };
+        }
+      } else {
+        return { success: true, imported: false };
+      }
+    } catch (error: any) {
+      console.error('❌ Erro no carregamento forçado:', error);
+      return { success: false, error: error.message };
+    }
   }
 
   /**

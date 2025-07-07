@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { syncService, SyncStatus as SyncStatusType } from '../lib/syncService';
+import { forceLoadFromCloud } from '../lib/initSync';
 
 interface SyncStatusProps {
   className?: string;
@@ -128,6 +129,20 @@ export function SyncStatus({
     }
   };
 
+  const handleForceLoad = async () => {
+    if (status.isAuthenticated && status.isOnline && !status.isSyncing) {
+      try {
+        const result = await forceLoadFromCloud();
+        if (result.success && result.imported) {
+          // A página será recarregada automaticamente após importação
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Erro ao forçar carregamento:', error);
+      }
+    }
+  };
+
   const positionClasses = {
     'top-right': 'top-4 right-4',
     'bottom-right': 'bottom-4 right-4',
@@ -186,26 +201,39 @@ export function SyncStatus({
             </div>
             
             {/* Botões de ação */}
-            <div className="flex space-x-2 mt-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleForceSync();
-                }}
-                disabled={!status.isAuthenticated || !status.isOnline || status.isSyncing}
-                className="flex-1 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-              >
-                {status.isSyncing ? 'Sincronizando...' : 'Forçar Sync'}
-              </button>
+            <div className="space-y-2 mt-3">
+              <div className="flex space-x-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleForceSync();
+                  }}
+                  disabled={!status.isAuthenticated || !status.isOnline || status.isSyncing}
+                  className="flex-1 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {status.isSyncing ? 'Sincronizando...' : 'Enviar Dados'}
+                </button>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleForceLoad();
+                  }}
+                  disabled={!status.isAuthenticated || !status.isOnline || status.isSyncing}
+                  className="flex-1 px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  Buscar Dados
+                </button>
+              </div>
               
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   window.location.href = '/auth/google';
                 }}
-                className="flex-1 px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                className="w-full px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
               >
-                {status.isAuthenticated ? 'Reautenticar' : 'Conectar'}
+                {status.isAuthenticated ? 'Reautenticar' : 'Conectar Google Drive'}
               </button>
             </div>
           </div>
