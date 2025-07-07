@@ -1,0 +1,373 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
+    
+    /* Cores temáticas por área */
+    --inicio-primary: 210 100% 50%;
+    --inicio-light: 210 100% 95%;
+    
+    --alimentacao-primary: 16 100% 50%;
+    --alimentacao-light: 16 100% 95%;
+    
+    --estudos-primary: 43 100% 50%;
+    --estudos-light: 43 100% 95%;
+    
+    --saude-primary: 152 100% 45%;
+    --saude-light: 152 100% 95%;
+    
+    --lazer-primary: 262 100% 50%;
+    --lazer-light: 262 100% 95%;
+    
+    --financas-primary: 130 100% 30%;
+    --financas-light: 130 100% 95%;
+    
+    --hiperfocos-primary: 0 90% 50%;
+    --hiperfocos-light: 0 90% 95%;
+    
+    --sono-primary: 240 85% 60%;
+    --sono-light: 240 85% 95%;
+    
+    --perfil-primary: 180 100% 30%;
+    --perfil-secondary: 180 100% 35%;
+    
+    --autoconhecimento-primary: 27 100% 40%;
+    --autoconhecimento-light: 27 100% 90%;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+ 
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+ 
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+ 
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+ 
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+ 
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 216 34% 17%;
+    
+    /* Cores temáticas por área - versão dark */
+    --inicio-primary: 210 100% 65%;
+    --inicio-light: 210 100% 15%;
+    
+    --alimentacao-primary: 16 100% 65%;
+    --alimentacao-light: 16 100% 15%;
+    
+    --estudos-primary: 43 100% 65%;
+    --estudos-light: 43 100% 15%;
+    
+    --saude-primary: 152 100% 55%;
+    --saude-light: 152 100% 15%;
+    
+    --lazer-primary: 262 100% 70%;
+    --lazer-light: 262 100% 15%;
+    
+    --financas-primary: 130 100% 40%;
+    --financas-light: 130 100% 15%;
+    
+    --hiperfocos-primary: 0 90% 65%;
+    --hiperfocos-light: 0 90% 15%;
+    
+    --sono-primary: 240 85% 70%;
+    --sono-light: 240 85% 15%;
+    
+    --perfil-primary: 180 100% 40%;
+    --perfil-secondary: 180 100% 45%;
+    
+    --autoconhecimento-primary: 27 100% 60%;
+    --autoconhecimento-light: 27 100% 15%;
+  }
+
+  body {
+    @apply text-gray-900 dark:text-white;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Estilos para acessibilidade */
+  .alto-contraste {
+    --contrast-factor: 1.5;
+  }
+  
+  .alto-contraste .text-gray-500,
+  .alto-contraste .text-gray-400,
+  .alto-contraste .text-gray-300 {
+    @apply text-gray-900 dark:text-white;
+  }
+  
+  .alto-contraste .bg-gray-50,
+  .alto-contraste .bg-gray-100,
+  .alto-contraste .bg-gray-200 {
+    @apply bg-white dark:bg-gray-900;
+  }
+  
+  .reducao-estimulos * {
+    transition: none !important;
+    animation: none !important;
+  }
+  
+  .reducao-estimulos .bg-opacity-90,
+  .reducao-estimulos .bg-opacity-80,
+  .reducao-estimulos .bg-opacity-70 {
+    @apply bg-opacity-100;
+  }
+  
+  .texto-grande {
+    font-size: 1.1rem;
+  }
+  
+  .texto-grande h1 {
+    font-size: 2.5rem;
+  }
+  
+  .texto-grande h2 {
+    font-size: 2rem;
+  }
+  
+  .texto-grande h3 {
+    font-size: 1.5rem;
+  }
+  
+  .texto-grande input,
+  .texto-grande button {
+    font-size: 1.1rem;
+  }
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 dark:focus-visible:ring-blue-400;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 transition-all duration-200;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus-ring;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100;
+  }
+  
+  .input {
+    @apply px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg focus-ring;
+  }
+}
+
+/* Acessibilidade - Classes de preferências */
+
+/* Texto Grande */
+.text-lg {
+  font-size: 1.125rem !important;
+}
+
+.text-lg h1 {
+  font-size: 2.5rem !important;
+}
+
+.text-lg h2 {
+  font-size: 2rem !important;
+}
+
+.text-lg h3 {
+  font-size: 1.75rem !important;
+}
+
+.text-lg p,
+.text-lg span,
+.text-lg button,
+.text-lg a {
+  font-size: 1.125rem !important;
+}
+
+/* Alto Contraste */
+.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 0%;
+  
+  --border: 0 0% 0%;
+  --input: 0 0% 0%;
+  
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 0 0% 95%;
+  --secondary-foreground: 0 0% 0%;
+  
+  --muted: 0 0% 95%;
+  --muted-foreground: 0 0% 0%;
+}
+
+.dark.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  
+  --border: 0 0% 100%;
+  --input: 0 0% 100%;
+  
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  
+  --secondary: 0 0% 15%;
+  --secondary-foreground: 0 0% 100%;
+  
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 100%;
+}
+
+.high-contrast a,
+.high-contrast button,
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  outline: 2px solid transparent;
+}
+
+.high-contrast a:focus,
+.high-contrast button:focus,
+.high-contrast input:focus,
+.high-contrast select:focus,
+.high-contrast textarea:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Redução de Estímulos */
+.reduce-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.reduce-motion *:hover {
+  transform: none !important;
+}
+
+.reduce-motion .animate-pulse {
+  animation: none !important;
+}
+
+/* Cores temáticas por área */
+.text-inicio-primary {
+  color: hsl(var(--inicio-primary)) !important;
+}
+.bg-inicio-light {
+  background-color: hsl(var(--inicio-light)) !important;
+}
+
+.text-alimentacao-primary {
+  color: hsl(var(--alimentacao-primary)) !important;
+}
+.bg-alimentacao-light {
+  background-color: hsl(var(--alimentacao-light)) !important;
+}
+
+.text-estudos-primary {
+  color: hsl(var(--estudos-primary)) !important;
+}
+.bg-estudos-light {
+  background-color: hsl(var(--estudos-light)) !important;
+}
+
+.text-saude-primary {
+  color: hsl(var(--saude-primary)) !important;
+}
+.bg-saude-light {
+  background-color: hsl(var(--saude-light)) !important;
+}
+
+.text-lazer-primary {
+  color: hsl(var(--lazer-primary)) !important;
+}
+.bg-lazer-light {
+  background-color: hsl(var(--lazer-light)) !important;
+}
+
+.text-financas-primary {
+  color: hsl(var(--financas-primary)) !important;
+}
+.bg-financas-light {
+  background-color: hsl(var(--financas-light)) !important;
+}
+
+.text-hiperfocos-primary {
+  color: hsl(var(--hiperfocos-primary)) !important;
+}
+.bg-hiperfocos-light {
+  background-color: hsl(var(--hiperfocos-light)) !important;
+}
+
+.text-sono-primary {
+  color: hsl(var(--sono-primary)) !important;
+}
+.bg-sono-light {
+  background-color: hsl(var(--sono-light)) !important;
+}
+
+.text-autoconhecimento-primary {
+  color: hsl(var(--autoconhecimento-primary)) !important;
+}
+.bg-autoconhecimento-light {
+  background-color: hsl(var(--autoconhecimento-light)) !important;
+}

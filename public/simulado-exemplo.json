@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "titulo": "Simulado de Conhecimentos Gerais para Neurodivergentes",
+    "concurso": "Concurso Inclusivo 2025",
+    "ano": 2025,
+    "area": "Conhecimentos Gerais",
+    "nivel": "Médio",
+    "totalQuestoes": 10,
+    "tempoPrevisto": 30,
+    "autor": "Instituto de Apoio Neurodivergente",
+    "dataGeracao": "2025-03-30"
+  },
+  "questoes": [
+    {
+      "id": 1,
+      "enunciado": "Qual das seguintes é considerada uma condição neurodivergente?",
+      "alternativas": {
+        "a": "Hipertensão",
+        "b": "TDAH (Transtorno do Déficit de Atenção e Hiperatividade)",
+        "c": "Diabetes",
+        "d": "Astigmatismo",
+        "e": "Artrite"
+      },
+      "gabarito": "b",
+      "assunto": "Neurodiversidade",
+      "dificuldade": 1,
+      "explicacao": "O TDAH é um transtorno neurobiológico, caracterizado por padrões persistentes de desatenção, hiperatividade e impulsividade, sendo considerado parte da neurodiversidade."
+    },
+    {
+      "id": 2,
+      "enunciado": "Qual estratégia abaixo NÃO é recomendada para auxiliar pessoas com dislexia?",
+      "alternativas": {
+        "a": "Uso de fontes específicas como OpenDyslexic",
+        "b": "Leitores de tela e audiobooks",
+        "c": "Mapas mentais e organizadores visuais",
+        "d": "Exigir leitura em voz alta em público sem preparação prévia",
+        "e": "Permitir tempo adicional para leitura e escrita"
+      },
+      "gabarito": "d",
+      "assunto": "Dislexia",
+      "dificuldade": 2,
+      "explicacao": "Exigir leitura em voz alta sem preparação pode causar ansiedade e desconforto desnecessários para pessoas com dislexia, reduzindo sua confiança e aumentando a dificuldade de processamento textual."
+    },
+    {
+      "id": 3,
+      "enunciado": "A técnica Pomodoro, útil para pessoas com TDAH, consiste em:",
+      "alternativas": {
+        "a": "Dividir o trabalho em blocos de tempo focado com pausas curtas",
+        "b": "Fazer todas as tarefas difíceis no final do dia",
+        "c": "Estudar apenas com música clássica de fundo",
+        "d": "Tomar medicação a cada 25 minutos",
+        "e": "Evitar qualquer pausa durante períodos de estudo"
+      },
+      "gabarito": "a",
+      "assunto": "Técnicas de Produtividade",
+      "dificuldade": 1,
+      "dicas": ["Pense em como gerenciar o tempo de forma estruturada", "O nome vem de um temporizador de cozinha"]
+    },
+    {
+      "id": 4,
+      "enunciado": "Qual dessas afirmações sobre estimulação sensorial é INCORRETA?",
+      "alternativas": {
+        "a": "Pessoas autistas podem ser hipersensíveis a certos estímulos sensoriais",
+        "b": "A hipersensibilidade auditiva pode dificultar a concentração em ambientes barulhentos",
+        "c": "Estímulos sensoriais afetam igualmente todas as pessoas neurodivergentes da mesma forma",
+        "d": "Algumas pessoas podem se beneficiar de objetos de estimulação tátil como fidgets",
+        "e": "A iluminação fluorescente pode causar sobrecarga sensorial em algumas pessoas"
+      },
+      "gabarito": "c",
+      "assunto": "Processamento Sensorial",
+      "dificuldade": 2,
+      "explicacao": "A experiência sensorial varia amplamente entre indivíduos neurodivergentes. Cada pessoa tem um perfil sensorial único, algumas podem ser hipersensíveis a sons mas não a luzes, enquanto outras podem ter o padrão inverso."
+    },
+    {
+      "id": 5,
+      "enunciado": "Quais destes aplicativos foram especificamente desenvolvidos para auxiliar pessoas com autismo?",
+      "alternativas": {
+        "a": "Instagram e Twitter",
+        "b": "WhatsApp e Telegram",
+        "c": "Habitica e Forest",
+        "d": "Proloquo2Go e AutismXpress",
+        "e": "Excel e PowerPoint"
+      },
+      "gabarito": "d",
+      "assunto": "Tecnologia Assistiva",
+      "dificuldade": 3
+    },
+    {
+      "id": 6,
+      "enunciado": "O que é 'masking' no contexto da neurodiversidade?",
+      "alternativas": {
+        "a": "Uma técnica de meditação para acalmar a mente",
+        "b": "O processo de esconder traços neurodivergentes para se adequar socialmente",
+        "c": "Usar máscaras de proteção em ambientes com muitos estímulos",
+        "d": "Um método terapêutico para reduzir ansiedade",
+        "e": "Uma forma de terapia ocupacional específica para autistas"
+      },
+      "gabarito": "b",
+      "assunto": "Identidade Neurodivergente",
+      "dificuldade": 2,
+      "explicacao": "Masking (ou mascaramento) refere-se ao processo pelo qual pessoas neurodivergentes, especialmente autistas, escondem conscientemente ou suprimem comportamentos naturais para parecerem 'típicos' em situações sociais. Esse processo pode ser extremamente exaustivo mentalmente."
+    },
+    {
+      "id": 7,
+      "enunciado": "Qual legislação brasileira garante direitos educacionais para estudantes neurodivergentes?",
+      "alternativas": {
+        "a": "Lei da Ficha Limpa",
+        "b": "Lei Maria da Penha",
+        "c": "Lei Brasileira de Inclusão (LBI)",
+        "d": "Código de Defesa do Consumidor",
+        "e": "Lei da Anistia"
+      },
+      "gabarito": "c",
+      "assunto": "Legislação Inclusiva",
+      "dificuldade": 2,
+      "dicas": ["Foi promulgada em 2015", "Também é conhecida como Estatuto da Pessoa com Deficiência"]
+    },
+    {
+      "id": 8,
+      "enunciado": "Qual das seguintes alterações em ambientes de trabalho é um exemplo de acomodação razoável para uma pessoa com sensibilidade sensorial?",
+      "alternativas": {
+        "a": "Determinar que todos os funcionários trabalhem em silêncio absoluto",
+        "b": "Permitir o uso de fones de ouvido com cancelamento de ruído quando necessário",
+        "c": "Exigir que a pessoa trabalhe apenas em horários noturnos",
+        "d": "Instalar mais luzes fluorescentes piscantes no ambiente",
+        "e": "Remover todas as divisórias do ambiente de trabalho"
+      },
+      "gabarito": "b",
+      "assunto": "Acomodações no Trabalho",
+      "dificuldade": 1
+    },
+    {
+      "id": 9,
+      "enunciado": "O que significa a sigla 'CID' no contexto de diagnósticos?",
+      "alternativas": {
+        "a": "Comprometimento Intelectual e Desenvolvimental",
+        "b": "Centro de Informações sobre Deficiências",
+        "c": "Classificação Internacional de Doenças",
+        "d": "Coordenação de Inclusão e Diversidade",
+        "e": "Comitê Interno de Diagnósticos"
+      },
+      "gabarito": "c",
+      "assunto": "Terminologia Médica",
+      "dificuldade": 1,
+      "explicacao": "A Classificação Internacional de Doenças (CID) é publicada pela Organização Mundial da Saúde (OMS) e fornece códigos para classificação de doenças e condições de saúde, incluindo condições neurodivergentes."
+    },
+    {
+      "id": 10,
+      "enunciado": "Qual dos seguintes NÃO é um sistema de Comunicação Alternativa e Aumentativa (CAA) que pode auxiliar pessoas não-verbais?",
+      "alternativas": {
+        "a": "PECS (Sistema de Comunicação por Troca de Figuras)",
+        "b": "Makaton (combinação de sinais e símbolos)",
+        "c": "Boardmaker",
+        "d": "TEACCH (programa estruturado de ensino)",
+        "e": "Livox (aplicativo de CAA)"
+      },
+      "gabarito": "d",
+      "assunto": "Comunicação Alternativa",
+      "dificuldade": 3,
+      "explicacao": "TEACCH (Treatment and Education of Autistic and Communication related handicapped CHildren) é uma abordagem estruturada de ensino para pessoas autistas, mas não é um sistema de Comunicação Alternativa e Aumentativa. Os outros são sistemas ou ferramentas de CAA."
+    }
+  ]
+}

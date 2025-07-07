@@ -1,0 +1,11 @@
+{
+  "snapshot": "snapshot-20250518-1678b83d-a8cc-447c-964b-746217e25890",
+  "install": "npm install",
+  "start": "npm run dev",
+  "terminals": [
+    {
+      "name": "Run on build",
+      "command": "npm run build"
+    }
+  ]
+}
