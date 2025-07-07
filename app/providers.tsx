@@ -4,7 +4,6 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { type ThemeProviderProps } from 'next-themes/dist/types'
 import { useEffect, useState } from 'react'
 import { initializeSync } from './lib/initSync'
-import { SyncStatus } from './components/SyncStatus'
 
 export function Providers({ children, ...props }: ThemeProviderProps) {
   const [syncInitialized, setSyncInitialized] = useState(false)
@@ -49,18 +48,9 @@ export function Providers({ children, ...props }: ThemeProviderProps) {
       <div suppressHydrationWarning>
         {children}
         
-        {/* Componente de Status de Sincronização */}
-        {syncInitialized && (
-          <SyncStatus 
-            showDetails={true}
-            position="top-right"
-            className="z-50"
-          />
-        )}
-        
         {/* Mostrar erro de inicialização se houver */}
         {syncError && (
-          <div className="fixed bottom-4 left-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 max-w-md">
+          <div className="fixed bottom-4 left-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-40 max-w-md">
             <div className="flex">
               <div className="py-1">
                 <svg className="fill-current h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

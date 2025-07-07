@@ -295,3 +295,108 @@ export function useSyncStatus() {
       : 'Nunca'
   };
 }
+
+/**
+ * Componente compacto para integração no header
+ */
+export function SyncStatusCompact() {
+  const [status, setStatus] = useState<SyncStatusType>(syncService.getStatus());
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    const updateStatus = (newStatus: SyncStatusType) => setStatus(newStatus);
+    syncService.addStatusListener(updateStatus);
+    return () => syncService.removeStatusListener(updateStatus);
+  }, []);
+
+  const getStatusIcon = () => {
+    if (status.isSyncing) {
+      return (
+        <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full" />
+      );
+    }
+    
+    if (!status.isAuthenticated) {
+      return (
+        <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    
+    if (!status.isOnline) {
+      return (
+        <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 10-1.414-1.414l-2 2a1 1 0 000 1.414l2 2a1 1 0 001.414-1.414L5.414 8l.879-.879z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    
+    if (status.hasPendingChanges) {
+      return (
+        <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+      );
+    }
+    
+    return (
+      <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+      </svg>
+    );
+  };
+
+  const getStatusColor = () => {
+    if (status.isSyncing) return 'text-blue-500';
+    if (!status.isAuthenticated) return 'text-gray-400';
+    if (!status.isOnline) return 'text-orange-500';
+    if (status.hasPendingChanges) return 'text-yellow-500';
+    return 'text-green-500';
+  };
+
+  const getTooltipText = () => {
+    if (status.isSyncing) return 'Sincronizando dados...';
+    if (!status.isAuthenticated) return 'Google Drive não conectado';
+    if (!status.isOnline) return 'Modo offline';
+    if (status.hasPendingChanges) return 'Aguardando sincronização';
+    return 'Dados sincronizados';
+  };
+
+  const handleClick = async () => {
+    if (!status.isAuthenticated) {
+      window.location.href = '/auth/google';
+    } else if (status.isAuthenticated && status.isOnline && !status.isSyncing) {
+      try {
+        const result = await forceLoadFromCloud();
+        if (result.success && result.imported) {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Erro ao forçar carregamento:', error);
+      }
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleClick}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${getStatusColor()}`}
+        aria-label="Status de Sincronização"
+      >
+        {getStatusIcon()}
+      </button>
+
+      {/* Tooltip */}
+      {showTooltip && (
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap z-50">
+          {getTooltipText()}
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
+}

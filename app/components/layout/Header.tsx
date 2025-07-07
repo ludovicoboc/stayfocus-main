@@ -5,6 +5,7 @@ import { Menu, X, Sun, Moon, HelpCircle, Anchor } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Sidebar } from './Sidebar'
 import { PWAStatus } from '../PWAInstallPrompt'
+import { SyncStatusCompact } from '../SyncStatus'
 import Link from 'next/link'
 
 export function Header() {
@@ -60,6 +61,10 @@ export function Header() {
           <div className="flex items-center space-x-3">
             {/* PWA Status */}
             <PWAStatus />
+            
+            {/* Status de Sincronização */}
+            <SyncStatusCompact />
+            
             {/* Ícone Zzz para Sono */}
             <Link href="/sono">
               <button
