@@ -39,3 +39,9 @@ next-env.d.ts
 # credenciais e segredos
 client_secret*.json
 *googleusercontent*.json
+
+# PWA / Service Worker
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map

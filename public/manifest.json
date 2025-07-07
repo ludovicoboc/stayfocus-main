@@ -1,0 +1,83 @@
+{
+  "name": "StayFocus - Painel Neurodivergentes",
+  "short_name": "StayFocus",
+  "description": "Aplicativo para ajudar pessoas neurodivergentes com organização e produtividade",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "pt-BR",
+  "categories": ["productivity", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/stayfocus_logo.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "apple touch icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Pomodoro",
+      "short_name": "Timer",
+      "description": "Iniciar sessão de Pomodoro",
+      "url": "/estudos",
+      "icons": [
+        {
+          "src": "/images/stayfocus_logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Painel do Dia",
+      "short_name": "Painel",
+      "description": "Ver atividades do dia",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/images/stayfocus_logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Estudos",
+      "short_name": "Estudos",
+      "description": "Acessar área de estudos",
+      "url": "/estudos",
+      "icons": [
+        {
+          "src": "/images/stayfocus_logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

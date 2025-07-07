@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X, Sun, Moon, HelpCircle, Anchor } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Sidebar } from './Sidebar'
+import { PWAStatus } from '../PWAInstallPrompt'
 import Link from 'next/link'
 
 export function Header() {
@@ -57,6 +58,8 @@ export function Header() {
 
           {/* Controles */}
           <div className="flex items-center space-x-3">
+            {/* PWA Status */}
+            <PWAStatus />
             {/* Ícone Zzz para Sono */}
             <Link href="/sono">
               <button
