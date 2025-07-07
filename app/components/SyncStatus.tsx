@@ -7,7 +7,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { syncService, SyncStatus as SyncStatusType } from '../lib/syncService';
-import { forceLoadFromCloud } from '../lib/initSync';
 
 interface SyncStatusProps {
   className?: string;
@@ -129,19 +128,7 @@ export function SyncStatus({
     }
   };
 
-  const handleForceLoad = async () => {
-    if (status.isAuthenticated && status.isOnline && !status.isSyncing) {
-      try {
-        const result = await forceLoadFromCloud();
-        if (result.success && result.imported) {
-          // A página será recarregada automaticamente após importação
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Erro ao forçar carregamento:', error);
-      }
-    }
-  };
+
 
   const positionClasses = {
     'top-right': 'top-4 right-4',
@@ -200,42 +187,20 @@ export function SyncStatus({
               </div>
             </div>
             
-            {/* Botões de ação */}
-            <div className="space-y-2 mt-3">
-              <div className="flex space-x-2">
+            {/* Link para configuração se necessário */}
+            {!status.isAuthenticated && (
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleForceSync();
+                    window.location.href = '/perfil';
                   }}
-                  disabled={!status.isAuthenticated || !status.isOnline || status.isSyncing}
-                  className="flex-1 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  className="w-full px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                 >
-                  {status.isSyncing ? 'Sincronizando...' : 'Enviar Dados'}
-                </button>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleForceLoad();
-                  }}
-                  disabled={!status.isAuthenticated || !status.isOnline || status.isSyncing}
-                  className="flex-1 px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  Buscar Dados
+                  Conectar Google Drive
                 </button>
               </div>
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.location.href = '/auth/google';
-                }}
-                className="w-full px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-              >
-                {status.isAuthenticated ? 'Reautenticar' : 'Conectar Google Drive'}
-              </button>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -347,48 +312,36 @@ export function SyncStatusCompact() {
     );
   };
 
-  const getStatusColor = () => {
-    if (status.isSyncing) return 'text-blue-500';
-    if (!status.isAuthenticated) return 'text-gray-400';
-    if (!status.isOnline) return 'text-orange-500';
-    if (status.hasPendingChanges) return 'text-yellow-500';
-    return 'text-green-500';
-  };
-
   const getTooltipText = () => {
-    if (status.isSyncing) return 'Sincronizando dados...';
-    if (!status.isAuthenticated) return 'Google Drive não conectado';
-    if (!status.isOnline) return 'Modo offline';
-    if (status.hasPendingChanges) return 'Aguardando sincronização';
-    return 'Dados sincronizados';
+    if (status.isSyncing) return 'Sincronizando automaticamente...';
+    if (!status.isAuthenticated) return 'Conecte o Google Drive no perfil';
+    if (!status.isOnline) return 'Modo offline - dados salvos localmente';
+    if (status.hasPendingChanges) return 'Sincronização automática em breve...';
+    return 'Dados sincronizados automaticamente';
   };
 
-  const handleClick = async () => {
+  // Para usuários não autenticados, link para perfil
+  const handleClick = () => {
     if (!status.isAuthenticated) {
-      window.location.href = '/auth/google';
-    } else if (status.isAuthenticated && status.isOnline && !status.isSyncing) {
-      try {
-        const result = await forceLoadFromCloud();
-        if (result.success && result.imported) {
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Erro ao forçar carregamento:', error);
-      }
+      window.location.href = '/perfil';
     }
   };
 
   return (
     <div className="relative">
-      <button
-        onClick={handleClick}
+      <div
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
-        className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${getStatusColor()}`}
-        aria-label="Status de Sincronização"
+        onClick={!status.isAuthenticated ? handleClick : undefined}
+        className={`p-2 rounded-full transition-colors ${
+          !status.isAuthenticated 
+            ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' 
+            : 'cursor-default'
+        }`}
+        aria-label="Status de Sincronização Automática"
       >
         {getStatusIcon()}
-      </button>
+      </div>
 
       {/* Tooltip */}
       {showTooltip && (

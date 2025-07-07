@@ -56,16 +56,16 @@ export class SyncService {
    * Inicia sincronização automática em intervalos
    */
   private async startAutoSync(): Promise<void> {
-    // Sincronização a cada 5 minutos
+    // SINCRONIZAÇÃO MAIS AGRESSIVA: a cada 30 segundos
     this.syncInterval = setInterval(async () => {
       if (this.isOnline && !this.pendingSync && this.isAuthenticated && this.hasPendingChanges) {
         await this.syncToCloud();
       }
-    }, 5 * 60 * 1000);
+    }, 30 * 1000); // 30 segundos em vez de 5 minutos
 
     // Sincronização imediata se há mudanças pendentes
     if (this.hasPendingChanges) {
-      setTimeout(() => this.syncToCloud(), 2000); // Delay de 2s para evitar múltiplas chamadas
+      setTimeout(() => this.syncToCloud(), 1000); // Reduzido para 1 segundo
     }
   }
 
@@ -195,47 +195,41 @@ export class SyncService {
         ultimaSyncLocal: localTimestamp
       });
 
-      // CORREÇÃO: Lógica melhorada para detecção de dados novos
+      // NOVA LÓGICA: Importação automática e inteligente
       let shouldImport = false;
       let reason = '';
 
       if (!localTimestamp) {
-        // Dispositivo nunca sincronizou - verificar se há dados na nuvem mais recentes que 1 minuto
-        const cloudDate = new Date(cloudTimestamp);
-        const oneMinuteAgo = new Date(Date.now() - 60000);
-        
-        if (cloudDate > oneMinuteAgo) {
-          shouldImport = true;
-          reason = 'Primeiro acesso - dados recentes encontrados na nuvem';
-        }
+        // Primeiro acesso - sempre importar se há dados na nuvem
+        shouldImport = true;
+        reason = 'Primeiro acesso - importando dados da nuvem automaticamente';
       } else {
-        // Dispositivo já sincronizou antes - comparar timestamps
+        // Verificar se dados da nuvem são significativamente mais recentes (>30 segundos)
         const cloudDate = new Date(cloudTimestamp);
         const localDate = new Date(localTimestamp);
+        const diffMinutes = (cloudDate.getTime() - localDate.getTime()) / (1000 * 60);
         
-        if (cloudDate > localDate) {
+        if (diffMinutes > 0.5) { // Mais de 30 segundos de diferença
           shouldImport = true;
-          reason = 'Dados da nuvem são mais recentes';
+          reason = `Dados da nuvem são ${Math.round(diffMinutes)} minuto(s) mais recentes - importando automaticamente`;
         }
       }
 
       if (shouldImport) {
-        console.log(`🔄 ${reason} - solicitando importação ao usuário`);
-        const userConfirmed = await this.showCloudDataPrompt(cloudTimestamp);
+        console.log(`🔄 ${reason}`);
         
-        if (userConfirmed) {
-          console.log('👤 Usuário confirmou importação');
-          const importResult = importarDadosFromObject(cloudResult.data);
+        // Importar automaticamente sem perguntar ao usuário
+        const importResult = importarDadosFromObject(cloudResult.data);
+        
+        if (importResult.sucesso) {
+          this.lastSyncTime = cloudTimestamp;
+          this.saveLastSyncTime();
+          console.log('✅ Dados importados automaticamente da nuvem');
           
-          if (importResult.sucesso) {
-            this.lastSyncTime = cloudTimestamp;
-            this.saveLastSyncTime();
-            console.log('✅ Dados importados da nuvem na inicialização');
-          } else {
-            console.error('❌ Falha ao importar dados:', importResult.erro);
-          }
+          // Notificar usuário de forma discreta
+          this.showDiscreteNotification('Dados sincronizados da nuvem');
         } else {
-          console.log('👤 Usuário cancelou importação');
+          console.error('❌ Falha ao importar dados:', importResult.erro);
         }
       } else {
         console.log('✅ Dados locais estão atualizados');
@@ -281,7 +275,7 @@ export class SyncService {
     });
 
     if (!this.isProcessingQueue) {
-      setTimeout(() => this.processQueue(), 2000); // Debounce de 2 segundos
+      setTimeout(() => this.processQueue(), 500); // Reduzido de 2 segundos para 500ms
     }
   }
 
@@ -362,56 +356,31 @@ export class SyncService {
   }
 
   /**
-   * Mostrar prompt para dados da nuvem
+   * Mostra notificação discreta (não modal)
    */
-  private async showCloudDataPrompt(cloudTimestamp: string): Promise<boolean> {
-    if (typeof window === 'undefined') return false;
+  private showDiscreteNotification(message: string): void {
+    if (typeof window === 'undefined') return;
     
-    const cloudDate = new Date(cloudTimestamp).toLocaleString('pt-BR');
-    const deviceId = this.getDeviceId().substring(0, 8);
+    // Criar notificação toast discreta
+    const notification = document.createElement('div');
+    notification.className = 'fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow-lg z-50 text-sm';
+    notification.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+        ${message}
+      </div>
+    `;
     
-    return confirm(
-      `🔄 SINCRONIZAÇÃO ENTRE DISPOSITIVOS\n\n` +
-      `Encontramos dados mais recentes na nuvem:\n` +
-      `📅 Data: ${cloudDate}\n` +
-      `💻 Seu dispositivo: ${deviceId}...\n\n` +
-      `Deseja importar esses dados?\n` +
-      `⚠️ Isso substituirá os dados locais atuais.`
-    );
-  }
-
-  /**
-   * Força carregamento de dados da nuvem (útil para debug e sincronização manual)
-   */
-  async forceLoadFromCloud(): Promise<{ success: boolean; imported?: boolean; error?: string }> {
-    try {
-      console.log('🔄 Forçando carregamento da nuvem...');
-      const cloudResult = await this.loadFromCloud();
-      
-      if (!cloudResult.success || !cloudResult.data) {
-        return { success: false, error: cloudResult.error || 'Nenhum dados encontrados na nuvem' };
+    document.body.appendChild(notification);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
       }
-
-      const shouldImport = await this.showCloudDataPrompt(cloudResult.data.timestamp);
-      
-      if (shouldImport) {
-        const importResult = importarDadosFromObject(cloudResult.data);
-        
-        if (importResult.sucesso) {
-          this.lastSyncTime = cloudResult.data.timestamp;
-          this.saveLastSyncTime();
-          console.log('✅ Dados importados manualmente da nuvem');
-          return { success: true, imported: true };
-        } else {
-          return { success: false, error: importResult.erro };
-        }
-      } else {
-        return { success: true, imported: false };
-      }
-    } catch (error: any) {
-      console.error('❌ Erro no carregamento forçado:', error);
-      return { success: false, error: error.message };
-    }
+    }, 3000);
   }
 
   /**

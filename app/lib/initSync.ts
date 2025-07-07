@@ -27,67 +27,67 @@ import { useAppStore } from '../store';
 const SYNC_CONFIG = {
   financas: {
     enabled: true,
-    debounceMs: 3000, // Finanças podem ter mais delay
+    debounceMs: 500, // Reduzido de 3000 para 500ms
     excludeFields: [] as string[]
   },
   alimentacao: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   },
   autoconhecimento: {
     enabled: true,
-    debounceMs: 5000, // Autoconhecimento é menos frequente
+    debounceMs: 800, // Reduzido de 5000 para 800ms
     excludeFields: [] as string[]
   },
   hiperfocos: {
     enabled: true,
-    debounceMs: 1000, // Hiperfocos precisam de sync rápido
+    debounceMs: 300, // Reduzido de 1000 para 300ms
     excludeFields: [] as string[]
   },
   painelDia: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   },
   perfil: {
     enabled: true,
-    debounceMs: 5000, // Perfil muda raramente
+    debounceMs: 1000, // Reduzido de 5000 para 1000ms
     excludeFields: [] as string[]
   },
   pomodoro: {
     enabled: true,
-    debounceMs: 1000, // Pomodoro precisa de sync rápido
+    debounceMs: 300, // Reduzido de 1000 para 300ms
     excludeFields: ['isRunning', 'timeLeft'] // Não sincronizar estado de execução
   },
   prioridades: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   },
   registroEstudos: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   },
   sono: {
     enabled: true,
-    debounceMs: 3000,
+    debounceMs: 800, // Reduzido de 3000 para 800ms
     excludeFields: [] as string[]
   },
   atividades: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   },
   historicoSimulados: {
     enabled: true,
-    debounceMs: 3000,
+    debounceMs: 800, // Reduzido de 3000 para 800ms
     excludeFields: [] as string[]
   },
   appGlobal: {
     enabled: true,
-    debounceMs: 2000,
+    debounceMs: 500, // Reduzido de 2000 para 500ms
     excludeFields: [] as string[]
   }
 };
@@ -191,17 +191,6 @@ export async function forceSyncNow() {
 }
 
 /**
- * Força carregamento de dados da nuvem
- */
-export async function forceLoadFromCloud() {
-  if (!syncInitialized) {
-    throw new Error('Sincronização não foi inicializada');
-  }
-  
-  return await syncService.forceLoadFromCloud();
-}
-
-/**
  * Para a sincronização (útil para testes ou manutenção)
  */
 export function stopSync() {
@@ -250,13 +239,7 @@ export const syncDebug = {
     return await syncService.forcSync();
   },
 
-  // NOVO: Forçar carregamento da nuvem
-  loadFromCloud: async () => {
-    console.log(`🔄 Forçando carregamento da nuvem...`);
-    return await syncService.forceLoadFromCloud();
-  },
-
-  // NOVO: Informações do dispositivo
+  // Informações do dispositivo
   getDeviceInfo: () => {
     if (typeof window !== 'undefined') {
       return {
