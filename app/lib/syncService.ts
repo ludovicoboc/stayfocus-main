@@ -86,21 +86,12 @@ export class SyncService {
         throw new Error('Falha ao coletar dados locais');
       }
 
-      // Adicionar metadados de sincronização
-      const syncData = {
-        ...localData,
-        syncMetadata: {
-          deviceId: this.getDeviceId(),
-          syncTimestamp: new Date().toISOString(),
-          version: '1.2' // Versão com sync
-        }
-      };
-
-      // CORREÇÃO: Enviar dados diretos (não envolver em objeto "data")
+      // CORREÇÃO: Usar estrutura compatível com validação existente
+      // Não adicionar metadados extras que podem interferir na importação
       const response = await fetch('/api/drive/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(syncData)  // Enviar dados diretos
+        body: JSON.stringify(localData)  // Enviar dados limpos sem metadados extras
       });
 
       if (!response.ok) {
@@ -187,7 +178,15 @@ export class SyncService {
         return;
       }
 
-      const cloudTimestamp = cloudResult.data.timestamp;
+      // CORREÇÃO: Validação mais robusta dos dados da nuvem
+      const cloudData = cloudResult.data;
+      console.log('📊 Dados da nuvem carregados:', {
+        versao: cloudData.versao,
+        timestamp: cloudData.timestamp,
+        temDados: !!cloudData.dados
+      });
+
+      const cloudTimestamp = cloudData.timestamp;
       const localTimestamp = this.lastSyncTime;
       
       console.log('📅 Comparando timestamps:', {
@@ -195,7 +194,7 @@ export class SyncService {
         ultimaSyncLocal: localTimestamp
       });
 
-      // NOVA LÓGICA: Importação automática e inteligente
+      // CORREÇÃO: Importação automática e inteligente
       let shouldImport = false;
       let reason = '';
 
@@ -218,24 +217,31 @@ export class SyncService {
       if (shouldImport) {
         console.log(`🔄 ${reason}`);
         
-        // Importar automaticamente sem perguntar ao usuário
-        const importResult = importarDadosFromObject(cloudResult.data);
-        
-        if (importResult.sucesso) {
-          this.lastSyncTime = cloudTimestamp;
-          this.saveLastSyncTime();
-          console.log('✅ Dados importados automaticamente da nuvem');
+        // CORREÇÃO: Importar automaticamente com tratamento de erros mais robusto
+        try {
+          const importResult = importarDadosFromObject(cloudData);
           
-          // Notificar usuário de forma discreta
-          this.showDiscreteNotification('Dados sincronizados da nuvem');
-        } else {
-          console.error('❌ Falha ao importar dados:', importResult.erro);
+          if (importResult.sucesso) {
+            this.lastSyncTime = cloudTimestamp;
+            this.saveLastSyncTime();
+            console.log('✅ Dados importados automaticamente da nuvem');
+            
+            // Notificar usuário de forma discreta
+            this.showDiscreteNotification('Dados sincronizados da nuvem');
+          } else {
+            console.error('❌ Falha ao importar dados:', importResult.erro);
+            this.showDiscreteNotification('Erro ao sincronizar dados da nuvem', 'error');
+          }
+        } catch (importError) {
+          console.error('❌ Erro crítico na importação:', importError);
+          this.showDiscreteNotification('Erro crítico na sincronização', 'error');
         }
       } else {
         console.log('✅ Dados locais estão atualizados');
       }
     } catch (error) {
       console.error('❌ Erro ao verificar dados da nuvem na inicialização:', error);
+      this.showDiscreteNotification('Erro ao verificar dados na nuvem', 'error');
     }
   }
 
@@ -358,16 +364,29 @@ export class SyncService {
   /**
    * Mostra notificação discreta (não modal)
    */
-  private showDiscreteNotification(message: string): void {
+  private showDiscreteNotification(message: string, type: 'success' | 'error' | 'info' = 'info'): void {
     if (typeof window === 'undefined') return;
+    
+    // CORREÇÃO: Usar classes CSS compatíveis com diferentes tipos
+    const typeClasses = {
+      success: 'bg-green-100 border-green-400 text-green-700',
+      error: 'bg-red-100 border-red-400 text-red-700',
+      info: 'bg-blue-100 border-blue-400 text-blue-700'
+    };
+    
+    const iconSvg = {
+      success: '<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>',
+      error: '<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>',
+      info: '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>'
+    };
     
     // Criar notificação toast discreta
     const notification = document.createElement('div');
-    notification.className = 'fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded shadow-lg z-50 text-sm';
+    notification.className = `fixed bottom-4 right-4 ${typeClasses[type]} px-4 py-2 rounded shadow-lg z-50 text-sm`;
     notification.innerHTML = `
       <div class="flex items-center">
         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          ${iconSvg[type]}
         </svg>
         ${message}
       </div>

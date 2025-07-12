@@ -177,13 +177,16 @@ const validarDadosImportados = (dados: any): { valido: boolean; erro?: string; t
   if (!dados || typeof dados !== 'object') {
     return { valido: false, erro: 'Dados inválidos ou não são um objeto.' };
   }
+  
+  // CORREÇÃO: Validação mais flexível para diferentes estruturas
   if (!dados.versao || !dados.timestamp || !dados.dados) {
     return { valido: false, erro: 'Formato de arquivo inválido: Faltam propriedades essenciais (versao, timestamp, dados).' };
-  } // <-- Fechar o primeiro IF aqui
+  }
 
-  // Validar a versão
-  if (dados.versao !== '1.0' && dados.versao !== '1.1') {
-    return { valido: false, erro: `Versão incompatível: ${dados.versao}. Esperada: 1.0 ou 1.1` };
+  // CORREÇÃO: Aceitar versões de sincronização (1.0, 1.1, 1.2)
+  const versaoValida = ['1.0', '1.1', '1.2'].includes(dados.versao);
+  if (!versaoValida) {
+    return { valido: false, erro: `Versão incompatível: ${dados.versao}. Esperada: 1.0, 1.1 ou 1.2` };
   }
 
   // Validar a seção 'dados'
@@ -199,36 +202,51 @@ const validarDadosImportados = (dados: any): { valido: boolean; erro?: string; t
  * @param dadosImportados Objeto contendo os dados dos módulos.
  */
 const _applyImportedData = (dadosImportados: any) => {
-  // Helper para aplicar estado a uma store
-  const applyState = (storeSetter: (partialState: any) => void, data: any) => {
+  // CORREÇÃO: Helper mais robusto para aplicar estado a uma store
+  const applyState = (storeSetter: (partialState: any) => void, data: any, storeName: string) => {
     if (data && typeof data === 'object') {
-      // Limpar funções novamente por segurança, caso existam no JSON por algum motivo
-      const cleanedData = limparFuncoesDoObjeto(data);
-      // Add explicit 'any' type for state parameter
-      storeSetter((state: any) => ({ 
-        ...state,
-        ...cleanedData
-      }));
+      try {
+        // Limpar funções novamente por segurança, caso existam no JSON por algum motivo
+        const cleanedData = limparFuncoesDoObjeto(data);
+        
+        // Aplicar estado de forma segura
+        storeSetter((state: any) => ({ 
+          ...state,
+          ...cleanedData
+        }));
+        
+        console.log(`✅ Store '${storeName}' atualizada com sucesso`);
+      } catch (error) {
+        console.error(`❌ Erro ao aplicar dados na store '${storeName}':`, error);
+      }
+    } else {
+      console.log(`⚠️ Dados inválidos ou não encontrados para store '${storeName}'`);
     }
   };
 
-  // Aplicar dados a cada store se existirem no objeto importado
-  applyState(useFinancasStore.setState, dadosImportados.financas);
-  applyState(useAlimentacaoStore.setState, dadosImportados.alimentacao);
-  applyState(useAutoconhecimentoStore.setState, dadosImportados.autoconhecimento);
-  applyState(useHiperfocosStore.setState, dadosImportados.hiperfocos);
-  applyState(usePainelDiaStore.setState, dadosImportados.painelDia);
-  applyState(usePerfilStore.setState, dadosImportados.perfil);
-  applyState(usePomodoroStore.setState, dadosImportados.pomodoro);
-  applyState(usePrioridadesStore.setState, dadosImportados.prioridades);
-  applyState(useRegistroEstudosStore.setState, dadosImportados.registroEstudos);
-  applyState(useSonoStore.setState, dadosImportados.sono);
-  applyState(useAtividadesStore.setState, dadosImportados.atividades);
+  // CORREÇÃO: Aplicar dados a cada store de forma mais robusta
+  console.log('🔄 Aplicando dados importados às stores...');
+  
+  applyState(useFinancasStore.setState, dadosImportados.financas, 'financas');
+  applyState(useAlimentacaoStore.setState, dadosImportados.alimentacao, 'alimentacao');
+  applyState(useAutoconhecimentoStore.setState, dadosImportados.autoconhecimento, 'autoconhecimento');
+  applyState(useHiperfocosStore.setState, dadosImportados.hiperfocos, 'hiperfocos');
+  applyState(usePainelDiaStore.setState, dadosImportados.painelDia, 'painelDia');
+  applyState(usePerfilStore.setState, dadosImportados.perfil, 'perfil');
+  applyState(usePomodoroStore.setState, dadosImportados.pomodoro, 'pomodoro');
+  applyState(usePrioridadesStore.setState, dadosImportados.prioridades, 'prioridades');
+  applyState(useRegistroEstudosStore.setState, dadosImportados.registroEstudos, 'registroEstudos');
+  applyState(useSonoStore.setState, dadosImportados.sono, 'sono');
+  applyState(useAtividadesStore.setState, dadosImportados.atividades, 'atividades');
+  
   // Aplicar histórico apenas se existir nos dados importados (compatibilidade com v1.0)
   if (dadosImportados.historicoSimulados) {
-    applyState(useHistoricoSimuladosStore.setState, dadosImportados.historicoSimulados); // <-- Restaurar histórico
+    applyState(useHistoricoSimuladosStore.setState, dadosImportados.historicoSimulados, 'historicoSimulados');
   }
-  applyState(useAppStore.setState, dadosImportados.appGlobal);
+  
+  applyState(useAppStore.setState, dadosImportados.appGlobal, 'appGlobal');
+  
+  console.log('✅ Aplicação de dados concluída');
 };
 
 
