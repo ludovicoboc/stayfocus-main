@@ -5,6 +5,8 @@
  */
 
 import { obterDadosParaExportar, importarDadosFromObject } from './dataService';
+import { dataCompressor } from './dataCompressor';
+import { intelligentCache } from './intelligentCache';
 
 export interface SyncStatus {
   isOnline: boolean;
@@ -24,10 +26,19 @@ export class SyncService {
   private statusListeners: ((status: SyncStatus) => void)[] = [];
   private syncQueue: (() => Promise<void>)[] = [];
   private isProcessingQueue = false;
-
+  
+  // Novas propriedades para sincronização inteligente
+  private lastActivityTime: number = Date.now();
+  private syncFailureCount: number = 0;
+  private currentSyncInterval: number = 2 * 60 * 1000; // 2 minutos inicial
+  private readonly MIN_SYNC_INTERVAL = 2 * 60 * 1000; // 2 minutos
+  private readonly MAX_SYNC_INTERVAL = 10 * 60 * 1000; // 10 minutos
+  private readonly ACTIVE_SYNC_INTERVAL = 1 * 60 * 1000; // 1 minuto quando ativo
+  private readonly ACTIVITY_THRESHOLD = 5 * 60 * 1000; // 5 minutos para considerar ativo
   constructor() {
     this.setupOnlineDetection();
     this.loadLastSyncTime();
+    this.setupActivityDetection();
   }
 
   /**
@@ -53,19 +64,29 @@ export class SyncService {
   }
 
   /**
-   * Inicia sincronização automática em intervalos
+   * Inicia sincronização automática com intervalo inteligente
    */
   private async startAutoSync(): Promise<void> {
-    // SINCRONIZAÇÃO MAIS AGRESSIVA: a cada 30 segundos
+    // Sistema de sincronização inteligente baseado na atividade
     this.syncInterval = setInterval(async () => {
       if (this.isOnline && !this.pendingSync && this.isAuthenticated && this.hasPendingChanges) {
-        await this.syncToCloud();
+        console.log(`🔄 Sincronizando com intervalo: ${this.currentSyncInterval / 1000}s`);
+        const result = await this.syncToCloud();
+        
+        if (result.success) {
+          this.syncFailureCount = 0; // Reset failure count on success
+        } else {
+          this.syncFailureCount++; // Increment failure count
+        }
+        
+        // Reajustar frequência após tentativa
+        this.adjustSyncFrequency();
       }
-    }, 30 * 1000); // 30 segundos em vez de 5 minutos
+    }, this.currentSyncInterval);
 
-    // Sincronização imediata se há mudanças pendentes
+    // Sincronização imediata se há mudanças pendentes (apenas uma vez)
     if (this.hasPendingChanges) {
-      setTimeout(() => this.syncToCloud(), 1000); // Reduzido para 1 segundo
+      setTimeout(() => this.syncToCloud(), 2000); // 2 segundos para permitir múltiplas mudanças
     }
   }
 
@@ -86,12 +107,48 @@ export class SyncService {
         throw new Error('Falha ao coletar dados locais');
       }
 
-      // CORREÇÃO: Usar estrutura compatível com validação existente
-      // Não adicionar metadados extras que podem interferir na importação
+      // Verificar se realmente precisa sincronizar usando cache inteligente
+      const cacheResult = await intelligentCache.shouldSync('all_data', localData);
+      
+      if (!cacheResult.shouldSync) {
+        console.log(`⚡ Sincronização pulada: ${cacheResult.reason}`);
+        this.hasPendingChanges = false;
+        this.notifyStatusChange();
+        return { success: true };
+      }
+
+      console.log(`🔄 Sincronização necessária: ${cacheResult.reason}`);
+
+      // Analisar se vale a pena comprimir
+      const compressionStats = dataCompressor.getCompressionStats(localData);
+      console.log(`📊 Dados para sync: ${compressionStats.originalSize} bytes, compressão estimada: ${compressionStats.estimatedRatio.toFixed(2)}x`);
+
+      let payload: any;
+      let compressionMetadata: any = null;
+
+      if (compressionStats.shouldCompress) {
+        // Usar compressão
+        const compressed = dataCompressor.compressForUpload(localData);
+        payload = {
+          data: compressed.payload,
+          compression: compressed.metadata,
+          compressed: true
+        };
+        compressionMetadata = compressed.metadata;
+        console.log(`📦 Dados comprimidos: ${compressed.metadata.originalSize} → ${compressed.metadata.compressedSize} bytes (${compressed.metadata.compressionRatio.toFixed(2)}x)`);
+      } else {
+        // Não comprimir dados pequenos
+        payload = {
+          data: localData,
+          compressed: false
+        };
+        console.log('📦 Dados pequenos, enviando sem compressão');
+      }
+
       const response = await fetch('/api/drive/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(localData)  // Enviar dados limpos sem metadados extras
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -105,7 +162,12 @@ export class SyncService {
       this.hasPendingChanges = false;
       this.saveLastSyncTime();
       
-      console.log('✅ Dados sincronizados com sucesso:', result.fileName);
+      // Atualizar cache após sincronização bem-sucedida
+      intelligentCache.updateCache('all_data', localData, cacheResult.hash);
+      
+      const compressionInfo = compressionMetadata ? 
+        ` (${compressionMetadata.compressionRatio.toFixed(2)}x compressão)` : '';
+      console.log(`✅ Dados sincronizados com sucesso: ${result.fileName}${compressionInfo}`);
       this.notifyStatusChange();
       
       return { success: true };
@@ -156,7 +218,26 @@ export class SyncService {
       const cloudData = await loadResponse.json();
       
       if (cloudData.success) {
-        return { success: true, data: cloudData.data };
+        let finalData = cloudData.data;
+        
+        // Verificar se os dados estão comprimidos
+        if (cloudData.data && typeof cloudData.data === 'object' && cloudData.data.compressed) {
+          console.log('📦 Dados comprimidos detectados, descomprimindo...');
+          
+          const decompressed = dataCompressor.decompressFromUpload(
+            cloudData.data.data, 
+            cloudData.data.compression
+          );
+          
+          if (decompressed.success) {
+            finalData = decompressed.data;
+            console.log('✅ Dados descomprimidos com sucesso');
+          } else {
+            throw new Error(`Falha na descompressão: ${decompressed.error}`);
+          }
+        }
+        
+        return { success: true, data: finalData };
       } else {
         throw new Error('Dados da nuvem inválidos');
       }
@@ -264,7 +345,11 @@ export class SyncService {
    */
   markPendingChanges(): void {
     this.hasPendingChanges = true;
+    this.lastActivityTime = Date.now(); // Atualizar atividade
     this.notifyStatusChange();
+    
+    // Ajustar frequência baseada na nova atividade
+    this.adjustSyncFrequency();
     
     // Agenda sincronização com debounce
     this.scheduleSync();
@@ -326,6 +411,63 @@ export class SyncService {
         this.isOnline = false;
         this.notifyStatusChange();
       });
+    }
+  }
+
+  /**
+   * Configura detecção de atividade do usuário
+   */
+  private setupActivityDetection(): void {
+    if (typeof window !== 'undefined') {
+      // Detectar atividade do usuário
+      ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.addEventListener(event, this.updateActivity, { passive: true });
+      });
+    }
+  }
+
+  /**
+   * Ajusta a frequência de sincronização baseada na atividade
+   */
+  private adjustSyncFrequency(): void {
+    const now = Date.now();
+    const timeSinceActivity = now - this.lastActivityTime;
+    const isUserActive = timeSinceActivity < this.ACTIVITY_THRESHOLD;
+
+    let newInterval: number;
+    
+    if (isUserActive && this.hasPendingChanges) {
+      // Usuário ativo com mudanças pendentes - sincronizar mais frequentemente
+      newInterval = this.ACTIVE_SYNC_INTERVAL;
+    } else if (this.hasPendingChanges) {
+      // Mudanças pendentes mas usuário inativo - intervalo médio
+      newInterval = this.MIN_SYNC_INTERVAL;
+    } else {
+      // Sem mudanças pendentes - usar backoff exponencial
+      newInterval = Math.min(
+        this.MIN_SYNC_INTERVAL * Math.pow(2, this.syncFailureCount),
+        this.MAX_SYNC_INTERVAL
+      );
+    }
+
+    // Atualizar intervalo se mudou significativamente
+    if (Math.abs(newInterval - this.currentSyncInterval) > 30000) { // 30 segundos de diferença
+      this.currentSyncInterval = newInterval;
+      this.restartSyncTimer();
+    }
+  }
+
+  /**
+   * Reinicia o timer de sincronização com novo intervalo
+   */
+  private restartSyncTimer(): void {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
+
+    if (this.isAuthenticated) {
+      this.startAutoSync();
     }
   }
 
@@ -465,12 +607,44 @@ export class SyncService {
   }
 
   /**
+   * Obtém estatísticas do cache
+   */
+  getCacheStats() {
+    return intelligentCache.getStats();
+  }
+
+  /**
+   * Limpa cache de sincronização
+   */
+  clearSyncCache(): void {
+    intelligentCache.clearCache();
+  }
+
+  /**
    * Destruir instância do serviço
    */
   destroy(): void {
     this.stopSync();
     this.statusListeners.length = 0;
     this.syncQueue.length = 0;
+    
+    // Limpar cache inteligente
+    intelligentCache.destroy();
+    
+    // Limpar event listeners de atividade
+    if (typeof window !== 'undefined') {
+      ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.removeEventListener(event, this.updateActivity);
+      });
+    }
+  }
+  
+  /**
+   * Método para atualizar atividade (usado nos event listeners)
+   */
+  private updateActivity = (): void => {
+    this.lastActivityTime = Date.now();
+    this.adjustSyncFrequency();
   }
 }
 

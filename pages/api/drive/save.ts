@@ -22,9 +22,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     // Get data from request body - assume it's already a JSON string or object
-    const dataToSave = sessionReq.body; 
-    if (!dataToSave) {
+    const requestData = sessionReq.body; 
+    if (!requestData) {
       return res.status(400).json({ error: 'No data provided in request body.' });
+    }
+
+    // Verificar se os dados estão comprimidos
+    let dataToSave: any;
+    let compressionInfo = '';
+    
+    if (requestData.compressed && requestData.compression) {
+      // Dados comprimidos - manter estrutura para descompressão futura
+      dataToSave = requestData;
+      compressionInfo = ` (comprimido: ${requestData.compression.originalSize} → ${requestData.compression.compressedSize} bytes)`;
+      console.log(`📦 Salvando dados comprimidos: ${requestData.compression.compressionRatio.toFixed(2)}x redução`);
+    } else {
+      // Dados não comprimidos - usar estrutura tradicional
+      dataToSave = requestData.data || requestData;
+      console.log('📦 Salvando dados não comprimidos');
     }
 
     // Ensure data is a string for upload
@@ -62,7 +77,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fields: 'id, name', // Request the ID and name of the created file
     });
 
-    console.log(`File uploaded successfully: ID: ${file.data.id}, Name: ${file.data.name}`);
+    console.log(`File uploaded successfully: ID: ${file.data.id}, Name: ${file.data.name}${compressionInfo}`);
 
     res.status(200).json({ success: true, fileId: file.data.id, fileName: file.data.name });
 
