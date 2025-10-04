@@ -1,0 +1,7 @@
+Alembic was initialized (if not already present).
+The file backend/alembic/env.py requires manual edits as per the subtask log.
+Key changes involve:
+- Importing settings and Base from the app.
+- Setting target_metadata = Base.metadata.
+- Setting sqlalchemy.url from app.core.config.settings.SQLALCHEMY_DATABASE_URI.
+- Ensuring run_migrations_online uses the app's engine.
