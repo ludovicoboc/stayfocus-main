@@ -1,124 +1,86 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { usePainelDiaStore, BlocoTempo } from '@/app/stores/painelDiaStore'
-import { usePrioridadesStore, Prioridade } from '@/app/stores/prioridadesStore'
-import { usePerfilStore } from '@/app/stores/perfilStore'
+import { useMemo } from 'react';
+import { usePainelDiaStore } from '@/app/stores/painelDiaStore';
+import { usePrioridadesStore } from '@/app/stores/prioridadesStore';
+import { usePerfilStore } from '@/app/stores/perfilStore';
 
-export type DashboardData = {
-  blocosDia: BlocoTempo[]
-  prioridadesDia: Prioridade[] 
-  proximosCompromissos: BlocoTempo[]
-  prioridadesPendentes: number
-  prioridadesConcluidas: number
-  metasPausas: number
-  mostrarPausas: boolean
-  metasPrioridades: number
-  nomeUsuario: string
-  preferenciasVisuais: {
-    altoContraste: boolean
-    reducaoEstimulos: boolean
-    textoGrande: boolean
-  }
-  isLoading: boolean
-}
-
-// Valores padrão para garantir tipo seguro
-const defaultDashboardData: DashboardData = {
-  blocosDia: [],
-  prioridadesDia: [],
-  proximosCompromissos: [],
-  prioridadesPendentes: 0,
-  prioridadesConcluidas: 0,
-  metasPausas: 4,
-  mostrarPausas: true,
-  metasPrioridades: 3,
-  nomeUsuario: 'Usuário',
-  preferenciasVisuais: {
-    altoContraste: false,
-    reducaoEstimulos: false,
-    textoGrande: false
-  },
-  isLoading: true
-}
-
+/**
+ * Hook para agregar e processar dados de várias stores para o painel principal.
+ * Ele simplifica o acesso aos dados do dashboard, combinando informações
+ * de perfil, blocos de tempo e prioridades.
+ */
 export const useDashboard = () => {
-  const [data, setData] = useState<DashboardData>(defaultDashboardData)
-  const [isLoading, setIsLoading] = useState(true)
+  // --- 1. Consumir dados das stores ---
+  const {
+    blocos,
+    isLoading: isLoadingPainel
+  } = usePainelDiaStore();
+
+  const {
+    getHistoricoPorData,
+    isLoading: isLoadingPrioridades
+  } = usePrioridadesStore();
   
-  // Stores do Zustand
-  const { blocos } = usePainelDiaStore()
-  const { prioridades, getHistoricoPorData } = usePrioridadesStore()
   const { 
     nome, 
     metasDiarias, 
     pausasAtivas, 
-    preferenciasVisuais 
-  } = usePerfilStore()
-  
-  useEffect(() => {
-    const carregarDados = async () => {
-      try {
-        // Obtenha a data atual em formato ISO (YYYY-MM-DD)
-        const dataAtual = new Date().toISOString().split('T')[0]
-        
-        // Obtenha prioridades do dia atual
-        const prioridadesDoDia = getHistoricoPorData(dataAtual)
-        
-        // Calcule próximos compromissos (próximos 3 blocos a partir da hora atual)
-        const agora = new Date()
-        const horaAtual = `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`
-        
-        // Ordenar blocos por hora e filtrar os que ainda estão por vir
-        const blocosFuturos = [...blocos]
-          .sort((a, b) => {
-            const horaA = a.hora.split(':').map(Number)
-            const horaB = b.hora.split(':').map(Number)
-            
-            if (horaA[0] !== horaB[0]) {
-              return horaA[0] - horaB[0]
-            }
-            return horaA[1] - horaB[1]
-          })
-          .filter(bloco => bloco.hora >= horaAtual)
-          .slice(0, 3)
-        
-        // Calcule estatísticas de prioridades
-        const prioridadesPendentes = prioridadesDoDia.filter(p => !p.concluida).length
-        const prioridadesConcluidas = prioridadesDoDia.filter(p => p.concluida).length
-        
-        // Atualizar dados do dashboard
-        setData({
-          blocosDia: blocos || [],
-          prioridadesDia: prioridadesDoDia || [],
-          proximosCompromissos: blocosFuturos,
-          prioridadesPendentes,
-          prioridadesConcluidas,
-          metasPausas: metasDiarias?.pausasProgramadas || 4,
-          mostrarPausas: pausasAtivas,
-          metasPrioridades: metasDiarias?.tarefasPrioritarias || 3,
-          nomeUsuario: nome || 'Usuário',
-          preferenciasVisuais: preferenciasVisuais || {
-            altoContraste: false,
-            reducaoEstimulos: false,
-            textoGrande: false
-          },
-          isLoading: false
-        })
-      } catch (error) {
-        console.error("Erro ao carregar dados do dashboard:", error)
-        // Em caso de erro, definir valores padrão, mas manter isLoading como false
-        setData({
-          ...defaultDashboardData,
-          isLoading: false
-        })
-      } finally {
-        setIsLoading(false)
-      }
-    }
+    preferenciasVisuais,
+    isLoading: isLoadingPerfil
+  } = usePerfilStore();
+
+  // --- 2. Processar e derivar dados ---
+  // Usar useMemo para otimizar cálculos que não precisam ser refeitos a cada renderização.
+  const {
+    prioridadesDia,
+    prioridadesPendentes,
+    prioridadesConcluidas,
+    proximosCompromissos,
+  } = useMemo(() => {
+    // Obter prioridades do dia atual
+    const dataAtual = new Date().toISOString().split('T')[0];
+    const prioridadesDoDia = getHistoricoPorData(dataAtual);
     
-    carregarDados()
-  }, [blocos, prioridades, nome, metasDiarias, pausasAtivas, preferenciasVisuais, getHistoricoPorData])
-  
-  return { ...data, isLoading }
-} 
+    // Calcular estatísticas de prioridades
+    const pendentes = prioridadesDoDia.filter(p => !p.concluida).length;
+    const concluidas = prioridadesDoDia.filter(p => p.concluida).length;
+
+    // Calcular próximos compromissos (próximos 3 blocos)
+    const agora = new Date();
+    const horaAtual = `${agora.getHours().toString().padStart(2, '0')}:${agora.getMinutes().toString().padStart(2, '0')}`;
+    const blocosFuturos = blocos
+      .filter(bloco => bloco.hora >= horaAtual)
+      .slice(0, 3); // Já vêm ordenados da store
+
+    return {
+      prioridadesDia: prioridadesDoDia,
+      prioridadesPendentes: pendentes,
+      prioridadesConcluidas: concluidas,
+      proximosCompromissos: blocosFuturos,
+    };
+  }, [blocos, getHistoricoPorData]);
+
+  // --- 3. Determinar o estado de carregamento agregado ---
+  const isLoading = isLoadingPainel || isLoadingPrioridades || isLoadingPerfil;
+
+  // --- 4. Retornar a estrutura de dados consolidada ---
+  return {
+    // Dados diretos das stores
+    blocosDia: blocos,
+    nomeUsuario: nome,
+    preferenciasVisuais,
+    metasPausas: metasDiarias.pausasProgramadas,
+    metasPrioridades: metasDiarias.tarefasPrioritarias,
+    mostrarPausas: pausasAtivas,
+
+    // Dados derivados e calculados
+    prioridadesDia,
+    proximosCompromissos,
+    prioridadesPendentes,
+    prioridadesConcluidas,
+
+    // Estado de carregamento
+    isLoading,
+  };
+};

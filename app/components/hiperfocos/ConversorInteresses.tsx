@@ -1,287 +1,129 @@
 'use client'
 
-import { useState, useRef, FormEvent } from 'react'
-import { Rocket, CheckCircle, PlusCircle, X, Save } from 'lucide-react'
-import { useHiperfocosStore, CORES_HIPERFOCOS } from '../../stores/hiperfocosStore'
+import { useState, FormEvent } from 'react';
+import { Rocket, CheckCircle, PlusCircle, X, Save, Loader2 } from 'lucide-react';
+import { useHiperfocosStore, CORES_HIPERFOCOS } from '../../stores/hiperfocosStore';
 
 export function ConversorInteresses() {
-  const { adicionarHiperfoco, adicionarTarefa } = useHiperfocosStore()
+  const { adicionarHiperfoco, adicionarTarefa } = useHiperfocosStore();
   
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
     corSelecionada: CORES_HIPERFOCOS[0],
     tempoLimite: '',
-    novasTarefas: [''] // Iniciar com um campo vazio
-  })
+    novasTarefas: [''],
+  });
   
-  const [feedback, setFeedback] = useState<{
-    tipo: 'sucesso' | 'erro',
-    mensagem: string
-  } | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ tipo: 'sucesso' | 'erro', mensagem: string } | null>(null);
   
-  const formRef = useRef<HTMLFormElement>(null)
-  
-  // Função para adicionar mais campos de tarefas
   const adicionarCampoTarefa = () => {
-    setFormData({
-      ...formData,
-      novasTarefas: [...formData.novasTarefas, '']
-    })
-  }
+    setFormData(prev => ({ ...prev, novasTarefas: [...prev.novasTarefas, ''] }));
+  };
   
-  // Função para atualizar uma tarefa específica
   const atualizarTarefa = (index: number, valor: string) => {
-    const tarefasAtualizadas = [...formData.novasTarefas]
-    tarefasAtualizadas[index] = valor
-    
-    setFormData({
-      ...formData,
-      novasTarefas: tarefasAtualizadas
-    })
-  }
+    const tarefasAtualizadas = [...formData.novasTarefas];
+    tarefasAtualizadas[index] = valor;
+    setFormData(prev => ({ ...prev, novasTarefas: tarefasAtualizadas }));
+  };
   
-  // Função para remover uma tarefa
   const removerTarefa = (index: number) => {
-    const tarefasAtualizadas = formData.novasTarefas.filter((_, i) => i !== index)
-    
-    setFormData({
-      ...formData,
-      novasTarefas: tarefasAtualizadas
-    })
-  }
+    const tarefasAtualizadas = formData.novasTarefas.filter((_, i) => i !== index);
+    setFormData(prev => ({ ...prev, novasTarefas: tarefasAtualizadas }));
+  };
   
-  // Função para lidar com o envio do formulário
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     
-    // Validação
-    if (!formData.titulo) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'O título do hiperfoco é obrigatório'
-      })
-      return
+    if (!formData.titulo || formData.novasTarefas.filter(t => t.trim() !== '').length === 0) {
+      setFeedback({ tipo: 'erro', mensagem: 'Título e pelo menos uma tarefa são obrigatórios.' });
+      return;
     }
     
-    if (formData.novasTarefas.filter(t => t.trim() !== '').length === 0) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'Adicione pelo menos uma tarefa'
-      })
-      return
-    }
+    setIsSubmitting(true);
+    setFeedback(null);
     
     try {
-      // Criar um novo hiperfoco
-      const tempoLimiteInt = formData.tempoLimite ? parseInt(formData.tempoLimite) : undefined
-      const hiperfocoId = adicionarHiperfoco(
-        formData.titulo,
-        formData.descricao,
-        formData.corSelecionada,
-        tempoLimiteInt
-      )
+      const novoHiperfoco = await adicionarHiperfoco({
+        titulo: formData.titulo,
+        descricao: formData.descricao,
+        cor: formData.corSelecionada,
+        tempoLimite: formData.tempoLimite ? parseInt(formData.tempoLimite) : undefined,
+      });
       
-      // Adicionar as tarefas ao hiperfoco
-      formData.novasTarefas
-        .filter(tarefa => tarefa.trim() !== '')
-        .forEach(tarefa => {
-          adicionarTarefa(hiperfocoId, tarefa)
-        })
+      for (const tarefaTexto of formData.novasTarefas.filter(t => t.trim() !== '')) {
+        await adicionarTarefa(novoHiperfoco.id, tarefaTexto);
+      }
       
-      // Feedback de sucesso
-      setFeedback({
-        tipo: 'sucesso',
-        mensagem: 'Hiperfoco criado com sucesso!'
-      })
+      setFeedback({ tipo: 'sucesso', mensagem: 'Hiperfoco criado com sucesso!' });
+      setFormData({ titulo: '', descricao: '', corSelecionada: CORES_HIPERFOCOS[0], tempoLimite: '', novasTarefas: [''] });
       
-      // Limpar o formulário
-      setFormData({
-        titulo: '',
-        descricao: '',
-        corSelecionada: CORES_HIPERFOCOS[0],
-        tempoLimite: '',
-        novasTarefas: ['']
-      })
-      
-      // Timer para remover o feedback
-      setTimeout(() => {
-        setFeedback(null)
-      }, 3000)
+      setTimeout(() => setFeedback(null), 3000);
     } catch (error) {
-      setFeedback({
-        tipo: 'erro',
-        mensagem: 'Ocorreu um erro ao criar o hiperfoco'
-      })
+      setFeedback({ tipo: 'erro', mensagem: 'Ocorreu um erro ao criar o hiperfoco.' });
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
   
   return (
     <div>
       <div className="flex items-center mb-4">
-        <Rocket className="h-6 w-6 text-hiperfocos-primary mr-2" aria-hidden="true" />
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-          Conversor de Interesses
-        </h2>
+        <Rocket className="h-6 w-6 text-hiperfocos-primary mr-2" />
+        <h2 className="text-xl font-semibold">Conversor de Interesses</h2>
       </div>
-      
-      <p className="text-gray-600 dark:text-gray-300 mb-6">
-        Transforme um interesse intenso em um projeto estruturado com tarefas claras e objetivas.
-      </p>
+      <p className="text-gray-600 dark:text-gray-300 mb-6">Transforme um interesse em um projeto estruturado.</p>
       
       {feedback && (
-        <div 
-          className={`mb-4 p-3 rounded-md ${
-            feedback.tipo === 'sucesso' 
-              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
-              : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
-          }`}
-          role="alert"
-        >
-          {feedback.tipo === 'sucesso' ? (
-            <CheckCircle className="h-5 w-5 inline mr-2" aria-hidden="true" />
-          ) : (
-            <X className="h-5 w-5 inline mr-2" aria-hidden="true" />
-          )}
+        <div className={`mb-4 p-3 rounded-md ${feedback.tipo === 'sucesso' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`} role="alert">
+          <CheckCircle className="h-5 w-5 inline mr-2" />
           {feedback.mensagem}
         </div>
       )}
       
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-        {/* Informações básicas do hiperfoco */}
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label 
-              htmlFor="titulo" 
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Título do Interesse/Hiperfoco *
-            </label>
-            <input
-              type="text"
-              id="titulo"
-              name="titulo"
-              value={formData.titulo}
-              onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-hiperfocos-primary focus:border-hiperfocos-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              aria-required="true"
-            />
+            <label htmlFor="titulo" className="block text-sm font-medium mb-1">Título do Hiperfoco *</label>
+            <input type="text" id="titulo" value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} className="w-full px-3 py-2 border rounded-md" required />
           </div>
-          
           <div>
-            <label 
-              htmlFor="tempoLimite" 
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Tempo Limite (em minutos, opcional)
-            </label>
-            <input
-              type="number"
-              id="tempoLimite"
-              name="tempoLimite"
-              value={formData.tempoLimite}
-              onChange={(e) => setFormData({ ...formData, tempoLimite: e.target.value })}
-              min="1"
-              placeholder="Ex: 60"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-hiperfocos-primary focus:border-hiperfocos-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
+            <label htmlFor="tempoLimite" className="block text-sm font-medium mb-1">Tempo Limite (minutos)</label>
+            <input type="number" id="tempoLimite" value={formData.tempoLimite} onChange={(e) => setFormData({ ...formData, tempoLimite: e.target.value })} min="1" placeholder="Ex: 60" className="w-full px-3 py-2 border rounded-md" />
           </div>
         </div>
-        
         <div>
-          <label 
-            htmlFor="descricao" 
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Descrição
-          </label>
-          <textarea
-            id="descricao"
-            name="descricao"
-            value={formData.descricao}
-            onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-hiperfocos-primary focus:border-hiperfocos-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            placeholder="Descreva seu interesse ou hiperfoco"
-          />
+          <label htmlFor="descricao" className="block text-sm font-medium mb-1">Descrição</label>
+          <textarea id="descricao" value={formData.descricao} onChange={(e) => setFormData({ ...formData, descricao: e.target.value })} rows={3} className="w-full px-3 py-2 border rounded-md" />
         </div>
-        
-        {/* Seleção de cor */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Cor do Hiperfoco
-          </label>
+          <label className="block text-sm font-medium mb-2">Cor</label>
           <div className="flex gap-2 flex-wrap">
             {CORES_HIPERFOCOS.map((cor) => (
-              <button
-                key={cor}
-                type="button"
-                onClick={() => setFormData({ ...formData, corSelecionada: cor })}
-                className={`w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-hiperfocos-primary ${
-                  formData.corSelecionada === cor ? 'ring-2 ring-offset-2 ring-hiperfocos-primary' : ''
-                }`}
-                style={{ backgroundColor: cor }}
-                aria-label={`Cor ${cor}`}
-                aria-pressed={formData.corSelecionada === cor}
-              />
+              <button key={cor} type="button" onClick={() => setFormData({ ...formData, corSelecionada: cor })} className={`w-8 h-8 rounded-full ${formData.corSelecionada === cor ? 'ring-2' : ''}`} style={{ backgroundColor: cor }} />
             ))}
           </div>
         </div>
-        
-        {/* Lista de tarefas */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Decomposição em Tarefas *
-          </label>
-          
+          <label className="block text-sm font-medium mb-2">Tarefas *</label>
           <div className="space-y-3">
             {formData.novasTarefas.map((tarefa, index) => (
               <div key={index} className="flex gap-2">
-                <input
-                  type="text"
-                  value={tarefa}
-                  onChange={(e) => atualizarTarefa(index, e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-hiperfocos-primary focus:border-hiperfocos-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder={`Tarefa ${index + 1}`}
-                  aria-label={`Tarefa ${index + 1}`}
-                />
-                
-                <button
-                  type="button"
-                  onClick={() => removerTarefa(index)}
-                  className="p-2 text-gray-500 rounded-md hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  aria-label="Remover tarefa"
-                  disabled={formData.novasTarefas.length <= 1}
-                >
-                  <X className="h-5 w-5" aria-hidden="true" />
-                </button>
+                <input type="text" value={tarefa} onChange={(e) => atualizarTarefa(index, e.target.value)} className="flex-1 px-3 py-2 border rounded-md" placeholder={`Tarefa ${index + 1}`} />
+                <button type="button" onClick={() => removerTarefa(index)} className="p-2" disabled={formData.novasTarefas.length <= 1}><X className="h-5 w-5" /></button>
               </div>
             ))}
           </div>
-          
-          <button
-            type="button"
-            onClick={adicionarCampoTarefa}
-            className="mt-3 flex items-center text-hiperfocos-primary hover:text-hiperfocos-secondary"
-            aria-label="Adicionar mais uma tarefa"
-          >
-            <PlusCircle className="h-5 w-5 mr-1" aria-hidden="true" />
-            Adicionar mais uma tarefa
-          </button>
+          <button type="button" onClick={adicionarCampoTarefa} className="mt-3 flex items-center text-hiperfocos-primary"><PlusCircle className="h-5 w-5 mr-1" />Adicionar Tarefa</button>
         </div>
-        
-        {/* Botão de envio */}
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-hiperfocos-primary hover:bg-hiperfocos-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-hiperfocos-primary"
-            aria-label="Converter interesse em hiperfoco"
-          >
-            <Save className="h-5 w-5 mr-2" aria-hidden="true" />
-            Converter em Hiperfoco
+          <button type="submit" className="inline-flex items-center px-4 py-2 border rounded-md text-white bg-hiperfocos-primary" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Save className="h-5 w-5 mr-2" />Converter em Hiperfoco</>}
           </button>
         </div>
       </form>
     </div>
-  )
+  );
 }

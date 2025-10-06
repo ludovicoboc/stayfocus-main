@@ -1,145 +1,158 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
 
-// Tipos
-export type Refeicao = {
-  id: string
-  horario: string
-  descricao: string
-}
+// --- TIPOS DE DADOS ---
+export type RefeicaoPlanejada = {
+  id: number;
+  horario: string;
+  descricao: string;
+};
 
 export type RegistroRefeicao = {
-  id: string
-  data: string
-  horario: string
-  descricao: string
-  tipoIcone: string | null
-  foto: string | null
-}
+  id: number;
+  data: string;
+  horario: string;
+  descricao: string;
+  tipoIcone: string | null;
+  foto: string | null;
+};
 
+export type Hidratacao = {
+  id: number;
+  data: string;
+  coposBebidos: number;
+  metaDiaria: number;
+};
+
+// --- ESTADO DA STORE ---
 type AlimentacaoState = {
-  // Planejador de Refeições
-  refeicoes: Refeicao[]
-  adicionarRefeicao: (horario: string, descricao: string) => void
-  atualizarRefeicao: (id: string, horario: string, descricao: string) => void
-  removerRefeicao: (id: string) => void
-  
-  // Registro de Refeições
-  registros: RegistroRefeicao[]
-  adicionarRegistro: (horario: string, descricao: string, tipoIcone: string | null, foto: string | null) => void
-  removerRegistro: (id: string) => void
-  
-  // Hidratação
-  coposBebidos: number
-  metaDiaria: number
-  ultimoRegistro: string | null
-  adicionarCopo: () => void
-  removerCopo: () => void
-  ajustarMeta: (valor: number) => void
-}
+  // Estado de inicialização e carregamento
+  isInitialized: boolean;
+  isLoading: boolean;
 
-export const useAlimentacaoStore = create<AlimentacaoState>()(
-  persist(
-    (set) => ({
-      // Planejador de Refeições - Estado Inicial
-      refeicoes: [
-        { id: '1', horario: '07:30', descricao: 'Café da manhã' },
-        { id: '2', horario: '12:00', descricao: 'Almoço' },
-        { id: '3', horario: '16:00', descricao: 'Lanche da tarde' },
-        { id: '4', horario: '19:30', descricao: 'Jantar' },
-      ],
-      
-      adicionarRefeicao: (horario, descricao) => 
-        set((state) => ({
-          refeicoes: [
-            ...state.refeicoes,
-            {
-              id: Date.now().toString(),
-              horario,
-              descricao,
-            },
-          ],
-        })),
-      
-      atualizarRefeicao: (id, horario, descricao) =>
-        set((state) => ({
-          refeicoes: state.refeicoes.map((refeicao) =>
-            refeicao.id === id ? { ...refeicao, horario, descricao } : refeicao
-          ),
-        })),
-      
-      removerRefeicao: (id) =>
-        set((state) => ({
-          refeicoes: state.refeicoes.filter((refeicao) => refeicao.id !== id),
-        })),
-      
-      // Registro de Refeições - Estado Inicial
-      registros: [
-        {
-          id: '1',
-          data: '2025-03-03',
-          horario: '08:30',
-          descricao: 'Café da manhã',
-          tipoIcone: 'cafe',
-          foto: null,
-        },
-      ],
-      
-      adicionarRegistro: (horario, descricao, tipoIcone, foto) =>
-        set((state) => {
-          const hoje = new Date().toISOString().split('T')[0]
-          return {
-            registros: [
-              ...state.registros,
-              {
-                id: Date.now().toString(),
-                data: hoje,
-                horario,
-                descricao,
-                tipoIcone,
-                foto,
-              },
-            ],
-          }
-        }),
-      
-      removerRegistro: (id) =>
-        set((state) => ({
-          registros: state.registros.filter((registro) => registro.id !== id),
-        })),
-      
-      // Hidratação - Estado Inicial
-      coposBebidos: 0,
-      metaDiaria: 8,
-      ultimoRegistro: null,
-      
-      adicionarCopo: () =>
-        set((state) => {
-          if (state.coposBebidos < state.metaDiaria) {
-            return {
-              coposBebidos: state.coposBebidos + 1,
-              ultimoRegistro: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-          }
-          return state
-        }),
-      
-      removerCopo: () =>
-        set((state) => ({
-          coposBebidos: Math.max(0, state.coposBebidos - 1),
-        })),
-      
-      ajustarMeta: (valor) =>
-        set((state) => {
-          const novaMeta = state.metaDiaria + valor
-          if (novaMeta >= 1 && novaMeta <= 15) {
-            return { metaDiaria: novaMeta }
-          }
-          return state
-        }),
-    }),
-    {
-      name: 'alimentacao-storage', // nome para o localStorage
+  // Planejador de Refeições
+  refeicoesPlanejadas: RefeicaoPlanejada[];
+  // Registro de Refeições
+  refeicoesRegistradas: RegistroRefeicao[];
+  // Hidratação
+  hidratacao: Hidratacao | null;
+
+  // --- AÇÕES ---
+  initialize: () => Promise<void>;
+
+  // Ações para Refeições Planejadas
+  adicionarRefeicaoPlanejada: (refeicao: Omit<RefeicaoPlanejada, 'id'>) => Promise<void>;
+  atualizarRefeicaoPlanejada: (id: number, updates: Partial<RefeicaoPlanejada>) => Promise<void>;
+  removerRefeicaoPlanejada: (id: number) => Promise<void>;
+
+  // Ações para Registro de Refeições
+  adicionarRegistroRefeicao: (registro: Omit<RegistroRefeicao, 'id' | 'data'>) => Promise<void>;
+  removerRegistroRefeicao: (id: number) => Promise<void>;
+
+  // Ações para Hidratação
+  updateHidratacao: (action: 'add_copo' | 'remove_copo' | 'ajustar_meta', value?: number) => Promise<void>;
+};
+
+export const useAlimentacaoStore = create<AlimentacaoState>((set, get) => ({
+  // Estado inicial
+  isInitialized: false,
+  isLoading: true,
+  refeicoesPlanejadas: [],
+  refeicoesRegistradas: [],
+  hidratacao: null,
+
+  // Ação de inicialização
+  initialize: async () => {
+    if (get().isInitialized) return;
+    set({ isLoading: true });
+
+    try {
+      // Busca todos os dados em paralelo
+      const [planejadasRes, registradasRes, hidratacaoRes] = await Promise.all([
+        fetch('/api/v1/alimentacao/refeicoes-planejadas'),
+        fetch('/api/v1/alimentacao/refeicoes-registradas'),
+        fetch('/api/v1/alimentacao/hidratacao'),
+      ]);
+
+      if (!planejadasRes.ok || !registradasRes.ok || !hidratacaoRes.ok) {
+        throw new Error('Falha ao buscar dados de alimentação.');
+      }
+
+      const refeicoesPlanejadas = await planejadasRes.json();
+      const refeicoesRegistradas = await registradasRes.json();
+      const hidratacao = await hidratacaoRes.json();
+
+      set({
+        refeicoesPlanejadas,
+        refeicoesRegistradas,
+        hidratacao,
+        isInitialized: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error(error);
+      set({ isInitialized: true, isLoading: false }); // Evita loops de carregamento
     }
-  )
-)
+  },
+
+  // --- CRUD: Refeições Planejadas ---
+  adicionarRefeicaoPlanejada: async (refeicao) => {
+    const response = await fetch('/api/v1/alimentacao/refeicoes-planejadas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(refeicao),
+    });
+    const novaRefeicao = await response.json();
+    set((state) => ({
+      refeicoesPlanejadas: [...state.refeicoesPlanejadas, novaRefeicao].sort((a, b) => a.horario.localeCompare(b.horario)),
+    }));
+  },
+
+  atualizarRefeicaoPlanejada: async (id, updates) => {
+    set((state) => ({
+      refeicoesPlanejadas: state.refeicoesPlanejadas.map((r) => (r.id === id ? { ...r, ...updates } : r)),
+    }));
+    await fetch(`/api/v1/alimentacao/refeicoes-planejadas/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+  },
+
+  removerRefeicaoPlanejada: async (id) => {
+    set((state) => ({
+      refeicoesPlanejadas: state.refeicoesPlanejadas.filter((r) => r.id !== id),
+    }));
+    await fetch(`/api/v1/alimentacao/refeicoes-planejadas/${id}`, { method: 'DELETE' });
+  },
+
+  // --- CRUD: Registros de Refeição ---
+  adicionarRegistroRefeicao: async (registro) => {
+    const response = await fetch('/api/v1/alimentacao/refeicoes-registradas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(registro),
+    });
+    const novoRegistro = await response.json();
+    set((state) => ({
+      refeicoesRegistradas: [novoRegistro, ...state.refeicoesRegistradas],
+    }));
+  },
+
+  removerRegistroRefeicao: async (id) => {
+    set((state) => ({
+      refeicoesRegistradas: state.refeicoesRegistradas.filter((r) => r.id !== id),
+    }));
+    await fetch(`/api/v1/alimentacao/refeicoes-registradas/${id}`, { method: 'DELETE' });
+  },
+
+  // --- Ações de Hidratação ---
+  updateHidratacao: async (action, value) => {
+    const response = await fetch('/api/v1/alimentacao/hidratacao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, value }),
+    });
+    const hidratacaoAtualizada = await response.json();
+    set({ hidratacao: hidratacaoAtualizada });
+  },
+}));

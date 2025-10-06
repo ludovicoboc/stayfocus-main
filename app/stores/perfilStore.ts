@@ -1,86 +1,119 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
 
+// Tipos de dados (mantidos)
 export type PreferenciasVisuais = {
-  altoContraste: boolean
-  reducaoEstimulos: boolean
-  textoGrande: boolean
-}
+  altoContraste: boolean;
+  reducaoEstimulos: boolean;
+  textoGrande: boolean;
+};
 
 export type MetasDiarias = {
-  horasSono: number         // Horas ideais de sono
-  tarefasPrioritarias: number // Número de tarefas prioritárias
-  coposAgua: number         // Copos de água por dia
-  pausasProgramadas: number // Número de pausas programadas
-}
+  horasSono: number;
+  tarefasPrioritarias: number;
+  coposAgua: number;
+  pausasProgramadas: number;
+};
 
-export type PerfilState = {
-  nome: string
-  preferenciasVisuais: PreferenciasVisuais
-  metasDiarias: MetasDiarias
-  notificacoesAtivas: boolean
-  pausasAtivas: boolean
-  // Ações
-  atualizarNome: (nome: string) => void
-  atualizarPreferenciasVisuais: (preferencias: Partial<PreferenciasVisuais>) => void
-  atualizarMetasDiarias: (metas: Partial<MetasDiarias>) => void
-  alternarNotificacoes: () => void
-  alternarPausas: () => void
-  resetarPerfil: () => void
-}
+// Estrutura completa do perfil como recebido da API
+export type PerfilCompleto = {
+  nome: string;
+  email: string;
+  preferenciasVisuais: PreferenciasVisuais;
+  metasDiarias: MetasDiarias;
+  notificacoesAtivas: boolean;
+  pausasAtivas: boolean;
+};
 
-const defaultState = {
+// Estado da store
+export type PerfilState = PerfilCompleto & {
+  isInitialized: boolean;
+  isLoading: boolean;
+  initialize: () => Promise<void>;
+  updateProfile: (updates: Partial<PerfilCompleto>) => Promise<void>;
+  resetarPerfil: () => void; // Manter para logout ou reset local
+};
+
+const defaultState: Omit<PerfilState, 'initialize' | 'updateProfile' | 'resetarPerfil' | 'email'> = {
   nome: 'Usuário',
   preferenciasVisuais: {
     altoContraste: false,
     reducaoEstimulos: false,
-    textoGrande: false
+    textoGrande: false,
   },
   metasDiarias: {
     horasSono: 8,
     tarefasPrioritarias: 3,
     coposAgua: 8,
-    pausasProgramadas: 4
+    pausasProgramadas: 4,
   },
   notificacoesAtivas: true,
-  pausasAtivas: true
-}
+  pausasAtivas: true,
+  isInitialized: false,
+  isLoading: true,
+};
 
-export const usePerfilStore = create<PerfilState>()(
-  persist(
-    (set) => ({
-      ...defaultState,
-      
-      atualizarNome: (nome) => set({
-        nome
-      }),
-      
-      atualizarPreferenciasVisuais: (preferencias) => set((state) => ({
-        preferenciasVisuais: {
-          ...state.preferenciasVisuais,
-          ...preferencias
-        }
-      })),
-      
-      atualizarMetasDiarias: (metas) => set((state) => ({
-        metasDiarias: {
-          ...state.metasDiarias,
-          ...metas
-        }
-      })),
-      
-      alternarNotificacoes: () => set((state) => ({
-        notificacoesAtivas: !state.notificacoesAtivas
-      })),
-      
-      alternarPausas: () => set((state) => ({
-        pausasAtivas: !state.pausasAtivas
-      })),
-      
-      resetarPerfil: () => set(defaultState)
-    }),
-    {
-      name: 'perfil-storage',
+// Função helper para enviar atualizações para o servidor
+const updateProfileOnServer = async (updates: Partial<PerfilCompleto>) => {
+  try {
+    const response = await fetch('/api/v1/perfil', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    });
+
+    if (!response.ok) {
+      throw new Error('Falha ao atualizar o perfil no servidor.');
     }
-  )
-)
+    console.log('Perfil atualizado no servidor com sucesso:', updates);
+  } catch (error) {
+    console.error(error);
+    // Opcional: Adicionar lógica para reverter o estado em caso de falha
+  }
+};
+
+export const usePerfilStore = create<PerfilState>((set, get) => ({
+  ...(defaultState as PerfilState), // Cast inicial
+  email: '', // Adicionar email ao estado padrão
+
+  // Ação para inicializar a store com dados do backend
+  initialize: async () => {
+    if (get().isInitialized) return;
+
+    set({ isLoading: true });
+    try {
+      const response = await fetch('/api/v1/perfil');
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Usuário não está logado, não fazer nada ou redirecionar
+          console.log('Usuário não autenticado. Perfil não será carregado.');
+          set({ isLoading: false, isInitialized: true }); // Marcar como inicializado para não tentar de novo
+          return;
+        }
+        throw new Error('Falha ao buscar dados do perfil.');
+      }
+      const data: PerfilCompleto = await response.json();
+      set({ ...data, isInitialized: true, isLoading: false });
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false, isInitialized: true }); // Mesmo em caso de erro, marcar como inicializado
+    }
+  },
+
+  // Ação unificada para atualizar o perfil
+  updateProfile: async (updates) => {
+    const currentState = get();
+
+    // Atualiza o estado local imediatamente para uma UI responsiva
+    set({ ...currentState, ...updates });
+
+    // Envia as atualizações para o servidor em segundo plano
+    await updateProfileOnServer(updates);
+  },
+
+  // Ação de resetar (pode ser usada para logout)
+  resetarPerfil: () => {
+    set({ ...defaultState, email: '', isInitialized: false, isLoading: true });
+  },
+}));

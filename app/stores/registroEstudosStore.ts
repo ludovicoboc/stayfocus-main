@@ -1,92 +1,98 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
 
 export type SessaoEstudo = {
-  id: string
-  titulo: string
-  descricao: string
-  duracao: number // em minutos
-  data: string
-  completo: boolean
-}
-
-// Dados iniciais para demonstração
-const sessoesIniciais: SessaoEstudo[] = [
-  {
-    id: '1',
-    titulo: 'Matemática - Álgebra Linear',
-    descricao: 'Revisão de matrizes e determinantes',
-    duracao: 45,
-    data: '2023-03-03',
-    completo: true,
-  },
-  {
-    id: '2',
-    titulo: 'Inglês - Vocabulário',
-    descricao: 'Praticar vocabulário técnico',
-    duracao: 30,
-    data: '2023-03-04',
-    completo: false,
-  },
-]
+  id: number; // ID numérico do banco de dados
+  titulo: string;
+  descricao: string;
+  duracao: number; // em minutos
+  data: string;
+  completo: boolean;
+};
 
 interface RegistroEstudosState {
-  sessoes: SessaoEstudo[]
-  adicionarSessao: (sessao: Omit<SessaoEstudo, 'id' | 'data' | 'completo'>) => void
-  removerSessao: (id: string) => void
-  alternarCompletar: (id: string) => void
-  editarSessao: (id: string, dados: Pick<SessaoEstudo, 'titulo' | 'descricao' | 'duracao'>) => void
+  sessoes: SessaoEstudo[];
+  isInitialized: boolean;
+  isLoading: boolean;
+  initialize: () => Promise<void>;
+  adicionarSessao: (sessao: Omit<SessaoEstudo, 'id' | 'data' | 'completo'>) => Promise<void>;
+  removerSessao: (id: number) => Promise<void>;
+  atualizarSessao: (id: number, dados: Partial<Pick<SessaoEstudo, 'titulo' | 'descricao' | 'duracao' | 'completo'>>) => Promise<void>;
 }
 
-export const useRegistroEstudosStore = create<RegistroEstudosState>()(
-  persist(
-    (set) => ({
-      sessoes: sessoesIniciais,
-      
-      adicionarSessao: (sessao) => set((state) => {
-        const hoje = new Date().toISOString().split('T')[0]
-        
-        return {
-          sessoes: [
-            ...state.sessoes,
-            {
-              id: Date.now().toString(),
-              titulo: sessao.titulo,
-              descricao: sessao.descricao,
-              duracao: sessao.duracao,
-              data: hoje,
-              completo: false,
-            },
-          ],
-        }
-      }),
-      
-      removerSessao: (id) => set((state) => ({
-        sessoes: state.sessoes.filter((sessao) => sessao.id !== id)
-      })),
-      
-      alternarCompletar: (id) => set((state) => ({
-        sessoes: state.sessoes.map((sessao) =>
-          sessao.id === id ? { ...sessao, completo: !sessao.completo } : sessao
-        )
-      })),
-      
-      editarSessao: (id, dados) => set((state) => ({
-        sessoes: state.sessoes.map((sessao) =>
-          sessao.id === id
-            ? {
-                ...sessao,
-                titulo: dados.titulo,
-                descricao: dados.descricao,
-                duracao: dados.duracao,
-              }
-            : sessao
-        )
-      })),
-    }),
-    {
-      name: 'registro-estudos-storage',
-      storage: createJSONStorage(() => localStorage)
+export const useRegistroEstudosStore = create<RegistroEstudosState>((set, get) => ({
+  sessoes: [],
+  isInitialized: false,
+  isLoading: true,
+
+  initialize: async () => {
+    if (get().isInitialized) return;
+    set({ isLoading: true });
+    try {
+      const response = await fetch('/api/v1/estudos/sessoes');
+      if (!response.ok) {
+        throw new Error('Falha ao buscar sessões de estudo.');
+      }
+      const data = await response.json();
+      const sessoesFormatadas: SessaoEstudo[] = data.map((s: any) => ({
+        ...s,
+        completo: Boolean(s.completo),
+      }));
+      set({ sessoes: sessoesFormatadas, isInitialized: true, isLoading: false });
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false, isInitialized: true });
     }
-  )
-)
+  },
+
+  adicionarSessao: async (sessao) => {
+    try {
+      const response = await fetch('/api/v1/estudos/sessoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessao),
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao adicionar sessão.');
+      }
+      const novaSessao: SessaoEstudo = await response.json();
+      set((state) => ({
+        sessoes: [{ ...novaSessao, completo: Boolean(novaSessao.completo) }, ...state.sessoes],
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  removerSessao: async (id) => {
+    const originalSessoes = get().sessoes;
+    set((state) => ({
+      sessoes: state.sessoes.filter((s) => s.id !== id),
+    }));
+    try {
+      const response = await fetch(`/api/v1/estudos/sessoes/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Falha ao remover sessão.');
+    } catch (error) {
+      console.error(error);
+      set({ sessoes: originalSessoes });
+    }
+  },
+
+  atualizarSessao: async (id, dados) => {
+    const originalSessoes = get().sessoes;
+    const sessoesAtualizadas = originalSessoes.map((s) =>
+      s.id === id ? { ...s, ...dados } : s
+    );
+    set({ sessoes: sessoesAtualizadas });
+    try {
+      const response = await fetch(`/api/v1/estudos/sessoes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados),
+      });
+      if (!response.ok) throw new Error('Falha ao atualizar sessão.');
+    } catch (error) {
+      console.error(error);
+      set({ sessoes: originalSessoes });
+    }
+  },
+}));

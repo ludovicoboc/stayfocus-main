@@ -1,20 +1,31 @@
-'use client'
+'use client';
 
-import { Droplet, PlusCircle, MinusCircle } from 'lucide-react'
-import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore'
+import { Droplet, PlusCircle, MinusCircle, Loader2 } from 'lucide-react';
+import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore';
 
 export function LembreteHidratacao() {
+  // Consumir o estado e ações corretas da store refatorada
   const { 
-    coposBebidos, 
-    metaDiaria, 
-    ultimoRegistro, 
-    adicionarCopo, 
-    removerCopo, 
-    ajustarMeta 
-  } = useAlimentacaoStore()
+    hidratacao,
+    updateHidratacao,
+    isLoading,
+    isInitialized
+  } = useAlimentacaoStore();
+
+  // Exibir indicador de carregamento ou estado nulo
+  if (isLoading || !isInitialized || !hidratacao) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  // Extrair dados do objeto de hidratação
+  const { coposBebidos, metaDiaria } = hidratacao;
 
   // Calcular a porcentagem de progresso
-  const progresso = Math.min((coposBebidos / metaDiaria) * 100, 100)
+  const progresso = Math.min((coposBebidos / metaDiaria) * 100, 100);
 
   return (
     <div className="space-y-4">
@@ -30,7 +41,7 @@ export function LembreteHidratacao() {
         
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => ajustarMeta(-1)}
+            onClick={() => updateHidratacao('ajustar_meta', metaDiaria - 1)}
             className="p-1 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Diminuir meta diária"
             disabled={metaDiaria <= 1}
@@ -45,7 +56,7 @@ export function LembreteHidratacao() {
           </div>
           
           <button
-            onClick={() => ajustarMeta(1)}
+            onClick={() => updateHidratacao('ajustar_meta', metaDiaria + 1)}
             className="p-1 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Aumentar meta diária"
             disabled={metaDiaria >= 15}
@@ -70,11 +81,6 @@ export function LembreteHidratacao() {
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {coposBebidos} de {metaDiaria} copos
-          {ultimoRegistro && (
-            <span className="ml-2">
-              (Último: {ultimoRegistro})
-            </span>
-          )}
         </div>
         
         <div className="text-blue-600 dark:text-blue-400">
@@ -108,7 +114,7 @@ export function LembreteHidratacao() {
       {/* Botões de ação */}
       <div className="flex justify-center space-x-4">
         <button
-          onClick={adicionarCopo}
+          onClick={() => updateHidratacao('add_copo')}
           disabled={coposBebidos >= metaDiaria}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Registrar um copo de água"
@@ -117,7 +123,7 @@ export function LembreteHidratacao() {
         </button>
         
         <button
-          onClick={removerCopo}
+          onClick={() => updateHidratacao('remove_copo')}
           disabled={coposBebidos <= 0}
           className="px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Remover um copo de água"
@@ -136,5 +142,5 @@ export function LembreteHidratacao() {
         </ul>
       </div>
     </div>
-  )
+  );
 }

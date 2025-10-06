@@ -1,50 +1,64 @@
 'use client'
 
-import { usePerfilStore } from '../../stores/perfilStore'
-import { Eye, BarChart2, Type, Bell, Coffee, Moon } from 'lucide-react'
+import { usePerfilStore } from '../../stores/perfilStore';
+import { Eye, BarChart2, Type, Bell, Coffee, Moon } from 'lucide-react';
 
 export function PreferenciasVisuais() {
+  // Consumir o estado e a nova ação unificada 'updateProfile'
   const { 
     preferenciasVisuais, 
-    atualizarPreferenciasVisuais, 
     notificacoesAtivas, 
     pausasAtivas,
-    alternarNotificacoes,
-    alternarPausas
-  } = usePerfilStore()
+    updateProfile
+  } = usePerfilStore();
   
-  const toggleAltoContraste = () => {
-    atualizarPreferenciasVisuais({ altoContraste: !preferenciasVisuais.altoContraste })
+  // Handlers agora são assíncronos e usam a nova ação
+  const toggleAltoContraste = async () => {
+    const newValue = !preferenciasVisuais.altoContraste;
+    await updateProfile({
+      preferenciasVisuais: { ...preferenciasVisuais, altoContraste: newValue }
+    });
     
-    // Aplicar classes ao documento para alto contraste
-    if (!preferenciasVisuais.altoContraste) {
-      document.documentElement.classList.add('alto-contraste')
+    if (newValue) {
+      document.documentElement.classList.add('alto-contraste');
     } else {
-      document.documentElement.classList.remove('alto-contraste')
+      document.documentElement.classList.remove('alto-contraste');
     }
-  }
+  };
   
-  const toggleReducaoEstimulos = () => {
-    atualizarPreferenciasVisuais({ reducaoEstimulos: !preferenciasVisuais.reducaoEstimulos })
-    
-    // Aplicar classes ao documento para redução de estímulos
-    if (!preferenciasVisuais.reducaoEstimulos) {
-      document.documentElement.classList.add('reducao-estimulos')
+  const toggleReducaoEstimulos = async () => {
+    const newValue = !preferenciasVisuais.reducaoEstimulos;
+    await updateProfile({
+      preferenciasVisuais: { ...preferenciasVisuais, reducaoEstimulos: newValue }
+    });
+
+    if (newValue) {
+      document.documentElement.classList.add('reducao-estimulos');
     } else {
-      document.documentElement.classList.remove('reducao-estimulos')
+      document.documentElement.classList.remove('reducao-estimulos');
     }
-  }
+  };
   
-  const toggleTextoGrande = () => {
-    atualizarPreferenciasVisuais({ textoGrande: !preferenciasVisuais.textoGrande })
-    
-    // Aplicar classes ao documento para texto grande
-    if (!preferenciasVisuais.textoGrande) {
-      document.documentElement.classList.add('texto-grande')
+  const toggleTextoGrande = async () => {
+    const newValue = !preferenciasVisuais.textoGrande;
+    await updateProfile({
+      preferenciasVisuais: { ...preferenciasVisuais, textoGrande: newValue }
+    });
+
+    if (newValue) {
+      document.documentElement.classList.add('texto-grande');
     } else {
-      document.documentElement.classList.remove('texto-grande')
+      document.documentElement.classList.remove('texto-grande');
     }
-  }
+  };
+
+  const toggleNotificacoes = async () => {
+    await updateProfile({ notificacoesAtivas: !notificacoesAtivas });
+  };
+
+  const togglePausas = async () => {
+    await updateProfile({ pausasAtivas: !pausasAtivas });
+  };
   
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
@@ -188,7 +202,7 @@ export function PreferenciasVisuais() {
               <button
                 role="switch"
                 aria-checked={notificacoesAtivas}
-                onClick={alternarNotificacoes}
+                onClick={toggleNotificacoes}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-perfil-primary ${
                   notificacoesAtivas ? 'bg-perfil-primary' : 'bg-gray-200 dark:bg-gray-700'
                 }`}
@@ -221,7 +235,7 @@ export function PreferenciasVisuais() {
               <button
                 role="switch"
                 aria-checked={pausasAtivas}
-                onClick={alternarPausas}
+                onClick={togglePausas}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-perfil-primary ${
                   pausasAtivas ? 'bg-perfil-primary' : 'bg-gray-200 dark:bg-gray-700'
                 }`}
@@ -244,5 +258,5 @@ export function PreferenciasVisuais() {
         </p>
       </div>
     </div>
-  )
+  );
 }

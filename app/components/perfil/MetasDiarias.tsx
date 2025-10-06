@@ -1,41 +1,48 @@
 'use client'
 
-import { useState } from 'react'
-import { usePerfilStore } from '../../stores/perfilStore'
-import { Save, Target, Clock, Droplet, Coffee } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { usePerfilStore } from '../../stores/perfilStore';
+import { Save, Target, Clock, Droplet, Coffee } from 'lucide-react';
 
 export function MetasDiarias() {
-  const { metasDiarias, atualizarMetasDiarias } = usePerfilStore()
-  const [editando, setEditando] = useState(false)
-  const [metas, setMetas] = useState(metasDiarias)
+  // Consumir a nova ação unificada 'updateProfile'
+  const { metasDiarias, updateProfile } = usePerfilStore();
+
+  const [editando, setEditando] = useState(false);
+  const [metas, setMetas] = useState(metasDiarias);
+
+  // Sincronizar o estado local se as metas da store mudarem
+  useEffect(() => {
+    setMetas(metasDiarias);
+  }, [metasDiarias]);
   
   const iniciarEdicao = () => {
-    setMetas({...metasDiarias})
-    setEditando(true)
-  }
+    setMetas({ ...metasDiarias });
+    setEditando(true);
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    const valorNumerico = parseInt(value)
+    const { name, value } = e.target;
+    const valorNumerico = parseInt(value, 10);
     
-    // Verificar se é um número válido
     if (!isNaN(valorNumerico)) {
       setMetas({
         ...metas,
-        [name]: valorNumerico
-      })
+        [name]: valorNumerico,
+      });
     }
-  }
+  };
   
-  const salvarAlteracoes = () => {
-    atualizarMetasDiarias(metas)
-    setEditando(false)
-  }
+  // Handler agora é assíncrono e usa a nova ação
+  const salvarAlteracoes = async () => {
+    await updateProfile({ metasDiarias: metas });
+    setEditando(false);
+  };
   
   const cancelarEdicao = () => {
-    setMetas({...metasDiarias})
-    setEditando(false)
-  }
+    setMetas({ ...metasDiarias });
+    setEditando(false);
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
@@ -209,5 +216,5 @@ export function MetasDiarias() {
         </p>
       </div>
     </div>
-  )
+  );
 }

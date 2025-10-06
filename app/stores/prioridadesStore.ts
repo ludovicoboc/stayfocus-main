@@ -1,78 +1,126 @@
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
 
+// Tipos de dados
 export type Prioridade = {
-  id: string;
+  id: number; // ID numérico do banco de dados
   texto: string;
   concluida: boolean;
   data: string; // formato ISO: YYYY-MM-DD
-  tipo?: 'geral' | 'concurso'; // Novo campo para tipo de prioridade
-  origemId?: string; // Novo campo para ID da origem (ex: concursoId)
-}
+  tipo?: 'geral' | 'concurso';
+  origemId?: string;
+};
 
+// Estado da store
 interface PrioridadesState {
   prioridades: Prioridade[];
-  // Atualiza a assinatura para aceitar os novos campos opcionais
-  adicionarPrioridade: (prioridade: Omit<Prioridade, 'id' | 'data' | 'concluida'> & { concluida?: boolean }) => void;
-  editarPrioridade: (id: string, texto: string) => void;
-  removerPrioridade: (id: string) => void;
-  toggleConcluida: (id: string) => void
-  getHistoricoPorData: (data?: string) => Prioridade[]
-  getDatasPrioridades: () => string[]
+  isInitialized: boolean;
+  isLoading: boolean;
+  initialize: () => Promise<void>;
+  adicionarPrioridade: (novaPrioridade: Omit<Prioridade, 'id' | 'data' | 'concluida'>) => Promise<void>;
+  atualizarPrioridade: (id: number, updates: Partial<Pick<Prioridade, 'texto' | 'concluida'>>) => Promise<void>;
+  removerPrioridade: (id: number) => Promise<void>;
+  getHistoricoPorData: (data?: string) => Prioridade[];
+  getDatasPrioridades: () => string[];
 }
 
-export const usePrioridadesStore = create<PrioridadesState>()(
-  persist(
-    (set, get) => ({
-      prioridades: [],
+export const usePrioridadesStore = create<PrioridadesState>((set, get) => ({
+  prioridades: [],
+  isInitialized: false,
+  isLoading: true,
 
-      adicionarPrioridade: (novaPrioridade) => set((state) => {
-        // Obter a data atual em formato ISO (YYYY-MM-DD)
-        const dataAtual = new Date().toISOString().split('T')[0];
-        const prioridadeCompleta: Prioridade = {
-          id: crypto.randomUUID(),
-          texto: novaPrioridade.texto,
-          concluida: novaPrioridade.concluida ?? false, // Define concluida como false por padrão
-          data: dataAtual,
-          tipo: novaPrioridade.tipo || 'geral', // Define tipo como 'geral' por padrão
-          origemId: novaPrioridade.origemId, // Adiciona origemId se fornecido
-        };
-
-        return {
-          prioridades: [...state.prioridades, prioridadeCompleta],
-        };
-      }),
-
-      editarPrioridade: (id, texto) => set((state) => ({
-        prioridades: state.prioridades.map(p => 
-          p.id === id ? { ...p, texto } : p
-        )
-      })),
-      
-      removerPrioridade: (id) => set((state) => ({
-        prioridades: state.prioridades.filter(p => p.id !== id)
-      })),
-      
-      toggleConcluida: (id) => set((state) => ({
-        prioridades: state.prioridades.map(p => 
-          p.id === id ? { ...p, concluida: !p.concluida } : p
-        )
-      })),
-      
-      getHistoricoPorData: (data) => {
-        const dataFiltro = data || new Date().toISOString().split('T')[0]
-        return get().prioridades.filter(p => p.data === dataFiltro)
-      },
-      
-      getDatasPrioridades: () => {
-        // Retorna array de datas únicas (sem repetições)
-        const datas = get().prioridades.map(p => p.data)
-        return Array.from(new Set(datas)).sort().reverse() // Mais recentes primeiro
+  // Ação para inicializar a store com dados do backend
+  initialize: async () => {
+    if (get().isInitialized) return;
+    set({ isLoading: true });
+    try {
+      const response = await fetch('/api/v1/prioridades');
+      if (!response.ok) {
+        throw new Error('Falha ao buscar prioridades.');
       }
-    }),
-    {
-      name: 'prioridades-diarias',
-      storage: createJSONStorage(() => localStorage),
+      const data = await response.json();
+      // Garantir que 'concluida' seja sempre um booleano
+      const prioridadesFormatadas: Prioridade[] = data.map((p: any) => ({
+        ...p,
+        concluida: Boolean(p.concluida),
+      }));
+      set({ prioridades: prioridadesFormatadas, isInitialized: true, isLoading: false });
+    } catch (error) {
+      console.error(error);
+      set({ isLoading: false, isInitialized: true });
     }
-  )
-)
+  },
+
+  // Adicionar uma nova prioridade
+  adicionarPrioridade: async (novaPrioridade) => {
+    try {
+      const response = await fetch('/api/v1/prioridades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novaPrioridade),
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao adicionar prioridade.');
+      }
+      const prioridadeCriada: Prioridade = await response.json();
+      set((state) => ({
+        prioridades: [...state.prioridades, { ...prioridadeCriada, concluida: Boolean(prioridadeCriada.concluida) }],
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  // Atualizar uma prioridade existente
+  atualizarPrioridade: async (id, updates) => {
+    const originalPrioridades = get().prioridades;
+    const prioridadesAtualizadas = originalPrioridades.map(p =>
+      p.id === id ? { ...p, ...updates } : p
+    );
+    set({ prioridades: prioridadesAtualizadas });
+
+    try {
+      const response = await fetch(`/api/v1/prioridades/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao atualizar prioridade.');
+      }
+    } catch (error) {
+      console.error(error);
+      set({ prioridades: originalPrioridades }); // Reverter em caso de falha
+    }
+  },
+
+  // Remover uma prioridade
+  removerPrioridade: async (id) => {
+    const originalPrioridades = get().prioridades;
+    set((state) => ({
+      prioridades: state.prioridades.filter(p => p.id !== id),
+    }));
+
+    try {
+      const response = await fetch(`/api/v1/prioridades/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Falha ao remover prioridade.');
+      }
+    } catch (error) {
+      console.error(error);
+      set({ prioridades: originalPrioridades }); // Reverter em caso de falha
+    }
+  },
+
+  // Funções de filtro (operam no estado local)
+  getHistoricoPorData: (data) => {
+    const dataFiltro = data || new Date().toISOString().split('T')[0];
+    return get().prioridades.filter(p => p.data === dataFiltro);
+  },
+
+  getDatasPrioridades: () => {
+    const datas = get().prioridades.map(p => p.data);
+    return Array.from(new Set(datas)).sort().reverse();
+  },
+}));

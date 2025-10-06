@@ -1,25 +1,42 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Settings, Eye, EyeOff, Type, Moon, Sun, BellRing, BellOff, Clock } from 'lucide-react'
+import { useState } from 'react'
+import { Settings, Eye, EyeOff, Type, BellRing, BellOff, Clock } from 'lucide-react'
 import { Button } from '@/app/components/ui/Button'
 import { Modal } from '@/app/components/ui/Modal'
 import { usePerfilStore } from '@/app/stores/perfilStore'
 
 export function PreferencesButton() {
   const [isOpen, setIsOpen] = useState(false)
+  // Consumir o estado e a nova ação unificada 'updateProfile'
   const {
     preferenciasVisuais,
-    atualizarPreferenciasVisuais,
     notificacoesAtivas,
-    alternarNotificacoes,
     pausasAtivas,
-    alternarPausas
+    updateProfile
   } = usePerfilStore()
 
   function toggleModal() {
     setIsOpen(!isOpen)
   }
+
+  // Handler genérico para atualizar as preferências visuais
+  const handleVisualPreferenceChange = async (key: keyof typeof preferenciasVisuais) => {
+    const newValue = !preferenciasVisuais[key];
+    await updateProfile({
+      preferenciasVisuais: { ...preferenciasVisuais, [key]: newValue }
+    });
+  };
+
+  // Handlers para notificações e pausas
+  const toggleNotificacoes = async () => {
+    await updateProfile({ notificacoesAtivas: !notificacoesAtivas });
+  };
+
+  const togglePausas = async () => {
+    await updateProfile({ pausasAtivas: !pausasAtivas });
+  };
+
 
   return (
     <>
@@ -49,9 +66,7 @@ export function PreferencesButton() {
               
               <div className="grid grid-cols-1 gap-3">
                 <button
-                  onClick={() => atualizarPreferenciasVisuais({ 
-                    altoContraste: !preferenciasVisuais.altoContraste 
-                  })}
+                  onClick={() => handleVisualPreferenceChange('altoContraste')}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
                     preferenciasVisuais.altoContraste
                       ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
@@ -91,9 +106,7 @@ export function PreferencesButton() {
                 </button>
 
                 <button
-                  onClick={() => atualizarPreferenciasVisuais({ 
-                    reducaoEstimulos: !preferenciasVisuais.reducaoEstimulos 
-                  })}
+                  onClick={() => handleVisualPreferenceChange('reducaoEstimulos')}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
                     preferenciasVisuais.reducaoEstimulos
                       ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
@@ -133,9 +146,7 @@ export function PreferencesButton() {
                 </button>
 
                 <button
-                  onClick={() => atualizarPreferenciasVisuais({ 
-                    textoGrande: !preferenciasVisuais.textoGrande 
-                  })}
+                  onClick={() => handleVisualPreferenceChange('textoGrande')}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
                     preferenciasVisuais.textoGrande
                       ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
@@ -183,7 +194,7 @@ export function PreferencesButton() {
               
               <div className="grid grid-cols-1 gap-3">
                 <button
-                  onClick={alternarNotificacoes}
+                  onClick={toggleNotificacoes}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
                     notificacoesAtivas
                       ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
@@ -223,7 +234,7 @@ export function PreferencesButton() {
                 </button>
 
                 <button
-                  onClick={alternarPausas}
+                  onClick={togglePausas}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
                     pausasAtivas
                       ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
@@ -277,4 +288,4 @@ export function PreferencesButton() {
       )}
     </>
   )
-} 
+}

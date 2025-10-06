@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Camera, Plus, X } from 'lucide-react'
-import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore'
+import { useState } from 'react';
+import { Camera, Plus, X, Loader2 } from 'lucide-react';
+import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore';
 
-// Ícones simples para tipos de refeição
+// Ícones e tipos de refeição (mantidos)
 const tiposRefeicao = [
   { id: 'cafe', emoji: '☕', nome: 'Café' },
   { id: 'fruta', emoji: '🍎', nome: 'Fruta' },
@@ -13,53 +13,69 @@ const tiposRefeicao = [
   { id: 'carboidrato', emoji: '🍚', nome: 'Carboidrato' },
   { id: 'sobremesa', emoji: '🍰', nome: 'Sobremesa' },
   { id: 'agua', emoji: '💧', nome: 'Água' },
-]
+];
 
 export function RegistroRefeicoes() {
-  const { registros, adicionarRegistro, removerRegistro } = useAlimentacaoStore()
+  // Consumir o estado e ações corretas da store refatorada
+  const {
+    refeicoesRegistradas: registros,
+    adicionarRegistroRefeicao,
+    removerRegistroRefeicao,
+    isLoading,
+    isInitialized
+  } = useAlimentacaoStore();
+
   const [novoRegistro, setNovoRegistro] = useState({
     horario: '',
     descricao: '',
     tipoIcone: null as string | null,
     foto: null as string | null,
-  })
-  const [mostrarForm, setMostrarForm] = useState(false)
+  });
+  const [mostrarForm, setMostrarForm] = useState(false);
 
-  const handleAdicionarRegistro = () => {
-    if (!novoRegistro.horario || !novoRegistro.descricao) return
+  // Handler agora é assíncrono
+  const handleAdicionarRegistro = async () => {
+    if (!novoRegistro.horario || !novoRegistro.descricao) return;
     
-    adicionarRegistro(
-      novoRegistro.horario,
-      novoRegistro.descricao,
-      novoRegistro.tipoIcone,
-      novoRegistro.foto
-    )
+    await adicionarRegistroRefeicao({
+      horario: novoRegistro.horario,
+      descricao: novoRegistro.descricao,
+      tipoIcone: novoRegistro.tipoIcone,
+      foto: novoRegistro.foto,
+    });
     
     setNovoRegistro({
       horario: '',
       descricao: '',
       tipoIcone: null,
       foto: null,
-    })
+    });
     
-    setMostrarForm(false)
-  }
+    setMostrarForm(false);
+  };
 
   const selecionarTipoIcone = (tipo: string) => {
     setNovoRegistro({
       ...novoRegistro,
       tipoIcone: novoRegistro.tipoIcone === tipo ? null : tipo,
-    })
-  }
+    });
+  };
 
-  // Função simplificada para simular upload de foto
   const simularUploadFoto = () => {
-    // Em um app real, aqui seria integrado com a câmera ou upload
-    const fotoSimulada = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTQ5NDk0Ij5Gb3RvIGRhIHJlZmVpw6fDo288L3RleHQ+PC9zdmc+'
+    const fotoSimulada = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTQ5NDk0Ij5Gb3RvIGRhIHJlZmVpw6fDo288L3RleHQ+PC9zdmc+';
     setNovoRegistro({
       ...novoRegistro,
       foto: fotoSimulada,
-    })
+    });
+  };
+
+  // Exibir indicador de carregamento
+  if (isLoading && !isInitialized) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Loader2 className="h-8 w-8 animate-spin text-alimentacao-primary" />
+      </div>
+    );
   }
 
   return (
@@ -91,7 +107,7 @@ export function RegistroRefeicoes() {
               </div>
               
               <button
-                onClick={() => removerRegistro(registro.id)}
+                onClick={() => removerRegistroRefeicao(registro.id)}
                 className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                 aria-label="Remover registro"
               >
@@ -220,5 +236,5 @@ export function RegistroRefeicoes() {
         </button>
       )}
     </div>
-  )
+  );
 }

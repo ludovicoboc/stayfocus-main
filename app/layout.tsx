@@ -3,6 +3,7 @@ import './globals.css'
 import { Header } from '@/app/components/layout/Header'
 import { Footer } from '@/app/components/layout/Footer'
 import { Providers } from '@/app/providers'
+import { AppInitializer } from '@/app/components/ui/AppInitializer'
 import { PWAInstallPrompt } from '@/app/components/PWAInstallPrompt'
 import { PWAUpdateNotification, SyncStatusIndicator } from '@/app/components/PWAUpdateNotification'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -69,6 +70,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="bg-gray-50 dark:bg-gray-900">
         <Providers>
+          <AppInitializer />
           <div className="flex h-screen overflow-hidden">
             <div className="flex flex-col flex-1 overflow-hidden">
               <Header />

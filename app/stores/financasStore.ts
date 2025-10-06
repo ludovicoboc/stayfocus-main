@@ -1,285 +1,174 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
 
-// Tipos
+// --- TIPOS DE DADOS ---
 export type Categoria = {
-  id: string
-  nome: string
-  cor: string
-  icone: string
-}
+  id: number;
+  nome: string;
+  cor: string;
+  icone: string;
+};
 
 export type Transacao = {
-  id: string
-  data: string
-  valor: number
-  descricao: string
-  categoriaId: string
-  tipo: 'receita' | 'despesa'
-}
+  id: number;
+  data: string;
+  valor: number;
+  descricao: string;
+  categoriaId: number;
+  tipo: 'receita' | 'despesa';
+};
 
 export type Envelope = {
-  id: string
-  nome: string
-  cor: string
-  valorAlocado: number
-  valorUtilizado: number
-}
+  id: number;
+  nome: string;
+  cor: string;
+  valorAlocado: number;
+  valorUtilizado: number;
+};
 
 export type PagamentoRecorrente = {
-  id: string
-  descricao: string
-  valor: number
-  dataVencimento: string // dia do mês (1-31)
-  categoriaId: string
-  proximoPagamento: string | null // data do próximo pagamento (YYYY-MM-DD)
-  pago: boolean
-}
+  id: number;
+  descricao: string;
+  valor: number;
+  dataVencimento: string;
+  categoriaId: number;
+  proximoPagamento: string | null;
+  pago: boolean;
+};
 
+// --- ESTADO DA STORE ---
 type FinancasState = {
-  // Categorias
-  categorias: Categoria[]
-  adicionarCategoria: (nome: string, cor: string, icone: string) => void
-  atualizarCategoria: (id: string, nome: string, cor: string, icone: string) => void
-  removerCategoria: (id: string) => void
+  isInitialized: boolean;
+  isLoading: boolean;
+  categorias: Categoria[];
+  transacoes: Transacao[];
+  envelopes: Envelope[];
+  pagamentosRecorrentes: PagamentoRecorrente[];
+  initialize: () => Promise<void>;
   
-  // Transações
-  transacoes: Transacao[]
-  adicionarTransacao: (data: string, valor: number, descricao: string, categoriaId: string, tipo: 'receita' | 'despesa') => void
-  removerTransacao: (id: string) => void
+  // Ações de Categoria
+  adicionarCategoria: (cat: Omit<Categoria, 'id'>) => Promise<void>;
+  atualizarCategoria: (id: number, cat: Omit<Categoria, 'id'>) => Promise<void>;
+  removerCategoria: (id: number) => Promise<void>;
   
-  // Envelopes
-  envelopes: Envelope[]
-  adicionarEnvelope: (nome: string, cor: string, valorAlocado: number) => void
-  atualizarEnvelope: (id: string, nome: string, cor: string, valorAlocado: number) => void
-  removerEnvelope: (id: string) => void
-  registrarGastoEnvelope: (id: string, valor: number) => void
+  // Ações de Transação
+  adicionarTransacao: (transacao: Omit<Transacao, 'id'>) => Promise<void>;
+  removerTransacao: (id: number) => Promise<void>;
   
-  // Pagamentos Recorrentes
-  pagamentosRecorrentes: PagamentoRecorrente[]
-  adicionarPagamentoRecorrente: (descricao: string, valor: number, dataVencimento: string, categoriaId: string) => void
-  atualizarPagamentoRecorrente: (id: string, descricao: string, valor: number, dataVencimento: string, categoriaId: string) => void
-  removerPagamentoRecorrente: (id: string) => void
-  marcarPagamentoComoPago: (id: string, pago: boolean) => void
-  atualizarProximoPagamento: (id: string, data: string) => void
+  // Ações de Envelope
+  adicionarEnvelope: (envelope: Omit<Envelope, 'id' | 'valorUtilizado'>) => Promise<void>;
+  atualizarEnvelope: (id: number, updates: Partial<Envelope>) => Promise<void>;
+  removerEnvelope: (id: number) => Promise<void>;
+
+  // Ações de Pagamento Recorrente
+  adicionarPagamento: (pagamento: Omit<PagamentoRecorrente, 'id' | 'proximoPagamento' | 'pago'>) => Promise<void>;
+  atualizarPagamento: (id: number, updates: Partial<PagamentoRecorrente>) => Promise<void>;
+  removerPagamento: (id: number) => Promise<void>;
+};
+
+// Helper para fazer chamadas à API
+async function apiCall(endpoint: string, method: string, body?: any) {
+  const response = await fetch(endpoint, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || `Falha na operação ${method} para ${endpoint}`);
+  }
+  return response.json();
 }
 
-// Cores predefinidas para categorias (com alto contraste)
-const CORES_CATEGORIAS = [
-  '#FF5252', // Vermelho
-  '#4CAF50', // Verde
-  '#2196F3', // Azul
-  '#FFC107', // Amarelo
-  '#9C27B0'  // Roxo
-]
+export const useFinancasStore = create<FinancasState>((set, get) => ({
+  isInitialized: false,
+  isLoading: true,
+  categorias: [],
+  transacoes: [],
+  envelopes: [],
+  pagamentosRecorrentes: [],
 
-// Ícones predefinidos para categorias
-const ICONES_CATEGORIAS = [
-  'home',    // Casa
-  'shopping-cart', // Compras
-  'utensils', // Alimentação
-  'car',     // Transporte
-  'heart'    // Saúde
-]
-
-export const useFinancasStore = create<FinancasState>()(
-  persist(
-    (set) => ({
-      // Categorias - Estado Inicial
-      categorias: [
-        { id: '1', nome: 'Moradia', cor: CORES_CATEGORIAS[0], icone: 'home' },
-        { id: '2', nome: 'Alimentação', cor: CORES_CATEGORIAS[1], icone: 'utensils' },
-        { id: '3', nome: 'Transporte', cor: CORES_CATEGORIAS[2], icone: 'car' },
-        { id: '4', nome: 'Saúde', cor: CORES_CATEGORIAS[3], icone: 'heart' },
-        { id: '5', nome: 'Lazer', cor: CORES_CATEGORIAS[4], icone: 'music' },
-      ],
-      
-      adicionarCategoria: (nome, cor, icone) => 
-        set((state) => {
-          // Limitar a 5 categorias
-          if (state.categorias.length >= 5) return state
-          
-          return {
-            categorias: [
-              ...state.categorias,
-              {
-                id: Date.now().toString(),
-                nome,
-                cor,
-                icone,
-              },
-            ],
-          }
-        }),
-      
-      atualizarCategoria: (id, nome, cor, icone) =>
-        set((state) => ({
-          categorias: state.categorias.map((categoria) =>
-            categoria.id === id ? { ...categoria, nome, cor, icone } : categoria
-          ),
-        })),
-      
-      removerCategoria: (id) =>
-        set((state) => ({
-          categorias: state.categorias.filter((categoria) => categoria.id !== id),
-          // Remover transações e pagamentos relacionados à categoria
-          transacoes: state.transacoes.filter((transacao) => transacao.categoriaId !== id),
-          pagamentosRecorrentes: state.pagamentosRecorrentes.filter(
-            (pagamento) => pagamento.categoriaId !== id
-          ),
-        })),
-      
-      // Transações - Estado Inicial
-      transacoes: [],
-      
-      adicionarTransacao: (data, valor, descricao, categoriaId, tipo) =>
-        set((state) => ({
-          transacoes: [
-            ...state.transacoes,
-            {
-              id: Date.now().toString(),
-              data,
-              valor,
-              descricao,
-              categoriaId,
-              tipo,
-            },
-          ],
-        })),
-      
-      removerTransacao: (id) =>
-        set((state) => ({
-          transacoes: state.transacoes.filter((transacao) => transacao.id !== id),
-        })),
-      
-      // Envelopes - Estado Inicial
-      envelopes: [
-        { id: '1', nome: 'Emergências', cor: '#FF5252', valorAlocado: 500, valorUtilizado: 0 },
-        { id: '2', nome: 'Férias', cor: '#2196F3', valorAlocado: 300, valorUtilizado: 0 },
-        { id: '3', nome: 'Presentes', cor: '#4CAF50', valorAlocado: 100, valorUtilizado: 0 },
-      ],
-      
-      adicionarEnvelope: (nome, cor, valorAlocado) =>
-        set((state) => ({
-          envelopes: [
-            ...state.envelopes,
-            {
-              id: Date.now().toString(),
-              nome,
-              cor,
-              valorAlocado,
-              valorUtilizado: 0,
-            },
-          ],
-        })),
-      
-      atualizarEnvelope: (id, nome, cor, valorAlocado) =>
-        set((state) => ({
-          envelopes: state.envelopes.map((envelope) =>
-            envelope.id === id ? { ...envelope, nome, cor, valorAlocado } : envelope
-          ),
-        })),
-      
-      removerEnvelope: (id) =>
-        set((state) => ({
-          envelopes: state.envelopes.filter((envelope) => envelope.id !== id),
-        })),
-      
-      registrarGastoEnvelope: (id, valor) =>
-        set((state) => ({
-          envelopes: state.envelopes.map((envelope) =>
-            envelope.id === id
-              ? { ...envelope, valorUtilizado: envelope.valorUtilizado + valor }
-              : envelope
-          ),
-        })),
-      
-      // Pagamentos Recorrentes - Estado Inicial
-      pagamentosRecorrentes: [],
-      
-      adicionarPagamentoRecorrente: (descricao, valor, dataVencimento, categoriaId) => {
-        const hoje = new Date()
-        const dia = parseInt(dataVencimento)
-        const proximoPagamento = new Date(hoje.getFullYear(), hoje.getMonth(), dia)
-        
-        // Se o dia já passou este mês, avançar para o próximo mês
-        if (proximoPagamento.getDate() < hoje.getDate()) {
-          proximoPagamento.setMonth(proximoPagamento.getMonth() + 1)
-        }
-        
-        return set((state) => ({
-          pagamentosRecorrentes: [
-            ...state.pagamentosRecorrentes,
-            {
-              id: Date.now().toString(),
-              descricao,
-              valor,
-              dataVencimento,
-              categoriaId,
-              proximoPagamento: proximoPagamento.toISOString().split('T')[0],
-              pago: false,
-            },
-          ],
-        }))
-      },
-      
-      atualizarPagamentoRecorrente: (id, descricao, valor, dataVencimento, categoriaId) =>
-        set((state) => ({
-          pagamentosRecorrentes: state.pagamentosRecorrentes.map((pagamento) =>
-            pagamento.id === id
-              ? { ...pagamento, descricao, valor, dataVencimento, categoriaId }
-              : pagamento
-          ),
-        })),
-      
-      removerPagamentoRecorrente: (id) =>
-        set((state) => ({
-          pagamentosRecorrentes: state.pagamentosRecorrentes.filter(
-            (pagamento) => pagamento.id !== id
-          ),
-        })),
-      
-      marcarPagamentoComoPago: (id, pago) =>
-        set((state) => {
-          const pagamentos = state.pagamentosRecorrentes.map((pagamento) => {
-            if (pagamento.id !== id) return pagamento
-            
-            if (pago) {
-              // Se marcado como pago, calcular o próximo pagamento
-              const dataAtual = new Date()
-              const dia = parseInt(pagamento.dataVencimento)
-              let proximoMes = dataAtual.getMonth() + 1
-              let proximoAno = dataAtual.getFullYear()
-              
-              if (proximoMes > 11) {
-                proximoMes = 0
-                proximoAno++
-              }
-              
-              const proximoPagamento = new Date(proximoAno, proximoMes, dia)
-              
-              return {
-                ...pagamento,
-                pago,
-                proximoPagamento: proximoPagamento.toISOString().split('T')[0],
-              }
-            }
-            
-            return { ...pagamento, pago }
-          })
-          
-          return { pagamentosRecorrentes: pagamentos }
-        }),
-      
-      atualizarProximoPagamento: (id, data) =>
-        set((state) => ({
-          pagamentosRecorrentes: state.pagamentosRecorrentes.map((pagamento) =>
-            pagamento.id === id ? { ...pagamento, proximoPagamento: data } : pagamento
-          ),
-        })),
-    }),
-    {
-      name: 'financas-storage', // nome para o localStorage
+  initialize: async () => {
+    if (get().isInitialized) return;
+    set({ isLoading: true });
+    try {
+      const [categorias, transacoes, envelopes, pagamentos] = await Promise.all([
+        apiCall('/api/v1/financas/categorias', 'GET'),
+        apiCall('/api/v1/financas/transacoes', 'GET'),
+        apiCall('/api/v1/financas/envelopes', 'GET'),
+        apiCall('/api/v1/financas/pagamentos-recorrentes', 'GET'),
+      ]);
+      set({
+        categorias: categorias,
+        transacoes: transacoes,
+        envelopes: envelopes,
+        pagamentosRecorrentes: pagamentos.map((p: any) => ({ ...p, pago: Boolean(p.pago) })),
+        isInitialized: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error("Erro ao inicializar financasStore:", error);
+      set({ isLoading: false, isInitialized: true });
     }
-  )
-)
+  },
+
+  // --- Implementação das Ações ---
+
+  adicionarCategoria: async (cat) => {
+    const novaCategoria = await apiCall('/api/v1/financas/categorias', 'POST', cat);
+    set(state => ({ categorias: [...state.categorias, novaCategoria] }));
+  },
+  atualizarCategoria: async (id, cat) => {
+    await apiCall(`/api/v1/financas/categorias/${id}`, 'PUT', cat);
+    set(state => ({
+      categorias: state.categorias.map(c => c.id === id ? { ...c, ...cat } : c)
+    }));
+  },
+  removerCategoria: async (id) => {
+    await apiCall(`/api/v1/financas/categorias/${id}`, 'DELETE');
+    set(state => ({
+      categorias: state.categorias.filter(c => c.id !== id),
+      // O DB cuida da cascata, mas é bom limpar o estado local também
+      transacoes: state.transacoes.filter(t => t.categoriaId !== id),
+      pagamentosRecorrentes: state.pagamentosRecorrentes.filter(p => p.categoriaId !== id),
+    }));
+  },
+
+  adicionarTransacao: async (transacao) => {
+    const novaTransacao = await apiCall('/api/v1/financas/transacoes', 'POST', transacao);
+    set(state => ({ transacoes: [novaTransacao, ...state.transacoes] }));
+  },
+  removerTransacao: async (id) => {
+    await apiCall(`/api/v1/financas/transacoes/${id}`, 'DELETE');
+    set(state => ({ transacoes: state.transacoes.filter(t => t.id !== id) }));
+  },
+
+  adicionarEnvelope: async (envelope) => {
+    const novoEnvelope = await apiCall('/api/v1/financas/envelopes', 'POST', envelope);
+    set(state => ({ envelopes: [...state.envelopes, novoEnvelope] }));
+  },
+  atualizarEnvelope: async (id, updates) => {
+    await apiCall(`/api/v1/financas/envelopes/${id}`, 'PUT', updates);
+    set(state => ({
+      envelopes: state.envelopes.map(e => e.id === id ? { ...e, ...updates } : e)
+    }));
+  },
+  removerEnvelope: async (id) => {
+    await apiCall(`/api/v1/financas/envelopes/${id}`, 'DELETE');
+    set(state => ({ envelopes: state.envelopes.filter(e => e.id !== id) }));
+  },
+
+  adicionarPagamento: async (pagamento) => {
+    const novoPagamento = await apiCall('/api/v1/financas/pagamentos-recorrentes', 'POST', pagamento);
+    set(state => ({ pagamentosRecorrentes: [...state.pagamentosRecorrentes, { ...novoPagamento, pago: Boolean(novoPagamento.pago) }] }));
+  },
+  atualizarPagamento: async (id, updates) => {
+    await apiCall(`/api/v1/financas/pagamentos-recorrentes/${id}`, 'PUT', updates);
+    set(state => ({
+      pagamentosRecorrentes: state.pagamentosRecorrentes.map(p => p.id === id ? { ...p, ...updates } : p)
+    }));
+  },
+  removerPagamento: async (id) => {
+    await apiCall(`/api/v1/financas/pagamentos-recorrentes/${id}`, 'DELETE');
+    set(state => ({ pagamentosRecorrentes: state.pagamentosRecorrentes.filter(p => p.id !== id) }));
+  },
+}));

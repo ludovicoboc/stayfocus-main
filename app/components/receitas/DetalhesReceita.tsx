@@ -1,12 +1,12 @@
-'use client'; // Required for useState and hooks
+'use client';
 
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import { useReceitasStore } from '../../stores/receitasStore';
-import { useAlimentacaoStore } from '../../stores/alimentacaoStore'; // Assuming this store exists
+import { useAlimentacaoStore } from '../../stores/alimentacaoStore';
 import { Button } from '../ui/Button';
 import { Tag } from '../ui/Tag';
-import { useRouter } from 'next/navigation'; // Use next/navigation for App Router
-import Link from 'next/link'; // Import Link
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface DetalhesReceitaProps {
   id: string;
@@ -15,21 +15,20 @@ interface DetalhesReceitaProps {
 export function DetalhesReceita({ id }: DetalhesReceitaProps) {
   const router = useRouter();
   const { obterReceitaPorId, removerReceita, alternarFavorito, favoritos } = useReceitasStore();
-  const { adicionarRefeicao } = useAlimentacaoStore(); // Use adicionarRefeicao from alimentacaoStore
-  const [porcoes, setPorcoes] = useState(1); // Default to 1 portion for calculation
+  // Corrigido para usar a nova ação da store
+  const { adicionarRefeicaoPlanejada } = useAlimentacaoStore();
+  const [porcoes, setPorcoes] = useState(1);
 
   const receita = obterReceitaPorId(id);
 
-  // Initialize porcoes state with the recipe's default portions once recipe is loaded using useEffect
   useEffect(() => {
     if (receita) {
       setPorcoes(receita.porcoes || 1);
     }
-  }, [receita]); // Dependency array ensures this runs when recipe data is available/changes
+  }, [receita]);
 
 
   if (!receita) {
-    // Optional: Add a loading state or redirect
     return <p className="p-4 text-center text-gray-500">Receita não encontrada ou carregando...</p>;
   }
 
@@ -37,35 +36,28 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
 
   const ajustarQuantidade = (quantidade: number | undefined) => {
     if (quantidade === undefined || receita.porcoes === undefined || receita.porcoes === 0) return 'N/A';
-    // Handle 'a gosto' or similar units where quantity might not scale
-    // For simplicity, we scale everything, but real-world might need checks
     const adjusted = (quantidade * porcoes) / receita.porcoes;
-    // Format to 1 decimal place, but avoid .0
     return adjusted % 1 === 0 ? adjusted.toFixed(0) : adjusted.toFixed(1);
   };
 
-  const adicionarAoPlanejamento = () => {
-    // adicionarRefeicao takes only horario and descricao
-    adicionarRefeicao(
-        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Example: current time
-        receita.nome // Use recipe name as description
-        // receita.id is not passed as per store signature
-    );
-    // Optionally, navigate to the planner or show a confirmation message
-    alert(`${receita.nome} adicionada ao planejador!`);
-    // router.push('/alimentacao'); // Example navigation
+  // Handler agora é assíncrono e usa a nova ação
+  const adicionarAoPlanejamento = async () => {
+    await adicionarRefeicaoPlanejada({
+        horario: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        descricao: `Preparar: ${receita.nome}`
+    });
+    alert(`${receita.nome} adicionada ao planejador de refeições!`);
   };
 
   const handleRemoverReceita = () => {
     if (window.confirm(`Tem certeza que deseja remover a receita "${receita.nome}"?`)) {
       removerReceita(id);
-      router.push('/receitas'); // Redirect back to the list after deletion
+      router.push('/receitas');
     }
   };
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto">
-      {/* Image Header */}
       <div className="relative h-48 sm:h-64 md:h-80 rounded-lg overflow-hidden mb-6 bg-gray-200 dark:bg-gray-700">
         {receita.imagem ? (
           <img
@@ -78,7 +70,6 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
             <span>Sem imagem disponível</span>
           </div>
         )}
-         {/* Favorite Button Overlay */}
          <button
             onClick={() => alternarFavorito(id)}
             className={`absolute top-3 right-3 p-2 rounded-full transition-colors duration-200 ${
@@ -92,7 +83,6 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
           </button>
       </div>
 
-      {/* Title and Tags */}
       <h1 className="text-3xl md:text-4xl font-bold mb-3">{receita.nome}</h1>
       {receita.descricao && <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">{receita.descricao}</p>}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -101,7 +91,6 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
         ))}
       </div>
 
-      {/* Quick Info Boxes */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-primary-50 dark:bg-primary-900/30 p-3 rounded-lg text-center">
           <p className="text-sm text-primary-700 dark:text-primary-300">Tempo de Preparo</p>
@@ -117,9 +106,7 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
         </div>
       </div>
 
-      {/* Ingredients and Instructions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Ingredients Section */}
         <div className="md:col-span-1">
           <h2 className="text-xl font-bold mb-4 border-b pb-2">Ingredientes</h2>
           <div className="flex items-center gap-4 mb-4">
@@ -159,7 +146,6 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
              )}
           </ul>
 
-          {/* Action Buttons */}
           <div className="mt-8 space-y-3">
             <Button onClick={adicionarAoPlanejamento} color="primary" className="w-full">
               Adicionar ao Planejador
@@ -173,7 +159,6 @@ export function DetalhesReceita({ id }: DetalhesReceitaProps) {
           </div>
         </div>
 
-        {/* Instructions Section */}
         <div className="md:col-span-2">
           <h2 className="text-xl font-bold mb-4 border-b pb-2">Modo de Preparo</h2>
           {receita.passos && receita.passos.length > 0 ? (

@@ -1,110 +1,108 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link'; // Importar Link
-import { CheckCircle2, Circle, PlusCircle, Edit2, Calendar, ChevronLeft, ChevronRight, X, Award } from 'lucide-react'; // Importar Award
+import Link from 'next/link';
+import { CheckCircle2, Circle, PlusCircle, Edit2, Calendar, ChevronLeft, ChevronRight, Award, Loader2 } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
 import { Input } from '@/app/components/ui/Input';
-import { Modal } from '@/app/components/ui/Modal'
-import { Badge } from '@/app/components/ui/Badge'
-import { usePrioridadesStore, Prioridade } from '@/app/stores/prioridadesStore'
+import { Modal } from '@/app/components/ui/Modal';
+import { Badge } from '@/app/components/ui/Badge';
+import { usePrioridadesStore, Prioridade } from '@/app/stores/prioridadesStore';
 
 export function ListaPrioridades() {
+  // Consumir as ações e estados corretos da store refatorada
   const { 
     prioridades, 
     adicionarPrioridade, 
-    editarPrioridade, 
+    atualizarPrioridade, // Nova ação unificada
     removerPrioridade, 
-    toggleConcluida, 
     getHistoricoPorData,
-    getDatasPrioridades
-  } = usePrioridadesStore()
+    getDatasPrioridades,
+    isLoading,
+    isInitialized
+  } = usePrioridadesStore();
   
-  const [novoTexto, setNovoTexto] = useState('')
-  const [prioridadeEditando, setPrioridadeEditando] = useState<Prioridade | null>(null)
-  const [textoEditando, setTextoEditando] = useState('')
-  const [showHistory, setShowHistory] = useState(false)
-  const [dataAtual, setDataAtual] = useState(new Date().toISOString().split('T')[0])
-  const [prioridadesExibidas, setPrioridadesExibidas] = useState<Prioridade[]>([])
-  const [datasHistorico, setDatasHistorico] = useState<string[]>([])
+  const [novoTexto, setNovoTexto] = useState('');
+  const [prioridadeEditando, setPrioridadeEditando] = useState<Prioridade | null>(null);
+  const [textoEditando, setTextoEditando] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
+  const [dataAtual, setDataAtual] = useState(new Date().toISOString().split('T')[0]);
+  const [prioridadesExibidas, setPrioridadesExibidas] = useState<Prioridade[]>([]);
+  const [datasHistorico, setDatasHistorico] = useState<string[]>([]);
 
-  // Carregar prioridades do dia atual
   useEffect(() => {
-    const prioridadesDoDia = getHistoricoPorData(dataAtual)
-    setPrioridadesExibidas(prioridadesDoDia)
-  }, [prioridades, dataAtual, getHistoricoPorData])
+    const prioridadesDoDia = getHistoricoPorData(dataAtual);
+    setPrioridadesExibidas(prioridadesDoDia);
+  }, [prioridades, dataAtual, getHistoricoPorData]);
 
-  // Carregar datas disponíveis no histórico
   useEffect(() => {
-    const datas = getDatasPrioridades()
-    setDatasHistorico(datas)
-  }, [prioridades, getDatasPrioridades])
+    const datas = getDatasPrioridades();
+    setDatasHistorico(datas);
+  }, [prioridades, getDatasPrioridades]);
 
-  // Verifica se estamos vendo o dia atual
   const isToday = () => {
-    const hoje = new Date().toISOString().split('T')[0]
-    return dataAtual === hoje
-  }
+    const hoje = new Date().toISOString().split('T')[0];
+    return dataAtual === hoje;
+  };
 
-  // Funções para navegação no histórico
   const irParaDataAnterior = () => {
-    const indexAtual = datasHistorico.indexOf(dataAtual)
+    const indexAtual = datasHistorico.indexOf(dataAtual);
     if (indexAtual < datasHistorico.length - 1) {
-      setDataAtual(datasHistorico[indexAtual + 1])
+      setDataAtual(datasHistorico[indexAtual + 1]);
     }
-  }
+  };
 
   const irParaDataProxima = () => {
-    const indexAtual = datasHistorico.indexOf(dataAtual)
+    const indexAtual = datasHistorico.indexOf(dataAtual);
     if (indexAtual > 0) {
-      setDataAtual(datasHistorico[indexAtual - 1])
+      setDataAtual(datasHistorico[indexAtual - 1]);
     }
-  }
+  };
 
   const voltarParaHoje = () => {
-    setDataAtual(new Date().toISOString().split('T')[0])
-  }
+    setDataAtual(new Date().toISOString().split('T')[0]);
+  };
 
-  // Função para adicionar nova prioridade
-  const handleAdicionarPrioridade = () => {
-    if (!novoTexto.trim() || prioridadesExibidas.length >= 3) return
+  // Handler agora é assíncrono e usa a nova assinatura da ação
+  const handleAdicionarPrioridade = async () => {
+    if (!novoTexto.trim() || prioridadesExibidas.length >= 3) return;
     
-    adicionarPrioridade({
-      texto: novoTexto,
-      concluida: false
-    })
-    
-    setNovoTexto('')
-  }
+    await adicionarPrioridade({ texto: novoTexto });
+    setNovoTexto('');
+  };
 
-  // Função para iniciar edição
   const iniciarEdicao = (prioridade: Prioridade) => {
-    setPrioridadeEditando(prioridade)
-    setTextoEditando(prioridade.texto)
-  }
+    setPrioridadeEditando(prioridade);
+    setTextoEditando(prioridade.texto);
+  };
 
-  // Função para salvar edição
-  const salvarEdicao = () => {
+  // Handler agora é assíncrono e usa a nova ação
+  const salvarEdicao = async () => {
     if (prioridadeEditando && textoEditando.trim()) {
-      editarPrioridade(prioridadeEditando.id, textoEditando)
-      setPrioridadeEditando(null)
+      await atualizarPrioridade(prioridadeEditando.id, { texto: textoEditando });
+      setPrioridadeEditando(null);
     }
-  }
+  };
 
-  // Função para cancelar edição
   const cancelarEdicao = () => {
-    setPrioridadeEditando(null)
-  }
+    setPrioridadeEditando(null);
+  };
 
-  // Formatar data para exibição (DD/MM/YYYY)
   const formatarData = (dataISO: string) => {
-    const partes = dataISO.split('-')
-    return `${partes[2]}/${partes[1]}/${partes[0]}`
+    const partes = dataISO.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  };
+
+  if (isLoading && !isInitialized) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
-      {/* Cabeçalho com controles de histórico */}
       <div className="flex justify-between items-center mb-2">
         <Button 
           variant="ghost" 
@@ -123,7 +121,6 @@ export function ListaPrioridades() {
         )}
       </div>
 
-      {/* Controles de navegação no histórico */}
       {showHistory && (
         <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-2 rounded-lg mb-3">
           <Button 
@@ -162,7 +159,6 @@ export function ListaPrioridades() {
         </div>
       )}
 
-      {/* Lista de prioridades */}
       <div className="space-y-2">
         {prioridadesExibidas.length === 0 ? (
           <div className="text-center py-6 text-gray-500 dark:text-gray-400">
@@ -184,7 +180,8 @@ export function ListaPrioridades() {
             >
               {isToday() && (
                 <button
-                  onClick={() => toggleConcluida(prioridade.id)}
+                  // Handler agora é assíncrono e usa a nova ação
+                  onClick={() => atualizarPrioridade(prioridade.id, { concluida: !prioridade.concluida })}
                   className="mr-3 text-green-600 dark:text-green-400 focus:outline-none"
                   aria-label={prioridade.concluida ? 'Marcar como não concluída' : 'Marcar como concluída'}
                 >
@@ -196,12 +193,10 @@ export function ListaPrioridades() {
                 </button>
               )}
 
-              {/* Ícone para prioridade de concurso */}
               {prioridade.tipo === 'concurso' && (
                 <Award className="h-5 w-5 mr-2 text-indigo-600 flex-shrink-0" />
               )}
 
-              {/* Texto da prioridade, com link se for de concurso */}
               <span
                 className={`flex-1 ${
                   prioridade.concluida
@@ -218,7 +213,7 @@ export function ListaPrioridades() {
                 )}
               </span>
 
-              {isToday() && prioridade.tipo !== 'concurso' && ( // Não permite editar prioridades de concurso diretamente aqui
+              {isToday() && prioridade.tipo !== 'concurso' && (
                 <button
                   onClick={() => iniciarEdicao(prioridade)}
                   className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 focus:outline-none"
@@ -232,7 +227,6 @@ export function ListaPrioridades() {
         )}
       </div>
 
-      {/* Input para adicionar nova prioridade (apenas no dia atual) */}
       {isToday() && prioridadesExibidas.length < 3 && (
         <div className="flex items-center mt-4">
           <Input
@@ -253,14 +247,12 @@ export function ListaPrioridades() {
         </div>
       )}
 
-      {/* Mensagem quando atingir o limite de prioridades */}
       {isToday() && prioridadesExibidas.length >= 3 && (
         <p className="text-sm text-gray-500 dark:text-gray-400 italic">
           Máximo de 3 prioridades para manter o foco.
         </p>
       )}
 
-      {/* Modal de edição */}
       {prioridadeEditando && (
         <Modal
           isOpen={!!prioridadeEditando}
@@ -287,5 +279,5 @@ export function ListaPrioridades() {
         </Modal>
       )}
     </div>
-  )
+  );
 }

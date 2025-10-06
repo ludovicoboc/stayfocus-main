@@ -1,25 +1,33 @@
 'use client'
 
-import { useState } from 'react'
-import { usePerfilStore } from '../../stores/perfilStore'
-import { Save, User, Edit } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { usePerfilStore } from '../../stores/perfilStore';
+import { Save, User, Edit } from 'lucide-react';
 
 export function InformacoesPessoais() {
-  const { nome, atualizarNome } = usePerfilStore()
-  const [novoNome, setNovoNome] = useState(nome)
-  const [editando, setEditando] = useState(false)
+  // Consumir a nova ação unificada 'updateProfile'
+  const { nome, updateProfile } = usePerfilStore();
+
+  const [novoNome, setNovoNome] = useState(nome);
+  const [editando, setEditando] = useState(false);
+
+  // Sincronizar o estado local se o nome da store mudar
+  useEffect(() => {
+    setNovoNome(nome);
+  }, [nome]);
   
   const iniciarEdicao = () => {
-    setNovoNome(nome)
-    setEditando(true)
-  }
+    setNovoNome(nome);
+    setEditando(true);
+  };
   
-  const salvarAlteracoes = () => {
+  // Handler agora é assíncrono e usa a nova ação
+  const salvarAlteracoes = async () => {
     if (novoNome.trim()) {
-      atualizarNome(novoNome.trim())
+      await updateProfile({ nome: novoNome.trim() });
     }
-    setEditando(false)
-  }
+    setEditando(false);
+  };
   
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
@@ -74,10 +82,10 @@ export function InformacoesPessoais() {
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Seu nome é usado para personalizar a experiência no Painel ND. 
-            As informações pessoais são armazenadas apenas no seu navegador.
+            As informações pessoais são armazenadas com segurança no servidor.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

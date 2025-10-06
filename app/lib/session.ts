@@ -27,9 +27,10 @@ declare module "next" {
 // Define the structure of your session data
 declare module "iron-session" {
   interface IronSessionData {
+    userId?: number; // ID do nosso banco de dados
     tokens?: {
       access_token: string;
-      refresh_token: string | null | undefined; // Explicitly allow string, null, or undefined
+      refresh_token: string | null | undefined;
       expiry_date: number;
       token_type?: string;
       scope?: string;

@@ -1,49 +1,69 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Clock, Plus, Save, Trash2 } from 'lucide-react'
-import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore'
-
-type Refeicao = {
-  id: string
-  horario: string
-  descricao: string
-}
+import { useState } from 'react';
+import { Clock, Plus, Save, Trash2, Loader2 } from 'lucide-react';
+import { useAlimentacaoStore } from '@/app/stores/alimentacaoStore';
 
 export function PlanejadorRefeicoes() {
-  const { refeicoes, adicionarRefeicao, atualizarRefeicao, removerRefeicao } = useAlimentacaoStore()
-  const [novaRefeicao, setNovaRefeicao] = useState({ horario: '', descricao: '' })
-  const [editando, setEditando] = useState<string | null>(null)
+  // Consumir o estado e ações corretas da store refatorada
+  const {
+    refeicoesPlanejadas,
+    adicionarRefeicaoPlanejada,
+    atualizarRefeicaoPlanejada,
+    removerRefeicaoPlanejada,
+    isLoading,
+    isInitialized
+  } = useAlimentacaoStore();
 
-  const handleAdicionarRefeicao = () => {
-    if (!novaRefeicao.horario || !novaRefeicao.descricao) return
+  const [novaRefeicao, setNovaRefeicao] = useState({ horario: '', descricao: '' });
+  // O ID agora é um número
+  const [editando, setEditando] = useState<number | null>(null);
 
-    adicionarRefeicao(novaRefeicao.horario, novaRefeicao.descricao)
-    setNovaRefeicao({ horario: '', descricao: '' })
-  }
+  // Handlers agora são assíncronos
+  const handleAdicionarRefeicao = async () => {
+    if (!novaRefeicao.horario || !novaRefeicao.descricao) return;
 
-  const iniciarEdicao = (id: string, horario: string, descricao: string) => {
-    setEditando(id)
-    setNovaRefeicao({ horario, descricao })
-  }
+    await adicionarRefeicaoPlanejada({
+      horario: novaRefeicao.horario,
+      descricao: novaRefeicao.descricao
+    });
+    setNovaRefeicao({ horario: '', descricao: '' });
+  };
 
-  const salvarEdicao = () => {
-    if (!editando || !novaRefeicao.horario || !novaRefeicao.descricao) return
+  const iniciarEdicao = (id: number, horario: string, descricao: string) => {
+    setEditando(id);
+    setNovaRefeicao({ horario, descricao });
+  };
 
-    atualizarRefeicao(editando, novaRefeicao.horario, novaRefeicao.descricao)
-    setEditando(null)
-    setNovaRefeicao({ horario: '', descricao: '' })
-  }
+  const salvarEdicao = async () => {
+    if (!editando || !novaRefeicao.horario || !novaRefeicao.descricao) return;
+
+    await atualizarRefeicaoPlanejada(editando, {
+      horario: novaRefeicao.horario,
+      descricao: novaRefeicao.descricao
+    });
+    setEditando(null);
+    setNovaRefeicao({ horario: '', descricao: '' });
+  };
 
   const cancelarEdicao = () => {
-    setEditando(null)
-    setNovaRefeicao({ horario: '', descricao: '' })
+    setEditando(null);
+    setNovaRefeicao({ horario: '', descricao: '' });
+  };
+
+  // Exibir indicador de carregamento
+  if (isLoading && !isInitialized) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Loader2 className="h-8 w-8 animate-spin text-alimentacao-primary" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        {refeicoes.map((refeicao) => (
+        {refeicoesPlanejadas.map((refeicao) => (
           <div
             key={refeicao.id}
             className="flex items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
@@ -100,7 +120,7 @@ export function PlanejadorRefeicoes() {
                   </svg>
                 </button>
                 <button
-                  onClick={() => removerRefeicao(refeicao.id)}
+                  onClick={() => removerRefeicaoPlanejada(refeicao.id)}
                   className="ml-1 p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                   aria-label="Remover refeição"
                 >
@@ -141,5 +161,5 @@ export function PlanejadorRefeicoes() {
         </div>
       </div>
     </div>
-  )
+  );
 }
