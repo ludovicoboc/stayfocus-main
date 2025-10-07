@@ -2,16 +2,27 @@
 
 import { useState, useRef, FormEvent } from 'react'
 import { Rocket, CheckCircle, PlusCircle, X, Save } from 'lucide-react'
-import { useHiperfocosStore, CORES_HIPERFOCOS } from '../../stores/hiperfocosStore'
+import { useHiperfocosStore } from '../../stores/hiperfocosStore'
+
+// Cores predefinidas para hiperfocos
+const CORES_HIPERFOCOS = [
+  '#FF5252', // Vermelho
+  '#4CAF50', // Verde
+  '#2196F3', // Azul
+  '#FF9800', // Laranja
+  '#9C27B0', // Roxo
+  '#795548', // Marrom
+  '#607D8B'  // Azul acinzentado
+]
 
 export function ConversorInteresses() {
-  const { adicionarHiperfoco, adicionarTarefa } = useHiperfocosStore()
+  const { adicionarHiperfoco } = useHiperfocosStore()
   
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
     corSelecionada: CORES_HIPERFOCOS[0],
-    tempoLimite: '',
+    tempo_limite: '',
     novasTarefas: [''] // Iniciar com um campo vazio
   })
   
@@ -74,20 +85,13 @@ export function ConversorInteresses() {
     
     try {
       // Criar um novo hiperfoco
-      const tempoLimiteInt = formData.tempoLimite ? parseInt(formData.tempoLimite) : undefined
-      const hiperfocoId = adicionarHiperfoco(
+      const tempoLimiteInt = formData.tempo_limite ? parseInt(formData.tempo_limite) : undefined
+      adicionarHiperfoco(
         formData.titulo,
         formData.descricao,
         formData.corSelecionada,
         tempoLimiteInt
       )
-      
-      // Adicionar as tarefas ao hiperfoco
-      formData.novasTarefas
-        .filter(tarefa => tarefa.trim() !== '')
-        .forEach(tarefa => {
-          adicionarTarefa(hiperfocoId, tarefa)
-        })
       
       // Feedback de sucesso
       setFeedback({
@@ -100,7 +104,7 @@ export function ConversorInteresses() {
         titulo: '',
         descricao: '',
         corSelecionada: CORES_HIPERFOCOS[0],
-        tempoLimite: '',
+        tempo_limite: '',
         novasTarefas: ['']
       })
       
@@ -170,17 +174,17 @@ export function ConversorInteresses() {
           
           <div>
             <label 
-              htmlFor="tempoLimite" 
+              htmlFor="tempo_limite"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
               Tempo Limite (em minutos, opcional)
             </label>
             <input
               type="number"
-              id="tempoLimite"
-              name="tempoLimite"
-              value={formData.tempoLimite}
-              onChange={(e) => setFormData({ ...formData, tempoLimite: e.target.value })}
+              id="tempo_limite"
+              name="tempo_limite"
+              value={formData.tempo_limite}
+              onChange={(e) => setFormData({ ...formData, tempo_limite: e.target.value })}
               min="1"
               placeholder="Ex: 60"
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-hiperfocos-primary focus:border-hiperfocos-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white"

@@ -13,19 +13,24 @@ type ListaNotasProps = {
 }
 
 export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
-  const { notas, removerNota, buscarNotas, modoRefugio } = useAutoconhecimentoStore()
+  const { notas, removerNota, modoRefugio } = useAutoconhecimentoStore()
   const [termoBusca, setTermoBusca] = useState('')
   
   // Filtrar notas da seção atual
   const notasSecao = useMemo(() => {
+    const termoBuscaLower = termoBusca.toLowerCase()
     const notasFiltradas = termoBusca 
-      ? buscarNotas(termoBusca) 
+      ? notas.filter(nota =>
+          nota.titulo.toLowerCase().includes(termoBuscaLower) ||
+          nota.conteudo.toLowerCase().includes(termoBuscaLower) ||
+          nota.tags.some(tag => tag.toLowerCase().includes(termoBuscaLower))
+        )
       : notas
     
     return notasFiltradas
       .filter(nota => nota.secao === secaoAtual)
-      .sort((a, b) => new Date(b.dataAtualizacao).getTime() - new Date(a.dataAtualizacao).getTime())
-  }, [notas, secaoAtual, termoBusca, buscarNotas])
+      .sort((a, b) => new Date(b.data_atualizacao).getTime() - new Date(a.data_atualizacao).getTime())
+  }, [notas, secaoAtual, termoBusca])
   
   // Função para lidar com a exclusão
   const handleRemoverNota = (id: string, e: React.MouseEvent) => {
@@ -132,8 +137,8 @@ export function ListaNotas({ secaoAtual, onSelectNota }: ListaNotasProps) {
                 )}
                 
                 <div className="mt-2 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-                  <span>Atualizado em {formatarData(nota.dataAtualizacao)}</span>
-                  {nota.imagemUrl && (
+                  <span>Atualizado em {formatarData(nota.data_atualizacao)}</span>
+                  {nota.imagem_url && (
                     <span className="flex items-center">
                       <ImageIcon size={12} className="mr-1" />
                       <span>Âncora visual</span>

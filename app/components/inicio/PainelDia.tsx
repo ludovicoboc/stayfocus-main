@@ -21,8 +21,6 @@ export function PainelDia() {
         return 'bg-opacity-40 bg-inicio-light border-inicio-primary'
       case 'alimentacao':
         return 'bg-opacity-40 bg-alimentacao-light border-alimentacao-primary'
-      case 'estudos':
-        return 'bg-opacity-40 bg-estudos-light border-estudos-primary'
       case 'saude':
         return 'bg-opacity-40 bg-saude-light border-saude-primary'
       case 'lazer':
@@ -227,14 +225,6 @@ export function PainelDia() {
                     onClick={() => editarCategoria(bloco.id, 'alimentacao')}
                   >
                     Alimentação
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={bloco.categoria === 'estudos' ? 'default' : 'outline'}
-                    className="py-0 px-2 h-6 text-xs bg-estudos-light text-estudos-primary border-estudos-primary"
-                    onClick={() => editarCategoria(bloco.id, 'estudos')}
-                  >
-                    Estudos
                   </Button>
                   <Button
                     size="sm"

@@ -30,7 +30,7 @@ export function PlanejadorRefeicoes() {
   const salvarEdicao = () => {
     if (!editando || !novaRefeicao.horario || !novaRefeicao.descricao) return
 
-    atualizarRefeicao(editando, novaRefeicao.horario, novaRefeicao.descricao)
+    atualizarRefeicao(editando, { horario: novaRefeicao.horario, descricao: novaRefeicao.descricao })
     setEditando(null)
     setNovaRefeicao({ horario: '', descricao: '' })
   }

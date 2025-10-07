@@ -1,16 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ConversorInteresses } from '../components/hiperfocos/ConversorInteresses'
 import { SistemaAlternancia } from '../components/hiperfocos/SistemaAlternancia'
 import { VisualizadorProjetos } from '../components/hiperfocos/VisualizadorProjetos'
 import { TemporizadorFoco } from '../components/hiperfocos/TemporizadorFoco'
 import { useHiperfocosStore } from '../stores/hiperfocosStore'
+import { Loader2, AlertTriangle } from 'lucide-react'
 
 export default function HiperfocosPage() {
-  // Separamos a interface em guias para melhor organização
+  const { hiperfocos, loading, error, fetchHiperfocosData } = useHiperfocosStore()
   const [tabAtiva, setTabAtiva] = useState<'conversor' | 'alternancia' | 'visualizador' | 'temporizador'>('conversor')
-  const { hiperfocos } = useHiperfocosStore()
+
+  useEffect(() => {
+    fetchHiperfocosData()
+  }, [fetchHiperfocosData])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <p className="ml-2 text-gray-600 dark:text-gray-400">Carregando hiperfocos...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-red-500">
+        <AlertTriangle className="h-8 w-8 mb-2" />
+        <p>Erro ao carregar os hiperfocos.</p>
+        <p className="text-sm text-gray-500">{error}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -23,7 +46,6 @@ export default function HiperfocosPage() {
         Transforme seus interesses intensos em projetos estruturados e gerencie suas transições de foco.
       </p>
       
-      {/* Tabs de navegação */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setTabAtiva('conversor')}
@@ -74,7 +96,6 @@ export default function HiperfocosPage() {
         </button>
       </div>
       
-      {/* Conteúdo da tab ativa */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         {tabAtiva === 'conversor' && <ConversorInteresses />}
         {tabAtiva === 'alternancia' && <SistemaAlternancia />}
@@ -82,7 +103,6 @@ export default function HiperfocosPage() {
         {tabAtiva === 'temporizador' && <TemporizadorFoco />}
       </div>
       
-      {/* Card de resumo - visível em todas as abas */}
       {hiperfocos.length > 0 && (
         <div className="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
           <h2 className="text-lg font-medium mb-2 text-gray-800 dark:text-white">Resumo dos Hiperfocos</h2>

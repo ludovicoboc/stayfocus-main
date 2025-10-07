@@ -26,13 +26,13 @@ export function AdicionarDespesa() {
     
     const hoje = new Date().toISOString().split('T')[0]
     
-    adicionarTransacao(
-      hoje,
-      parseFloat(valor),
-      descricao,
-      categoriaId,
-      'despesa'
-    )
+    adicionarTransacao({
+      data: hoje,
+      valor: parseFloat(valor),
+      descricao: descricao,
+      categoria_id: categoriaId,
+      tipo: 'despesa',
+    })
     
     // Mostrar feedback visual
     setMostrarFeedback(true)

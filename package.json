@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@supabase/ssr": "^0.7.0",
     "@types/node-fetch": "^2.6.12",
     "@types/pako": "^2.0.3",
     "@types/stream-buffers": "^3.0.7",
@@ -44,6 +45,7 @@
     "eslint-config-next": "14.0.4",
     "postcss": "^8.4.32",
     "prettier": "^3.1.1",
+    "supabase": "^2.48.3",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.3"
   }

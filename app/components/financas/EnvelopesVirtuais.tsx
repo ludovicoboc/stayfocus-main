@@ -5,8 +5,8 @@ import { useFinancasStore } from '@/app/stores/financasStore'
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
 
 export function EnvelopesVirtuais() {
-  const { envelopes, adicionarEnvelope, atualizarEnvelope, removerEnvelope, registrarGastoEnvelope } = useFinancasStore()
-  const [novoEnvelope, setNovoEnvelope] = useState({ nome: '', cor: '#2196F3', valorAlocado: 0 })
+  const { envelopes, adicionarEnvelope, atualizarEnvelope, removerEnvelope } = useFinancasStore()
+  const [novoEnvelope, setNovoEnvelope] = useState({ nome: '', cor: '#2196F3', valor_alocado: 0 })
   const [valorGasto, setValorGasto] = useState<{id: string, valor: number} | null>(null)
   const [editando, setEditando] = useState<string | null>(null)
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -29,15 +29,16 @@ export function EnvelopesVirtuais() {
   ]
   
   const handleAdicionarEnvelope = () => {
-    if (!novoEnvelope.nome || novoEnvelope.valorAlocado <= 0) return
+    if (!novoEnvelope.nome || novoEnvelope.valor_alocado <= 0) return
     
-    adicionarEnvelope(
-      novoEnvelope.nome,
-      novoEnvelope.cor,
-      novoEnvelope.valorAlocado
-    )
+    adicionarEnvelope({
+      nome: novoEnvelope.nome,
+      cor: novoEnvelope.cor,
+      valor_alocado: novoEnvelope.valor_alocado,
+      valor_utilizado: 0,
+    })
     
-    setNovoEnvelope({ nome: '', cor: '#2196F3', valorAlocado: 0 })
+    setNovoEnvelope({ nome: '', cor: '#2196F3', valor_alocado: 0 })
     setMostrarFormulario(false)
   }
   
@@ -47,7 +48,7 @@ export function EnvelopesVirtuais() {
       setNovoEnvelope({
         nome: envelope.nome,
         cor: envelope.cor,
-        valorAlocado: envelope.valorAlocado
+        valor_alocado: envelope.valor_alocado
       })
       setEditando(id)
       setMostrarFormulario(true)
@@ -55,30 +56,31 @@ export function EnvelopesVirtuais() {
   }
   
   const salvarEdicao = () => {
-    if (!editando || !novoEnvelope.nome || novoEnvelope.valorAlocado <= 0) return
+    if (!editando || !novoEnvelope.nome || novoEnvelope.valor_alocado <= 0) return
     
-    atualizarEnvelope(
-      editando,
-      novoEnvelope.nome,
-      novoEnvelope.cor,
-      novoEnvelope.valorAlocado
-    )
+    atualizarEnvelope(editando, {
+      nome: novoEnvelope.nome,
+      cor: novoEnvelope.cor,
+      valor_alocado: novoEnvelope.valor_alocado,
+    })
     
-    setNovoEnvelope({ nome: '', cor: '#2196F3', valorAlocado: 0 })
+    setNovoEnvelope({ nome: '', cor: '#2196F3', valor_alocado: 0 })
     setEditando(null)
     setMostrarFormulario(false)
   }
   
   const cancelarForm = () => {
-    setNovoEnvelope({ nome: '', cor: '#2196F3', valorAlocado: 0 })
+    setNovoEnvelope({ nome: '', cor: '#2196F3', valor_alocado: 0 })
     setEditando(null)
     setMostrarFormulario(false)
   }
   
   const handleRegistrarGasto = (id: string) => {
-    if (!valorGasto || !valorGasto.valor || valorGasto.valor <= 0) return
+    const envelope = envelopes.find(e => e.id === id);
+    if (!envelope || !valorGasto || !valorGasto.valor || valorGasto.valor <= 0) return
     
-    registrarGastoEnvelope(id, valorGasto.valor)
+    const novoValorUtilizado = envelope.valor_utilizado + valorGasto.valor;
+    atualizarEnvelope(id, { valor_utilizado: novoValorUtilizado })
     setValorGasto(null)
   }
   
@@ -87,8 +89,8 @@ export function EnvelopesVirtuais() {
       {/* Visualização dos envelopes */}
       <div className="space-y-3">
         {envelopes.map(envelope => {
-          const percentualUtilizado = envelope.valorAlocado > 0 
-            ? (envelope.valorUtilizado / envelope.valorAlocado) * 100 
+          const percentualUtilizado = envelope.valor_alocado > 0
+            ? (envelope.valor_utilizado / envelope.valor_alocado) * 100
             : 0
           
           return (
@@ -126,8 +128,8 @@ export function EnvelopesVirtuais() {
               
               <div className="p-3">
                 <div className="flex justify-between mb-1 text-sm">
-                  <span>Utilizado: {formatadorMoeda.format(envelope.valorUtilizado)}</span>
-                  <span>Total: {formatadorMoeda.format(envelope.valorAlocado)}</span>
+                  <span>Utilizado: {formatadorMoeda.format(envelope.valor_utilizado)}</span>
+                  <span>Total: {formatadorMoeda.format(envelope.valor_alocado)}</span>
                 </div>
                 
                 {/* Barra de progresso */}
@@ -209,8 +211,8 @@ export function EnvelopesVirtuais() {
               <input
                 id="envelopeValor"
                 type="number"
-                value={novoEnvelope.valorAlocado || ''}
-                onChange={e => setNovoEnvelope({ ...novoEnvelope, valorAlocado: parseFloat(e.target.value) || 0 })}
+                value={novoEnvelope.valor_alocado || ''}
+                onChange={e => setNovoEnvelope({ ...novoEnvelope, valor_alocado: parseFloat(e.target.value) || 0 })}
                 className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
                 placeholder="Valor"
                 min="0.01"

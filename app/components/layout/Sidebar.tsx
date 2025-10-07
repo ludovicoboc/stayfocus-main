@@ -28,13 +28,6 @@ const navItems: NavItem[] = [
     activeColor: 'bg-blue-100',
   },
   {
-    name: 'Estudos',
-    href: '/estudos',
-    icon: BookOpen,
-    color: 'text-estudos-primary',
-    activeColor: 'bg-estudos-light',
-  },
-  {
     name: 'Saúde',
     href: '/saude',
     icon: Heart,

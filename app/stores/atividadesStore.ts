@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
 type Atividade = {
   id: string
@@ -19,7 +18,6 @@ interface AtividadesState {
 }
 
 export const useAtividadesStore = create<AtividadesState>()(
-  persist(
     (set) => ({
       atividades: [],
       
@@ -36,10 +34,5 @@ export const useAtividadesStore = create<AtividadesState>()(
           a.id === id ? { ...a, concluida: true } : a
         )
       })),
-    }),
-    {
-      name: 'atividades-storage',
-      storage: createJSONStorage(() => localStorage)
-    }
-  )
+    })
 )

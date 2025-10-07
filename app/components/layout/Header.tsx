@@ -1,19 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Menu, X, Sun, Moon, HelpCircle, Anchor } from 'lucide-react'
+import { Menu, X, Sun, Moon, HelpCircle, Anchor, LogOut } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Sidebar } from './Sidebar'
 import { PWAStatus } from '../PWAInstallPrompt'
-import { SyncStatusCompact } from '../SyncStatus'
 import Link from 'next/link'
+import { usePerfilStore } from '@/app/stores/perfilStore'
+import { createClient } from '@/app/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const { nome } = usePerfilStore()
+  const router = useRouter()
   
-  // Garantir que o componente foi montado no cliente antes de renderizar ícones dinâmicos
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -22,12 +25,16 @@ export function Header() {
     setTheme(theme === 'dark' ? 'light' : 'dark')
   }
 
-  // Função para abrir o sidebar
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
   const openSidebar = () => {
     setSidebarOpen(true)
   }
 
-  // Função para fechar o sidebar
   const closeSidebar = () => {
     setSidebarOpen(false)
   }
@@ -59,13 +66,8 @@ export function Header() {
 
           {/* Controles */}
           <div className="flex items-center space-x-3">
-            {/* PWA Status */}
             <PWAStatus />
             
-            {/* Status de Sincronização */}
-            <SyncStatusCompact />
-            
-            {/* Ícone Zzz para Sono */}
             <Link href="/sono">
               <button
                 className="p-2 rounded-full text-sono-primary hover:bg-sono-light focus:outline-none focus:ring-2 focus:ring-sono-primary"
@@ -134,13 +136,20 @@ export function Header() {
               </button>
             </Link>
 
-            {/* User profile */}
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+              aria-label="Sair da conta"
+            >
+              {mounted ? <LogOut className="h-5 w-5" aria-hidden="true" /> : <div className="h-5 w-5" />}
+            </button>
+
             <Link href="/perfil">
               <button 
                 className="h-8 w-8 rounded-full bg-perfil-primary hover:bg-perfil-secondary text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-perfil-primary"
                 aria-label="Informações Pessoais"
               >
-                <span className="text-sm font-medium">U</span>
+                <span className="text-sm font-medium">{nome ? nome.charAt(0).toUpperCase() : '?'}</span>
               </button>
             </Link>
           </div>

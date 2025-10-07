@@ -13,8 +13,6 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Award, Calendar, Edit, ExternalLink, Trash, BookOpen, ChevronDown, ChevronUp, Star, StarOff, Edit2, X } from 'lucide-react';
 import { Input } from '@/app/components/ui/Input';
-import VisualizadorMarkdown from '@/app/components/estudos/VisualizadorMarkdown';
-import { VisualizadorChecklist } from '@/app/components/estudos/VisualizadorChecklist'; // Importar VisualizadorChecklist
 import { Modal } from '@/app/components/ui/Modal'; // Importar Modal
 
 interface DetalhesConcursoPageProps {
@@ -36,17 +34,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
   const [showQuestaoModal, setShowQuestaoModal] = useState(false);
   const [questaoParaEditar, setQuestaoParaEditar] = useState<Questao | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
- 
-  // Estados para os modais de materiais
-  const [isMaterialVisualizationModalOpen, setIsMaterialVisualizationModalOpen] = useState(false); // Estado único para visibilidade do modal de visualização
-  const [selectedMaterialFileId, setSelectedMaterialFileId] = useState<string | null>(null);
-  const [materialModalTitle, setMaterialModalTitle] = useState('');
-
-  // Novos estados para seleção de arquivos
-  const [isFileListModalOpen, setIsFileListModalOpen] = useState(false);
-  const [filesForSelection, setFilesForSelection] = useState<{ id: string; name: string }[]>([]);
-  const [selectedMaterialType, setSelectedMaterialType] = useState<string | null>(null);
-
 
   // Abas principais
   const abas = [
@@ -54,7 +41,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
     { key: 'gerar', label: 'Gerar Questões Automáticas' },
     { key: 'questoes', label: 'Questões do Concurso' },
     { key: 'simulados', label: 'Simulados Salvos' },
-    { key: 'materiais', label: 'Materiais de Estudo' } // Nova aba adicionada
   ];
   const [abaAtiva, setAbaAtiva] = useState('conteudo');
 
@@ -114,14 +100,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
     setQuestaoParaEditar(null);
   };
 
-  // Função para fechar o modal de visualização de materiais
-  const handleCloseMaterialVisualizationModal = () => {
-    setIsMaterialVisualizationModalOpen(false);
-    setSelectedMaterialFileId(null);
-    setMaterialModalTitle('');
-    setSelectedMaterialType(null); // Resetar o tipo selecionado ao fechar
-  };
-
   // Collapse/expand handler
   const toggleDisciplina = (disciplina: string) => {
     setDisciplinasAbertas(prev => ({
@@ -163,58 +141,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
     (concurso.conteudoProgramatico.reduce((acc, curr) => acc + curr.progresso, 0)) /
     (concurso.conteudoProgramatico.length || 1)
   );
-
-  // Função para selecionar o tipo de material e buscar arquivos
-  const handleSelectMaterialType = async (materialNome: string) => {
-    setSelectedMaterialType(materialNome);
-    setMaterialModalTitle(materialNome); // Define o título do modal de visualização antecipadamente
-
-    try {
-      const response = await fetch(`/api/drive/listar-materiais?tipo=${encodeURIComponent(materialNome.toLowerCase())}`);
-      const data = await response.json();
-
-      if (response.ok && data.files && Array.isArray(data.files)) {
-        if (data.files.length > 1) {
-          // Múltiplos arquivos, exibir lista para seleção
-          setFilesForSelection(data.files);
-          setIsFileListModalOpen(true);
-        } else if (data.files.length === 1) {
-          // Apenas um arquivo, abrir diretamente
-          const file = data.files[0];
-          setSelectedMaterialFileId(file.id);
-          setMaterialModalTitle(`${materialNome}: ${file.name}`);
-          setIsMaterialVisualizationModalOpen(true); // Abre o modal de visualização
-        } else {
-          // Nenhum arquivo encontrado
-          alert(`Nenhum arquivo encontrado para o material: ${materialNome}`);
-          setSelectedMaterialFileId(null); // Garante que nenhum arquivo anterior seja exibido
-          setIsMaterialVisualizationModalOpen(false); // Garante que o modal esteja fechado
-        }
-      } else {
-        // Erro na resposta da API
-        alert(`Erro ao listar arquivos para o material: ${materialNome}`);
-        console.error('Erro na resposta da API:', data);
-        setSelectedMaterialFileId(null);
-        setIsMaterialVisualizationModalOpen(false); // Garante que o modal esteja fechado
-      }
-    } catch (error) {
-      console.error('Erro ao buscar lista de arquivos:', error);
-      alert(`Erro ao buscar lista de arquivos para o material: ${materialNome}`);
-      setSelectedMaterialFileId(null);
-      setIsMaterialVisualizationModalOpen(false); // Garante que o modal esteja fechado
-    }
-  };
-
-  // Função para lidar com a seleção de um arquivo na lista
-  const handleFileSelection = (file: { id: string; name: string }) => {
-    if (selectedMaterialType) {
-      setSelectedMaterialFileId(file.id);
-      setMaterialModalTitle(`${selectedMaterialType}: ${file.name}`);
-      setIsFileListModalOpen(false); // Fecha o modal de seleção de arquivos
-      setIsMaterialVisualizationModalOpen(true); // Abre o modal de visualização
-    }
-  };
-
 
   return (
     <div className="space-y-6">
@@ -404,26 +330,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
         </div>
       )}
 
-      {/* Conteúdo da nova aba Materiais de Estudo */}
-      {abaAtiva === 'materiais' && (
-        <div>
-          <h2 className="text-lg font-semibold mb-4">Materiais de Estudo Gerais</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {/* Removido o mapeamento materialPaths, agora usa nomes diretos */}
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Resumos')}>Resumos</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Flashcards')}>Flashcards</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Simulados')}>Simulados</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Tarefas')}>Tarefas</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Estratégias de Foco')}>Estratégias de Foco</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Agendamento de Pausas')}>Agendamento de Pausas</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Mapas Mentais')}>Mapas Mentais</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Outlines de Infográficos')}>Outlines de Infográficos</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Checklists')}>Checklists</Button>
-            <Button variant="outline" onClick={() => handleSelectMaterialType('Guias de Estudo')}>Guias de Estudo</Button>
-          </div>
-        </div>
-      )}
-
       {/* Modal/Form para Adicionar/Editar Concurso */}
       <ConcursoForm
         isOpen={showEditModal}
@@ -438,46 +344,6 @@ export default function DetalhesConcursoPage({ params }: DetalhesConcursoPagePro
         concursoId={concurso.id}
         questaoParaEditar={questaoParaEditar}
       />
-
-      {/* Modal para seleção de arquivos */}
-      <Modal
-        isOpen={isFileListModalOpen}
-        onClose={() => setIsFileListModalOpen(false)}
-        title={`Selecionar Arquivo para ${selectedMaterialType}`}
-      >
-        <div className="space-y-2">
-          {filesForSelection.map((file) => (
-            <Button
-              key={file.id}
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => handleFileSelection(file)}
-            >
-              {file.name}
-            </Button>
-          ))}
-        </div>
-      </Modal>
-
-      {/* Modal Visualizador de Markdown */}
-      {selectedMaterialType !== 'Checklists' && (
-        <VisualizadorMarkdown
-          isOpen={isMaterialVisualizationModalOpen} // Usar estado único
-          onClose={handleCloseMaterialVisualizationModal} // Usar função única de fechar
-          fileId={selectedMaterialFileId}
-          title={materialModalTitle}
-        />
-      )}
-
-      {/* Modal Visualizador de Checklist */}
-      {selectedMaterialType === 'Checklists' && (
-        <VisualizadorChecklist
-          isOpen={isMaterialVisualizationModalOpen} // Usar estado único
-          onClose={handleCloseMaterialVisualizationModal} // Usar função única de fechar
-          fileId={selectedMaterialFileId}
-          title={materialModalTitle}
-        />
-      )}
     </div>
   );
 }

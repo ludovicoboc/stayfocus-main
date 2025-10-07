@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
 
 export interface Alternativa {
   id: string;
@@ -38,7 +37,6 @@ interface QuestoesStore {
 }
 
 export const useQuestoesStore = create<QuestoesStore>()(
-  persist(
     (set, get) => ({
       questoes: [],
 
@@ -108,38 +106,5 @@ export const useQuestoesStore = create<QuestoesStore>()(
         return get().questoes.filter(q => q.disciplina === disciplina);
       },
 
-    }),
-    {
-      name: 'questoes-store', // Nome específico para este store
-      storage: createJSONStorage(() => {
-        // Reutiliza a lógica de storage, garantindo que funcione no client-side
-        if (typeof window !== 'undefined') {
-          const storage: StateStorage = {
-            getItem: (name) => {
-              const str = localStorage.getItem(name);
-              if (!str) return null;
-              // Adiciona try-catch para robustez na desserialização
-              try {
-                return JSON.parse(str);
-              } catch (e) {
-                console.error(`Erro ao parsear ${name} do localStorage`, e);
-                return null;
-              }
-            },
-            setItem: (name, value) => {
-              localStorage.setItem(name, JSON.stringify(value));
-            },
-            removeItem: (name) => localStorage.removeItem(name),
-          };
-          return storage;
-        }
-        // Fallback para SSR ou ambientes sem window
-        return {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {},
-        };
-      })
-    }
-  )
+    })
 );

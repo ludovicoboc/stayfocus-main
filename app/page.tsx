@@ -153,14 +153,6 @@ export default function HomePage() {
         {/* Links Rápidos */}
         <DashboardSection id="links-rapidos" title="Acesso Rápido" className="mt-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/estudos" className={cn(
-              buttonVariants({ variant: "outline" }),
-              "flex flex-col items-center justify-center h-24 p-4 text-estudos-primary hover:bg-estudos-light hover:border-estudos-primary"
-            )}>
-              <span className="text-sm font-medium">Estudos</span>
-              <span className="text-xs mt-1 text-gray-500">Materiais e Técnicas</span>
-            </Link>
-            
             <Link href="/saude" className={cn(
               buttonVariants({ variant: "outline" }),
               "flex flex-col items-center justify-center h-24 p-4 text-saude-primary hover:bg-saude-light hover:border-saude-primary"

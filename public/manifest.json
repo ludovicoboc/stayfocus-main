@@ -42,34 +42,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Pomodoro",
-      "short_name": "Timer",
-      "description": "Iniciar sessão de Pomodoro",
-      "url": "/estudos",
-      "icons": [
-        {
-          "src": "/images/stayfocus_logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
       "name": "Painel do Dia",
       "short_name": "Painel",
       "description": "Ver atividades do dia",
       "url": "/",
-      "icons": [
-        {
-          "src": "/images/stayfocus_logo.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Estudos",
-      "short_name": "Estudos",
-      "description": "Acessar área de estudos",
-      "url": "/estudos",
       "icons": [
         {
           "src": "/images/stayfocus_logo.png",

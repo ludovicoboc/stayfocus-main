@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createClient } from '@/app/lib/supabase/client'
+import { type User } from '@supabase/supabase-js'
 
 export type PreferenciasVisuais = {
   altoContraste: boolean
@@ -15,21 +16,23 @@ export type MetasDiarias = {
 }
 
 export type PerfilState = {
+  user: User | null
   nome: string
   preferenciasVisuais: PreferenciasVisuais
   metasDiarias: MetasDiarias
   notificacoesAtivas: boolean
   pausasAtivas: boolean
   // Ações
-  atualizarNome: (nome: string) => void
-  atualizarPreferenciasVisuais: (preferencias: Partial<PreferenciasVisuais>) => void
-  atualizarMetasDiarias: (metas: Partial<MetasDiarias>) => void
-  alternarNotificacoes: () => void
-  alternarPausas: () => void
-  resetarPerfil: () => void
+  setPerfil: (perfil: Partial<PerfilState>) => void
+  atualizarNome: (nome: string) => Promise<void>
+  atualizarPreferenciasVisuais: (preferencias: Partial<PreferenciasVisuais>) => Promise<void>
+  atualizarMetasDiarias: (metas: Partial<MetasDiarias>) => Promise<void>
+  alternarNotificacoes: () => Promise<void>
+  alternarPausas: () => Promise<void>
 }
 
 const defaultState = {
+  user: null,
   nome: 'Usuário',
   preferenciasVisuais: {
     altoContraste: false,
@@ -47,40 +50,85 @@ const defaultState = {
 }
 
 export const usePerfilStore = create<PerfilState>()(
-  persist(
-    (set) => ({
+    (set, get) => ({
       ...defaultState,
+
+      setPerfil: (perfil) => set({ ...perfil }),
       
-      atualizarNome: (nome) => set({
-        nome
-      }),
-      
-      atualizarPreferenciasVisuais: (preferencias) => set((state) => ({
-        preferenciasVisuais: {
-          ...state.preferenciasVisuais,
-          ...preferencias
+      atualizarNome: async (nome) => {
+        const { user } = get()
+        if (!user) return
+
+        const supabase = createClient()
+        const { error } = await supabase.from('profiles').update({ nome }).eq('id', user.id)
+
+        if (!error) {
+          set({ nome })
+        } else {
+          console.error("Erro ao atualizar nome:", error)
         }
-      })),
+      },
       
-      atualizarMetasDiarias: (metas) => set((state) => ({
-        metasDiarias: {
-          ...state.metasDiarias,
-          ...metas
+      atualizarPreferenciasVisuais: async (preferencias) => {
+        const { user, preferenciasVisuais } = get()
+        if (!user) return
+
+        const novasPreferencias = { ...preferenciasVisuais, ...preferencias }
+
+        const supabase = createClient()
+        const { error } = await supabase.from('profiles').update({ preferencias_visuais: novasPreferencias }).eq('id', user.id)
+
+        if (!error) {
+          set({ preferenciasVisuais: novasPreferencias })
+        } else {
+          console.error("Erro ao atualizar preferências visuais:", error)
         }
-      })),
+      },
       
-      alternarNotificacoes: () => set((state) => ({
-        notificacoesAtivas: !state.notificacoesAtivas
-      })),
+      atualizarMetasDiarias: async (metas) => {
+        const { user, metasDiarias } = get()
+        if (!user) return
+
+        const novasMetas = { ...metasDiarias, ...metas }
+
+        const supabase = createClient()
+        const { error } = await supabase.from('profiles').update({ metas_diarias: novasMetas }).eq('id', user.id)
+
+        if (!error) {
+          set({ metasDiarias: novasMetas })
+        } else {
+          console.error("Erro ao atualizar metas diárias:", error)
+        }
+      },
       
-      alternarPausas: () => set((state) => ({
-        pausasAtivas: !state.pausasAtivas
-      })),
+      alternarNotificacoes: async () => {
+        const { user, notificacoesAtivas } = get()
+        if (!user) return
+
+        const novoStatus = !notificacoesAtivas
+        const supabase = createClient()
+        const { error } = await supabase.from('profiles').update({ notificacoes_ativas: novoStatus }).eq('id', user.id)
+
+        if (!error) {
+          set({ notificacoesAtivas: novoStatus })
+        } else {
+          console.error("Erro ao alternar notificações:", error)
+        }
+      },
       
-      resetarPerfil: () => set(defaultState)
-    }),
-    {
-      name: 'perfil-storage',
-    }
-  )
+      alternarPausas: async () => {
+        const { user, pausasAtivas } = get()
+        if (!user) return
+
+        const novoStatus = !pausasAtivas
+        const supabase = createClient()
+        const { error } = await supabase.from('profiles').update({ pausas_ativas: novoStatus }).eq('id', user.id)
+
+        if (!error) {
+          set({ pausasAtivas: novoStatus })
+        } else {
+          console.error("Erro ao alternar pausas:", error)
+        }
+      },
+    })
 )

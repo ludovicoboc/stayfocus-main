@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Anchor, PenSquare, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Anchor, PenSquare, X, Loader2, AlertTriangle } from 'lucide-react'
 import { EditorNotas } from '../components/autoconhecimento/EditorNotas'
 import { ListaNotas } from '../components/autoconhecimento/ListaNotas'
 import { ModoRefugio } from '../components/autoconhecimento/ModoRefugio'
@@ -15,7 +15,11 @@ export default function AutoconhecimentoPage() {
   const [notaSelecionada, setNotaSelecionada] = useState<string | null>(null)
   const [criandoNota, setCriandoNota] = useState(false)
   
-  const { modoRefugio } = useAutoconhecimentoStore()
+  const { modoRefugio, loading, error, fetchNotas } = useAutoconhecimentoStore()
+
+  useEffect(() => {
+    fetchNotas()
+  }, [fetchNotas])
   
   // Mapeamento de títulos para exibição
   const tituloAbas = {
@@ -58,6 +62,29 @@ export default function AutoconhecimentoPage() {
   // Verifica se estamos no modo refúgio para simplificar a interface
   const interfaceSimplificada = modoRefugio
   
+  if (loading) {
+    return (
+      <Container>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-autoconhecimento-primary" />
+          <p className="ml-2 text-gray-600 dark:text-gray-400">Carregando suas notas...</p>
+        </div>
+      </Container>
+    )
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <div className="flex flex-col items-center justify-center h-64 text-red-500">
+          <AlertTriangle className="h-8 w-8 mb-2" />
+          <p>Erro ao carregar as notas.</p>
+          <p className="text-sm text-gray-500">{error}</p>
+        </div>
+      </Container>
+    )
+  }
+
   return (
     <Container>
       {/* Cabeçalho com título */}

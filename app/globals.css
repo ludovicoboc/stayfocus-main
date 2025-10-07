@@ -42,9 +42,6 @@
     --alimentacao-primary: 16 100% 50%;
     --alimentacao-light: 16 100% 95%;
     
-    --estudos-primary: 43 100% 50%;
-    --estudos-light: 43 100% 95%;
-    
     --saude-primary: 152 100% 45%;
     --saude-light: 152 100% 95%;
     
@@ -103,9 +100,6 @@
     
     --alimentacao-primary: 16 100% 65%;
     --alimentacao-light: 16 100% 15%;
-    
-    --estudos-primary: 43 100% 65%;
-    --estudos-light: 43 100% 15%;
     
     --saude-primary: 152 100% 55%;
     --saude-light: 152 100% 15%;
@@ -321,13 +315,6 @@
 }
 .bg-alimentacao-light {
   background-color: hsl(var(--alimentacao-light)) !important;
-}
-
-.text-estudos-primary {
-  color: hsl(var(--estudos-primary)) !important;
-}
-.bg-estudos-light {
-  background-color: hsl(var(--estudos-light)) !important;
 }
 
 .text-saude-primary {

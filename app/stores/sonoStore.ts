@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 export type RegistroSono = {
   id: string
@@ -31,7 +30,6 @@ export type SonoState = {
 }
 
 export const useSonoStore = create<SonoState>()(
-  persist(
     (set) => ({
       registros: [],
       lembretes: [],
@@ -93,9 +91,5 @@ export const useSonoStore = create<SonoState>()(
             : lembrete
         )
       }))
-    }),
-    {
-      name: 'sono-storage',
-    }
-  )
+    })
 )

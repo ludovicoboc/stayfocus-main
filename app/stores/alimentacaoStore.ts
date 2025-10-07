@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import * as alimentacaoService from '@/app/lib/services/alimentacaoService'
 
 // Tipos
 export type Refeicao = {
@@ -13,133 +13,90 @@ export type RegistroRefeicao = {
   data: string
   horario: string
   descricao: string
-  tipoIcone: string | null
-  foto: string | null
+  tipo_icone: string | null
+  foto_url: string | null
+}
+
+export type Hidratacao = {
+    copos_bebidos: number;
+    meta_diaria: number;
+    data: string;
 }
 
 type AlimentacaoState = {
-  // Planejador de Refeições
   refeicoes: Refeicao[]
-  adicionarRefeicao: (horario: string, descricao: string) => void
-  atualizarRefeicao: (id: string, horario: string, descricao: string) => void
-  removerRefeicao: (id: string) => void
-  
-  // Registro de Refeições
   registros: RegistroRefeicao[]
-  adicionarRegistro: (horario: string, descricao: string, tipoIcone: string | null, foto: string | null) => void
-  removerRegistro: (id: string) => void
+  hidratacao: Hidratacao
+  loading: boolean
+  error: string | null
+
+  fetchAlimentacaoData: () => Promise<void>
+
+  // Ações de Refeição Programada
+  adicionarRefeicao: (horario: string, descricao: string) => Promise<void>
+  atualizarRefeicao: (id: string, updates: Partial<Omit<Refeicao, 'id'>>) => Promise<void>
+  removerRefeicao: (id: string) => Promise<void>
   
-  // Hidratação
-  coposBebidos: number
-  metaDiaria: number
-  ultimoRegistro: string | null
-  adicionarCopo: () => void
-  removerCopo: () => void
-  ajustarMeta: (valor: number) => void
+  // Ações de Registro de Refeição
+  adicionarRegistro: (registro: Omit<RegistroRefeicao, 'id'>) => Promise<void>
+  removerRegistro: (id: string) => Promise<void>
+
+  // Ações de Hidratação
+  atualizarHidratacao: (updates: Partial<Omit<Hidratacao, 'data'>>) => Promise<void>
 }
 
-export const useAlimentacaoStore = create<AlimentacaoState>()(
-  persist(
-    (set) => ({
-      // Planejador de Refeições - Estado Inicial
-      refeicoes: [
-        { id: '1', horario: '07:30', descricao: 'Café da manhã' },
-        { id: '2', horario: '12:00', descricao: 'Almoço' },
-        { id: '3', horario: '16:00', descricao: 'Lanche da tarde' },
-        { id: '4', horario: '19:30', descricao: 'Jantar' },
-      ],
-      
-      adicionarRefeicao: (horario, descricao) => 
-        set((state) => ({
-          refeicoes: [
-            ...state.refeicoes,
-            {
-              id: Date.now().toString(),
-              horario,
-              descricao,
-            },
-          ],
-        })),
-      
-      atualizarRefeicao: (id, horario, descricao) =>
-        set((state) => ({
-          refeicoes: state.refeicoes.map((refeicao) =>
-            refeicao.id === id ? { ...refeicao, horario, descricao } : refeicao
-          ),
-        })),
-      
-      removerRefeicao: (id) =>
-        set((state) => ({
-          refeicoes: state.refeicoes.filter((refeicao) => refeicao.id !== id),
-        })),
-      
-      // Registro de Refeições - Estado Inicial
-      registros: [
-        {
-          id: '1',
-          data: '2025-03-03',
-          horario: '08:30',
-          descricao: 'Café da manhã',
-          tipoIcone: 'cafe',
-          foto: null,
-        },
-      ],
-      
-      adicionarRegistro: (horario, descricao, tipoIcone, foto) =>
-        set((state) => {
-          const hoje = new Date().toISOString().split('T')[0]
-          return {
-            registros: [
-              ...state.registros,
-              {
-                id: Date.now().toString(),
-                data: hoje,
-                horario,
-                descricao,
-                tipoIcone,
-                foto,
-              },
-            ],
-          }
-        }),
-      
-      removerRegistro: (id) =>
-        set((state) => ({
-          registros: state.registros.filter((registro) => registro.id !== id),
-        })),
-      
-      // Hidratação - Estado Inicial
-      coposBebidos: 0,
-      metaDiaria: 8,
-      ultimoRegistro: null,
-      
-      adicionarCopo: () =>
-        set((state) => {
-          if (state.coposBebidos < state.metaDiaria) {
-            return {
-              coposBebidos: state.coposBebidos + 1,
-              ultimoRegistro: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-          }
-          return state
-        }),
-      
-      removerCopo: () =>
-        set((state) => ({
-          coposBebidos: Math.max(0, state.coposBebidos - 1),
-        })),
-      
-      ajustarMeta: (valor) =>
-        set((state) => {
-          const novaMeta = state.metaDiaria + valor
-          if (novaMeta >= 1 && novaMeta <= 15) {
-            return { metaDiaria: novaMeta }
-          }
-          return state
-        }),
-    }),
-    {
-      name: 'alimentacao-storage', // nome para o localStorage
+export const useAlimentacaoStore = create<AlimentacaoState>((set, get) => ({
+  refeicoes: [],
+  registros: [],
+  hidratacao: { copos_bebidos: 0, meta_diaria: 8, data: new Date().toISOString().split('T')[0] },
+  loading: true,
+  error: null,
+
+  fetchAlimentacaoData: async () => {
+    try {
+      set({ loading: true, error: null })
+      const data = await alimentacaoService.fetchAlimentacaoData()
+      set({ ...data, loading: false })
+    } catch (error) {
+      set({ loading: false, error: (error as Error).message })
     }
-  )
-)
+  },
+
+  // --- Ações de Refeição Programada ---
+  adicionarRefeicao: async (horario, descricao) => {
+    const novaRefeicao = await alimentacaoService.addRefeicao({ horario, descricao })
+    set((state) => ({ refeicoes: [...state.refeicoes, novaRefeicao] }))
+  },
+  atualizarRefeicao: async (id, updates) => {
+    const refeicaoAtualizada = await alimentacaoService.updateRefeicao(id, updates)
+    set((state) => ({
+      refeicoes: state.refeicoes.map((r) => (r.id === id ? refeicaoAtualizada : r)),
+    }))
+  },
+  removerRefeicao: async (id) => {
+    await alimentacaoService.deleteRefeicao(id)
+    set((state) => ({
+      refeicoes: state.refeicoes.filter((r) => r.id !== id),
+    }))
+  },
+
+  // --- Ações de Registro de Refeição ---
+  adicionarRegistro: async (registro) => {
+    const novoRegistro = await alimentacaoService.addRegistroRefeicao(registro)
+    set((state) => ({ registros: [...state.registros, novoRegistro] }))
+  },
+  removerRegistro: async (id) => {
+    await alimentacaoService.deleteRegistroRefeicao(id)
+    set((state) => ({
+      registros: state.registros.filter((r) => r.id !== id),
+    }))
+  },
+
+  // --- Ações de Hidratação ---
+  atualizarHidratacao: async (updates) => {
+    const { hidratacao } = get()
+    const novosDados = { ...hidratacao, ...updates }
+    const hidratacaoAtualizada = await alimentacaoService.upsertHidratacao(novosDados)
+    set({ hidratacao: hidratacaoAtualizada })
+  },
+}))

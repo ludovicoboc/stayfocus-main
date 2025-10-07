@@ -6,7 +6,7 @@ export type Tarefa = {
   id: string
   texto: string
   concluida: boolean
-  categoria: 'inicio' | 'alimentacao' | 'estudos' | 'saude' | 'lazer'
+  categoria: 'inicio' | 'alimentacao' | 'saude' | 'lazer'
   data: string // formato YYYY-MM-DD
 }
 
@@ -14,7 +14,7 @@ export type BlocoTempo = {
   id: string
   hora: string
   atividade: string
-  categoria: 'inicio' | 'alimentacao' | 'estudos' | 'saude' | 'lazer' | 'nenhuma'
+  categoria: 'inicio' | 'alimentacao' | 'saude' | 'lazer' | 'nenhuma'
   data: string // formato YYYY-MM-DD
 }
 

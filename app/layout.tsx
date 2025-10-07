@@ -4,8 +4,10 @@ import { Header } from '@/app/components/layout/Header'
 import { Footer } from '@/app/components/layout/Footer'
 import { Providers } from '@/app/providers'
 import { PWAInstallPrompt } from '@/app/components/PWAInstallPrompt'
-import { PWAUpdateNotification, SyncStatusIndicator } from '@/app/components/PWAUpdateNotification'
+import { PWAUpdateNotification } from '@/app/components/PWAUpdateNotification'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { createClient } from '@/app/lib/supabase/server'
+import StoreInitializer from '@/app/components/StoreInitializer'
 
 export const metadata: Metadata = {
   title: 'StayFocus',
@@ -60,15 +62,47 @@ export const metadata: Metadata = {
   }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let profileData = {
+    user: user,
+    nome: 'Usuário',
+    preferenciasVisuais: { altoContraste: false, reducaoEstimulos: false, textoGrande: false },
+    metasDiarias: { horasSono: 8, tarefasPrioritarias: 3, coposAgua: 8, pausasProgramadas: 4 },
+    notificacoesAtivas: true,
+    pausasAtivas: true
+  };
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      profileData = {
+        ...profileData,
+        nome: profile.nome,
+        preferenciasVisuais: profile.preferencias_visuais,
+        metasDiarias: profile.metas_diarias,
+        notificacoesAtivas: profile.notificacoes_ativas,
+        pausasAtivas: profile.pausas_ativas,
+      }
+    }
+  }
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className="bg-gray-50 dark:bg-gray-900">
         <Providers>
+          <StoreInitializer profile={profileData} />
           <div className="flex h-screen overflow-hidden">
             <div className="flex flex-col flex-1 overflow-hidden">
               <Header />
@@ -81,7 +115,6 @@ export default function RootLayout({
         </Providers>
         <PWAInstallPrompt />
         <PWAUpdateNotification />
-        <SyncStatusIndicator />
         <SpeedInsights />
       </body>
     </html>

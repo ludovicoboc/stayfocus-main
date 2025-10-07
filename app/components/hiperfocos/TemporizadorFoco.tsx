@@ -24,10 +24,10 @@ export function TemporizadorFoco() {
     
     const hiperfoco = hiperfocos.find(h => h.id === hiperfocoSelecionadoId)
     
-    if (hiperfoco && hiperfoco.tempoLimite) {
-      setTempoTotal(hiperfoco.tempoLimite * 60) // converter minutos para segundos
-      setTempoRestante(hiperfoco.tempoLimite * 60)
-      setTempoPausa(Math.floor(hiperfoco.tempoLimite * 60 * 0.1)) // 10% do tempo total para pausas
+    if (hiperfoco && hiperfoco.tempo_limite) {
+      setTempoTotal(hiperfoco.tempo_limite * 60) // converter minutos para segundos
+      setTempoRestante(hiperfoco.tempo_limite * 60)
+      setTempoPausa(Math.floor(hiperfoco.tempo_limite * 60 * 0.1)) // 10% do tempo total para pausas
     } else {
       // Tempo padrão de 25 minutos (pomodoro)
       setTempoTotal(25 * 60)
@@ -39,7 +39,7 @@ export function TemporizadorFoco() {
     if (temporizadorAtivo) {
       pararTemporizador()
     }
-  }, [hiperfocoSelecionadoId, hiperfocos])
+  }, [hiperfocoSelecionadoId, hiperfocos, temporizadorAtivo])
   
   // Limpar timer ao desmontar componente
   useEffect(() => {
@@ -158,7 +158,7 @@ export function TemporizadorFoco() {
               <option value="">Selecione um hiperfoco</option>
               {hiperfocos.map((hiperfoco) => (
                 <option key={hiperfoco.id} value={hiperfoco.id}>
-                  {hiperfoco.titulo} {hiperfoco.tempoLimite ? `(${hiperfoco.tempoLimite} min)` : ''}
+                  {hiperfoco.titulo} {hiperfoco.tempo_limite ? `(${hiperfoco.tempo_limite} min)` : ''}
                 </option>
               ))}
             </select>

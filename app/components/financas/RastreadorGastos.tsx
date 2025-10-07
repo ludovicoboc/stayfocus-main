@@ -31,10 +31,10 @@ export default function RastreadorGastos() {
     const gastosPorCategoria: Record<string, number> = {}
     
     despesas.forEach(transacao => {
-      if (!gastosPorCategoria[transacao.categoriaId]) {
-        gastosPorCategoria[transacao.categoriaId] = 0
+      if (!gastosPorCategoria[transacao.categoria_id]) {
+        gastosPorCategoria[transacao.categoria_id] = 0
       }
-      gastosPorCategoria[transacao.categoriaId] += transacao.valor
+      gastosPorCategoria[transacao.categoria_id] += transacao.valor
     })
     
     // Preparar os dados para o gráfico

@@ -10,7 +10,7 @@ export function CalendarioPagamentos() {
     categorias,
     adicionarPagamentoRecorrente, 
     removerPagamentoRecorrente,
-    marcarPagamentoComoPago
+    atualizarPagamentoRecorrente
   } = useFinancasStore()
   
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -65,12 +65,12 @@ export function CalendarioPagamentos() {
   
   // Filtrar pagamentos do mês atual
   const pagamentosDoMes = pagamentosRecorrentes.filter(pagamento => {
-    return isDoMesAtual(pagamento.dataVencimento)
+    return isDoMesAtual(pagamento.data_vencimento)
   })
   
   // Ordenar pagamentos por dia
   const pagamentosOrdenados = [...pagamentosDoMes].sort((a, b) => {
-    return parseInt(a.dataVencimento) - parseInt(b.dataVencimento)
+    return parseInt(a.data_vencimento) - parseInt(b.data_vencimento)
   })
   
   // Adicionar novo pagamento recorrente
@@ -81,13 +81,22 @@ export function CalendarioPagamentos() {
       !novoPagamento.dataVencimento || 
       !novoPagamento.categoriaId
     ) return
+
+    const hoje = new Date()
+    const dia = parseInt(novoPagamento.dataVencimento)
+    const proximoPagamentoDate = new Date(hoje.getFullYear(), hoje.getMonth(), dia)
+    if (proximoPagamentoDate.getDate() < hoje.getDate()) {
+      proximoPagamentoDate.setMonth(proximoPagamentoDate.getMonth() + 1)
+    }
     
-    adicionarPagamentoRecorrente(
-      novoPagamento.descricao,
-      novoPagamento.valor,
-      novoPagamento.dataVencimento,
-      novoPagamento.categoriaId
-    )
+    adicionarPagamentoRecorrente({
+      descricao: novoPagamento.descricao,
+      valor: novoPagamento.valor,
+      data_vencimento: novoPagamento.dataVencimento,
+      categoria_id: novoPagamento.categoriaId,
+      proximo_pagamento: proximoPagamentoDate.toISOString().split('T')[0],
+      pago: false,
+    })
     
     setNovoPagamento({
       descricao: '',
@@ -155,8 +164,8 @@ export function CalendarioPagamentos() {
       <div className="space-y-2">
         {pagamentosOrdenados.length > 0 ? (
           pagamentosOrdenados.map(pagamento => {
-            const categoria = categorias.find(c => c.id === pagamento.categoriaId)
-            const diaVencimento = parseInt(pagamento.dataVencimento)
+            const categoria = categorias.find(c => c.id === pagamento.categoria_id)
+            const diaVencimento = parseInt(pagamento.data_vencimento)
             const dataPassada = isDataPassada(diaVencimento)
             const hoje = isHoje(diaVencimento)
             
@@ -186,7 +195,7 @@ export function CalendarioPagamentos() {
                 >
                   <div className="flex items-center">
                     <div className="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-700 rounded-full mr-3 font-medium">
-                      {pagamento.dataVencimento}
+                      {pagamento.data_vencimento}
                     </div>
                     <div>
                       <div className="font-medium text-gray-900 dark:text-white">
@@ -204,7 +213,7 @@ export function CalendarioPagamentos() {
                     </div>
                     
                     <button
-                      onClick={() => marcarPagamentoComoPago(pagamento.id, !pagamento.pago)}
+                      onClick={() => atualizarPagamentoRecorrente(pagamento.id, { pago: !pagamento.pago })}
                       className={`p-1 rounded-full ${
                         pagamento.pago 
                           ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' 

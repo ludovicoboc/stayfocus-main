@@ -48,28 +48,11 @@ export function QuestaoList({ concursoId, onAddQuestao, onEditQuestao }: Questao
     );
   };
 
-  const handleRealizarSimulado = () => {
-    // Salva as questões selecionadas no localStorage para a página de simulado buscar
-    const questoesSelecionadas = questoes.filter(q => selecionadas.includes(q.id));
-    localStorage.setItem('simulado_personalizado_questoes', JSON.stringify(questoesSelecionadas));
-    router.push('/estudos/simulado-personalizado');
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Questões do Concurso</h2>
         <div className="flex gap-2">
-          <Button
-            onClick={handleRealizarSimulado}
-            size="sm"
-            variant="success"
-            disabled={selecionadas.length === 0}
-            className="flex items-center"
-          >
-            <PlayCircle size={16} className="mr-2" />
-            Realizar Simulado
-          </Button>
           <Button onClick={onAddQuestao} size="sm">
             <Plus size={16} className="mr-2" />
             Adicionar Questão

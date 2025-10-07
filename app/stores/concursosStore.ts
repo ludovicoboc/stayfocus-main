@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
 
 export interface ConteudoProgramatico {
   disciplina: string;
@@ -27,7 +26,6 @@ interface ConcursosStore {
 }
 
 export const useConcursosStore = create<ConcursosStore>()(
-  persist(
     (set) => ({
       concursos: [],
 
@@ -72,30 +70,5 @@ export const useConcursosStore = create<ConcursosStore>()(
             : concurso
         )
       }))
-    }),
-    {
-      name: 'concursos-storage',
-      storage: createJSONStorage(() => {
-        if (typeof window !== 'undefined') {
-          const storage: StateStorage = {
-            getItem: (name) => {
-              const str = localStorage.getItem(name);
-              if (!str) return null;
-              return JSON.parse(str);
-            },
-            setItem: (name, value) => {
-              localStorage.setItem(name, JSON.stringify(value));
-            },
-            removeItem: (name) => localStorage.removeItem(name),
-          };
-          return storage;
-        }
-        return {
-          getItem: () => null,
-          setItem: () => {},
-          removeItem: () => {},
-        };
-      })
-    }
-  )
+    })
 );

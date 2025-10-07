@@ -28,12 +28,13 @@ export function RegistroRefeicoes() {
   const handleAdicionarRegistro = () => {
     if (!novoRegistro.horario || !novoRegistro.descricao) return
     
-    adicionarRegistro(
-      novoRegistro.horario,
-      novoRegistro.descricao,
-      novoRegistro.tipoIcone,
-      novoRegistro.foto
-    )
+    adicionarRegistro({
+      data: new Date().toISOString().split('T')[0],
+      horario: novoRegistro.horario,
+      descricao: novoRegistro.descricao,
+      tipo_icone: novoRegistro.tipoIcone,
+      foto_url: novoRegistro.foto,
+    })
     
     setNovoRegistro({
       horario: '',
@@ -81,10 +82,10 @@ export function RegistroRefeicoes() {
                   </span>
                 </div>
                 
-                {registro.tipoIcone && (
+                {registro.tipo_icone && (
                   <div className="mb-2">
-                    <span className="text-2xl" aria-label={`Tipo: ${tiposRefeicao.find(t => t.id === registro.tipoIcone)?.nome || ''}`}>
-                      {tiposRefeicao.find(t => t.id === registro.tipoIcone)?.emoji}
+                    <span className="text-2xl" aria-label={`Tipo: ${tiposRefeicao.find(t => t.id === registro.tipo_icone)?.nome || ''}`}>
+                      {tiposRefeicao.find(t => t.id === registro.tipo_icone)?.emoji}
                     </span>
                   </div>
                 )}
@@ -99,10 +100,10 @@ export function RegistroRefeicoes() {
               </button>
             </div>
             
-            {registro.foto && (
+            {registro.foto_url && (
               <div className="mt-2">
                 <img
-                  src={registro.foto}
+                  src={registro.foto_url}
                   alt="Foto da refeição"
                   className="w-full h-32 object-cover rounded-md"
                 />

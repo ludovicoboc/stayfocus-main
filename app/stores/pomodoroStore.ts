@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
 type CicloPomodoro = 'foco' | 'pausa' | 'longapausa'
 
@@ -22,7 +21,6 @@ interface PomodoroState {
 }
 
 export const usePomodoroStore = create<PomodoroState>()(
-  persist(
     (set) => ({
       // Configuração padrão
       configuracao: {
@@ -50,10 +48,5 @@ export const usePomodoroStore = create<PomodoroState>()(
       resetarCiclosCompletos: () => set({
         ciclosCompletos: 0
       }),
-    }),
-    {
-      name: 'pomodoro-storage',
-      storage: createJSONStorage(() => localStorage)
-    }
-  )
+    })
 )

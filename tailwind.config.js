@@ -18,12 +18,6 @@ module.exports = {
           secondary: '#34D399',
           light: '#ECFDF590', // Reduzida opacidade para suavizar
         },
-        estudos: {
-          primary: '#FF8C00', // Changed from Amber to a darker orange for better contrast
-          secondary: '#FFB74D',
-          light: '#FFF3E0', // Removed transparency for better contrast
-          dark: '#E65100', // Added a dark version for dark mode
-        },
         saude: {
           primary: '#EF4444', // Vermelho
           secondary: '#F87171',

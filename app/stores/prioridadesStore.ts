@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
 export type Prioridade = {
   id: string;
@@ -22,7 +21,6 @@ interface PrioridadesState {
 }
 
 export const usePrioridadesStore = create<PrioridadesState>()(
-  persist(
     (set, get) => ({
       prioridades: [],
 
@@ -69,10 +67,5 @@ export const usePrioridadesStore = create<PrioridadesState>()(
         const datas = get().prioridades.map(p => p.data)
         return Array.from(new Set(datas)).sort().reverse() // Mais recentes primeiro
       }
-    }),
-    {
-      name: 'prioridades-diarias',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
+    })
 )

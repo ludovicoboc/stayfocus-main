@@ -1,6 +1,5 @@
 // stores/receitasStore.ts
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 interface Ingrediente {
   nome: string;
@@ -33,7 +32,6 @@ interface ReceitasStore {
 }
 
 export const useReceitasStore = create<ReceitasStore>()(
-  persist(
     (set, get) => ({
       receitas: [],
       adicionarReceita: (receita) =>
@@ -61,10 +59,5 @@ export const useReceitasStore = create<ReceitasStore>()(
             return { favoritos: [...favoritos, id] };
           }
         }),
-    }),
-    {
-      name: 'receitas-storage', // name of the item in the storage (must be unique)
-      // storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-    }
-  )
+    })
 );

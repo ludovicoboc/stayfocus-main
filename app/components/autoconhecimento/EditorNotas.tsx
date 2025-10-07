@@ -18,11 +18,7 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
   const { 
     notas, 
     adicionarNota, 
-    atualizarNota, 
-    adicionarTag, 
-    removerTag,
-    adicionarImagem,
-    removerImagem,
+    atualizarNota,
     modoRefugio
   } = useAutoconhecimentoStore()
   
@@ -32,7 +28,7 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
   const [conteudo, setConteudo] = useState(nota?.conteudo || '')
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>(nota?.tags || [])
-  const [imagemUrl, setImagemUrl] = useState<string | undefined>(nota?.imagemUrl)
+  const [imagemUrl, setImagemUrl] = useState<string | undefined>(nota?.imagem_url)
   const [mostrarOpcaoImagem, setMostrarOpcaoImagem] = useState(false)
   
   const tagInputRef = useRef<HTMLInputElement>(null)
@@ -50,7 +46,7 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
       setTitulo(nota.titulo)
       setConteudo(nota.conteudo)
       setTags(nota.tags)
-      setImagemUrl(nota.imagemUrl)
+      setImagemUrl(nota.imagem_url)
     } else {
       setTitulo('')
       setConteudo('')
@@ -64,11 +60,6 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
       const novaTag = tagInput.trim()
       setTags([...tags, novaTag])
-      
-      if (id) {
-        adicionarTag(id, novaTag)
-      }
-      
       setTagInput('')
       tagInputRef.current?.focus()
     }
@@ -77,51 +68,37 @@ export function EditorNotas({ id, secaoAtual, onSave }: EditorNotasProps) {
   // Função para remover uma tag
   const handleRemoverTag = (tag: string) => {
     setTags(tags.filter(t => t !== tag))
-    
-    if (id) {
-      removerTag(id, tag)
-    }
   }
   
   // Função para adicionar/atualizar uma imagem
   const handleAdicionarImagem = () => {
-    if (imagemUrl && id) {
-      adicionarImagem(id, imagemUrl)
-    }
+    // A imagem será salva junto com a nota
     setMostrarOpcaoImagem(false)
   }
   
   // Função para remover uma imagem
   const handleRemoverImagem = () => {
     setImagemUrl(undefined)
-    
-    if (id) {
-      removerImagem(id)
-    }
-    
     setMostrarOpcaoImagem(false)
   }
   
   // Função para salvar a nota
   const handleSalvar = () => {
     if (titulo.trim() && conteudo.trim()) {
+      const notaData = {
+        titulo,
+        conteudo,
+        tags,
+        imagem_url: imagemUrl,
+        secao: secaoAtual,
+      };
+
       if (id) {
         // Atualizar nota existente
-        atualizarNota(id, {
-          titulo,
-          conteudo,
-          tags,
-          imagemUrl
-        })
+        atualizarNota(id, notaData);
       } else {
         // Criar nova nota
-        adicionarNota(
-          titulo,
-          conteudo,
-          secaoAtual,
-          tags,
-          imagemUrl
-        )
+        adicionarNota(notaData);
       }
       
       if (onSave) {

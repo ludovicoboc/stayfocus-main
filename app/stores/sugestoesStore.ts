@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface SugestoesState {
   sugestoesFavoritas: string[]
@@ -8,7 +7,6 @@ interface SugestoesState {
 }
 
 export const useSugestoesStore = create<SugestoesState>()(
-  persist(
     (set) => ({
       sugestoesFavoritas: [],
       
@@ -25,10 +23,5 @@ export const useSugestoesStore = create<SugestoesState>()(
       removerFavorita: (sugestao) => set((state) => ({
         sugestoesFavoritas: state.sugestoesFavoritas.filter(s => s !== sugestao)
       })),
-    }),
-    {
-      name: 'sugestoes-storage',
-      storage: createJSONStorage(() => localStorage)
-    }
-  )
+    })
 )
